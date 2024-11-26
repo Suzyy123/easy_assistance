@@ -1,14 +1,41 @@
 plugins {
     id "com.android.application"
     id "kotlin-android"
-    // The Flutter Gradle Plugin must be applied after the Android and Kotlin Gradle plugins.
-    id "dev.flutter.flutter-gradle-plugin"
+    id "com.google.gms.google-services" // Firebase plugin
+    id "dev.flutter.flutter-gradle-plugin" // Flutter plugin
 }
 
 android {
     namespace = "com.example.easy_assistance_app"
-    compileSdk = flutter.compileSdkVersion
-    ndkVersion = flutter.ndkVersion
+    compileSdk = 34 // Updated to match the required SDK version
+
+    defaultConfig {
+        applicationId = "com.example.easy_assistance_app"
+        minSdk = 21 // Minimum SDK supported by Firebase
+        targetSdk = 34 // Updated to match the compile SDK version
+        versionCode = 1
+        versionName = "1.0"
+    }
+
+    buildTypes {
+        release {
+            // Enable shrinking and minification for release builds
+            minifyEnabled true
+            shrinkResources true
+
+            // Specify ProGuard rules to avoid breaking Firebase or other libraries
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+
+            // Use your signing configuration for release builds
+            signingConfig signingConfigs.debug
+        }
+
+        debug {
+            // Disable shrinking and minification for debug builds
+            minifyEnabled false
+            shrinkResources false
+        }
+    }
 
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_1_8
@@ -16,29 +43,23 @@ android {
     }
 
     kotlinOptions {
-        jvmTarget = JavaVersion.VERSION_1_8
-    }
-
-    defaultConfig {
-        // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
-        applicationId = "com.example.easy_assistance_app"
-        // You can update the following values to match your application needs.
-        // For more information, see: https://flutter.dev/to/review-gradle-config.
-        minSdk = flutter.minSdkVersion
-        targetSdk = flutter.targetSdkVersion
-        versionCode = flutter.versionCode
-        versionName = flutter.versionName
-    }
-
-    buildTypes {
-        release {
-            // TODO: Add your own signing config for the release build.
-            // Signing with the debug keys for now, so `flutter run --release` works.
-            signingConfig = signingConfigs.debug
-        }
+        jvmTarget = "1.8"
     }
 }
 
 flutter {
     source = "../.."
+}
+
+dependencies {
+    // Import the Firebase BoM (Bill of Materials)
+    implementation platform('com.google.firebase:firebase-bom:32.1.0')
+
+    // Add the Firebase dependencies you are using
+    implementation 'com.google.firebase:firebase-auth'
+    implementation 'com.google.firebase:firebase-database'
+    implementation 'com.google.firebase:firebase-storage'
+
+    // Play Services Auth (required for Google Sign-In)
+    implementation 'com.google.android.gms:play-services-auth:20.7.0'
 }
