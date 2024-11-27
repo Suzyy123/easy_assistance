@@ -3,66 +3,90 @@ import 'package:flutter/material.dart';
 import '../Components/buttons.dart';
 import '../Components/textFields.dart';
 
-class Loginpage extends StatefulWidget {
+class Registerpage extends StatefulWidget {
   final void Function()? onTap;
 
-  Loginpage({super.key, required this.onTap});
+  Registerpage({super.key, required this.onTap});
 
   @override
-  _LoginpageState createState() => _LoginpageState();
+  _RegisterpageState createState() => _RegisterpageState();
 }
 
-class _LoginpageState extends State<Loginpage> {
-  // Email and password controllers
+class _RegisterpageState extends State<Registerpage> {
+  final TextEditingController usernameController = TextEditingController();
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
+  final TextEditingController confirmpassController = TextEditingController();
 
   @override
   void dispose() {
     // Dispose of controllers to avoid memory leaks
+    usernameController.dispose();
     emailController.dispose();
     passwordController.dispose();
+    confirmpassController.dispose();
     super.dispose();
   }
 
-  Future<void> login(BuildContext context) async {
+  Future<void> register(BuildContext context) async {
     // Get auth service instance
-    final authservice = AuthServices();
+    final auth = AuthServices();
 
-    // Try login
-    try {
-      await authservice.signInWithEmailPassword(
-        emailController.text.trim(),
-        passwordController.text.trim(),
-      );
+    // Check if passwords match
+    if (passwordController.text.trim() == confirmpassController.text.trim()) {
+      try {
+        // Register user
+        await auth.signUpWithEmailPassword(
+          emailController.text.trim(),
+          passwordController.text.trim(),
+        );
 
-      // If successful, display success message
+        // Display success message or navigate
+        showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: const Text("Registration Successful!"),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop(); // Close the dialog
+                  Navigator.of(context).pop(); // Go back to the previous screen
+                },
+                child: const Text("OK"),
+              )
+            ],
+          ),
+        );
+      } catch (e) {
+        // Handle registration errors
+        showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: const Text("Registration Failed"),
+            content: Text(e.toString()),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop(); // Close the dialog
+                },
+                child: const Text("OK"),
+              ),
+            ],
+          ),
+        );
+      }
+    } else {
+      // Show error dialog when passwords do not match
       showDialog(
         context: context,
         builder: (context) => AlertDialog(
-          title: const Text("Login Successful!"),
+          title: const Text("Password Mismatch"),
+          content: const Text(
+              "The passwords you entered do not match. Please try again."),
           actions: [
             TextButton(
               onPressed: () {
-                Navigator.of(context).pop(); // Close dialog
-                Navigator.of(context).pushReplacementNamed('/home'); // Navigate to Home
-              },
-              child: const Text("OK"),
-            ),
-          ],
-        ),
-      );
-    } catch (e) {
-      // If login fails, display error message
-      showDialog(
-        context: context,
-        builder: (context) => AlertDialog(
-          title: const Text("Login Failed"),
-          content: Text(e.toString()),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop(); // Close dialog
+                Navigator.of(context).pop(); // Close the dialog
               },
               child: const Text("OK"),
             ),
@@ -78,7 +102,7 @@ class _LoginpageState extends State<Loginpage> {
       backgroundColor: Theme.of(context).colorScheme.background,
       appBar: AppBar(
         title: const Text(
-          "Login",
+          "Register Here",
           style: TextStyle(
             fontSize: 26,
             fontWeight: FontWeight.bold,
@@ -97,27 +121,40 @@ class _LoginpageState extends State<Loginpage> {
             children: [
               Center(
                 child: Image.asset(
-                  "lib/images/google.jpeg",
-                  height: 100,
-                  width: 100,
+                  "lib/images/registerPage.png",
+                  height: 300,
+                  width: 300,
                 ),
               ),
               const SizedBox(height: 20),
-              // Email Input
+              // Username
+              MyTextfield(
+                hintText: "Username",
+                obscureText: false,
+                controller: usernameController,
+              ),
+              const SizedBox(height: 10),
+              // Email
               MyTextfield(
                 hintText: "Email",
                 obscureText: false,
                 controller: emailController,
               ),
               const SizedBox(height: 10),
-              // Password Input
+              // Password
               MyTextfield(
                 hintText: "Password",
                 obscureText: true,
                 controller: passwordController,
               ),
               const SizedBox(height: 10),
-              // Forgot Password
+              // Confirm Password
+              MyTextfield(
+                hintText: "Confirm Password",
+                obscureText: true,
+                controller: confirmpassController,
+              ),
+              const SizedBox(height: 20),
               GestureDetector(
                 onTap: () {
                   // Implement forgot password functionality here
@@ -128,18 +165,18 @@ class _LoginpageState extends State<Loginpage> {
                 ),
               ),
               const SizedBox(height: 20),
-              // Sign In Button
+              // Register Button
               Buttons(
-                text: "Sign in",
-                onTap: () async => await login(context), // Ensure async call
+                text: "Register",
+                onTap: () async => await register(context), // Ensure async call
               ),
               const SizedBox(height: 20),
-              // Don't have an account? Register Now
+              // Already have an account? Login Now
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Text(
-                    "Don't have an account? ",
+                    "Already have an account? ",
                     style: TextStyle(
                       color: Theme.of(context).colorScheme.primary,
                     ),
@@ -147,7 +184,7 @@ class _LoginpageState extends State<Loginpage> {
                   GestureDetector(
                     onTap: widget.onTap,
                     child: Text(
-                      "Register Now",
+                      "Login Now",
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
                         color: Theme.of(context).colorScheme.primary,

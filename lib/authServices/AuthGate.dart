@@ -1,17 +1,17 @@
-import 'package:easy_assistance_app/auth/login_or_register.dart';
-import 'package:flutter/material.dart';
+import 'package:easy_assistance_app/RegisterPages/homePage.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import '../MainPages/HomePage.dart';
-class Authpage extends StatelessWidget {
-  const Authpage({super.key});
+import 'package:flutter/material.dart';
+
+import '../auth/login_or_register.dart';
+class Authgate extends StatelessWidget {
+  const Authgate({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: StreamBuilder(
-          stream: FirebaseAuth.instance.authStateChanges(),
+      body: StreamBuilder(stream: FirebaseAuth.instance.authStateChanges(),
           builder: (context, snapshot){
-            //user is logged in
+        //user logged in
             if(snapshot.hasData){
               return const Homepage();
             }
@@ -19,8 +19,8 @@ class Authpage extends StatelessWidget {
             else{
               return const LoginOrRegister();
             }
-          }
-          ),
+          },
+      ),
     );
   }
 }

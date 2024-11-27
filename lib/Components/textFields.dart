@@ -15,16 +15,26 @@ class MyTextfield extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      width: 380, // Define width here
+      width: 380,
       child: TextField(
         controller: controller,
         decoration: InputDecoration(
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(10),
+          enabledBorder: OutlineInputBorder(
+            borderSide: BorderSide(
+              color: Theme.of(context).colorScheme.tertiary,
+            ),
           ),
+          focusedBorder: OutlineInputBorder(
+            borderSide: BorderSide(
+              color: Theme.of(context).colorScheme.primary,
+            ),
+          ),
+          fillColor: Theme.of(context).colorScheme.secondary,
+          filled: true,
           hintText: hintText,
+          hintStyle: TextStyle(color: Theme.of(context).colorScheme.primary)
         ),
-        obscureText: obscureText, // Dynamically use the passed parameter
+        obscureText: obscureText,
       ),
     );
   }
