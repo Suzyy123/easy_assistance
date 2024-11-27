@@ -1,5 +1,7 @@
+import 'package:easy_assistance_app/auth/AuthService.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'auth/AuthPage.dart';
 import 'auth/login_or_register.dart';
 import 'firebase_options.dart';
@@ -19,7 +21,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'Easy Assitance',
-      home: LoginOrRegister(),
+      home: Authpage(),
 
     );
   }
