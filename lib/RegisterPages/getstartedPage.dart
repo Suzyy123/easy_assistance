@@ -16,24 +16,34 @@ class _GetStartedPageState extends State<GetStartedPage> {
     {
       "title": "Welcome to Easy Assistance",
       "description": "Your perfect productivity partner.",
-
+      "image": "assets/images/1stImage.jpg",
     },
     {
       "title": "Organize Your Tasks",
       "description": "Manage tasks efficiently and prioritize what matters.",
-
+      "image": "assets/images/2ndImage.jpg",
     },
     {
       "title": "Collaborate Seamlessly",
       "description": "Chat, share, and work together with ease.",
-
+      "image": "assets/images/3rdImage.jpg",
     },
     {
       "title": "Track Your Progress",
       "description": "Monitor your goals and achievements.",
-
+      "image": "assets/images/4thImage.jpg",
     },
   ];
+
+  final TextStyle _titleStyle = const TextStyle(
+    fontSize: 24,
+    fontWeight: FontWeight.bold,
+  );
+
+  final TextStyle _descriptionStyle = const TextStyle(
+    fontSize: 16,
+    color: Colors.black87,
+  );
 
   @override
   Widget build(BuildContext context) {
@@ -57,28 +67,49 @@ class _GetStartedPageState extends State<GetStartedPage> {
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     Image.asset(
-                      page['image']!,
+                      page['image'] ?? 'assets/images/placeholder.png',
                       height: 300,
+                      fit: BoxFit.contain,
                     ),
                     const SizedBox(height: 30),
                     Text(
                       page['title']!,
-                      style: const TextStyle(
-                        fontSize: 24,
-                        fontWeight: FontWeight.bold,
-                      ),
+                      style: _titleStyle,
                       textAlign: TextAlign.center,
                     ),
                     const SizedBox(height: 15),
                     Text(
                       page['description']!,
-                      style: const TextStyle(fontSize: 16),
+                      style: _descriptionStyle,
                       textAlign: TextAlign.center,
                     ),
                   ],
                 ),
               );
             },
+          ),
+          Positioned(
+            bottom: 100,
+            left: 0,
+            right: 0,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: List.generate(
+                _pages.length,
+                    (index) => AnimatedContainer(
+                  duration: const Duration(milliseconds: 300),
+                  margin: const EdgeInsets.symmetric(horizontal: 5),
+                  width: _currentPage == index ? 12 : 8,
+                  height: _currentPage == index ? 12 : 8,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: _currentPage == index
+                        ? Colors.blue
+                        : Colors.grey.shade400,
+                  ),
+                ),
+              ),
+            ),
           ),
           Positioned(
             bottom: 50,
@@ -96,6 +127,16 @@ class _GetStartedPageState extends State<GetStartedPage> {
                       "Skip",
                       style: TextStyle(fontSize: 16, color: Colors.blue),
                     ),
+                  ),
+                if (_currentPage < _pages.length - 1)
+                  ElevatedButton(
+                    onPressed: () {
+                      _pageController.nextPage(
+                        duration: const Duration(milliseconds: 500),
+                        curve: Curves.easeInOut,
+                      );
+                    },
+                    child: const Text("Next"),
                   ),
                 if (_currentPage == _pages.length - 1)
                   ElevatedButton(
