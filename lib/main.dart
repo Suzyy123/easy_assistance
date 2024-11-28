@@ -1,8 +1,14 @@
+import 'package:easy_assistance_app/authServices/AuthGate.dart';
+import 'package:easy_assistance_app/firebase_options.dart';
+import 'package:easy_assistance_app/themes/lightMode.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'auth/AuthPage.dart';
+import 'ChatPage/ChatPageUI.dart';
+import 'ProfilePage/ProfileMain.dart';
+import 'RegisterPages/homePage.dart';
+import 'RegisterPages/loginPage.dart';
+import 'RegisterPages/registerPage.dart';
 import 'auth/login_or_register.dart';
-import 'firebase_options.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -17,10 +23,11 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      title: 'Flutter Demo',
       debugShowCheckedModeBanner: false,
-      title: 'Easy Assitance',
-      home: LoginOrRegister(),
-
+      home: Authgate(),
+      theme: lightMode,
     );
   }
 }
+

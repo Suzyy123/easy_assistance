@@ -1,7 +1,9 @@
+import 'package:easy_assistance_app/ProfilePage/ProfileMain.dart';
 import 'package:easy_assistance_app/RegisterPages/homePage.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
+import '../ChatPage/ChatPageUI.dart';
 import '../auth/login_or_register.dart';
 class Authgate extends StatelessWidget {
   const Authgate({super.key});
@@ -13,7 +15,7 @@ class Authgate extends StatelessWidget {
           builder: (context, snapshot){
         //user logged in
             if(snapshot.hasData){
-              return const Homepage();
+              return const ChatPage();
             }
             //user is not logged in
             else{

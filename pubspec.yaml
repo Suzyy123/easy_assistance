@@ -15,7 +15,9 @@ dependencies:
   firebase_core: ^2.32.0
   firebase_auth: ^4.16.0
   cloud_firestore: ^4.17.5
+  shared_preferences: ^2.0.18
   provider:
+  http: ^1.2.2
 
 dev_dependencies:
   flutter_test:
@@ -29,3 +31,11 @@ flutter:
     - lib/images/logo.png
     - lib/images/registerPage.png
     - lib/images/google.jpeg
+    - lib/images/avatar1.png
+    - lib/images/avatar2.png
+    - lib/images/avatar3.png
+    - lib/images/avatar4.png
+    - lib/images/avatar5.png
+    - lib/images/avatar6.png
+    - lib/images/avatar7.png
+    - lib/images/avatar8.png
