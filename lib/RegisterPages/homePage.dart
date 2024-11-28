@@ -1,13 +1,15 @@
 import 'package:flutter/material.dart';
 
 void main() {
-  runApp(MyApp());
+  runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return const MaterialApp(
       debugShowCheckedModeBanner: false,
       home: homePage(),
     );
@@ -15,6 +17,8 @@ class MyApp extends StatelessWidget {
 }
 
 class homePage extends StatefulWidget {
+  const homePage({super.key});
+
   @override
   _HomePageState createState() => _HomePageState();
 }
@@ -34,14 +38,14 @@ class _HomePageState extends State<homePage> {
         context: context,
         builder: (context) {
           return AlertDialog(
-            title: Text("Not Found"),
-            content: Text("No results match your search. Please try another term."),
+            title: const Text("Not Found"),
+            content: const Text("No results match your search. Please try another term."),
             actions: [
               TextButton(
                 onPressed: () {
                   Navigator.pop(context); // Close the dialog
                 },
-                child: Text("OK"),
+                child: const Text("OK"),
               ),
             ],
           );
@@ -61,7 +65,7 @@ class _HomePageState extends State<homePage> {
       appBar: AppBar(
         elevation: 0,
         backgroundColor: Colors.white,
-        title: Row(
+        title: const Row(
           children: [
             CircleAvatar(
               backgroundImage: AssetImage('assets/profile_image.jpg'), // Profile image placeholder
@@ -75,12 +79,12 @@ class _HomePageState extends State<homePage> {
         ),
         actions: [
           IconButton(
-            icon: Icon(Icons.notifications, color: Colors.black),
+            icon: const Icon(Icons.notifications, color: Colors.black),
             onPressed: () {
               // Navigate to Notification Page
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => NotificationPage()),
+                MaterialPageRoute(builder: (context) => const NotificationPage()),
               );
             },
           ),
@@ -104,9 +108,9 @@ class _HomePageState extends State<homePage> {
                           onSubmitted: (value) => _handleSearch(),
                           decoration: InputDecoration(
                             hintText: "Search",
-                            prefixIcon: Icon(Icons.search),
+                            prefixIcon: const Icon(Icons.search),
                             suffixIcon: IconButton(
-                              icon: Icon(Icons.close),
+                              icon: const Icon(Icons.close),
                               onPressed: () {
                                 _searchController.clear();
                               },
@@ -122,14 +126,14 @@ class _HomePageState extends State<homePage> {
                       ),
 
                       // Important Projects Section
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                      const Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 16.0),
                         child: Text(
                           "Important Project",
                           style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                         ),
                       ),
-                      SizedBox(height: 20),
+                      const SizedBox(height: 20),
                       SizedBox(
                         height: 140,
                         child: ListView(
@@ -141,17 +145,17 @@ class _HomePageState extends State<homePage> {
                           ],
                         ),
                       ),
-                      SizedBox(height: 20),
+                      const SizedBox(height: 20),
 
                       // My Tasks Section
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                      const Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 16.0),
                         child: Text(
                           "My Tasks",
                           style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                         ),
                       ),
-                      SizedBox(height: 10),
+                      const SizedBox(height: 10),
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 16.0),
                         child: Column(
@@ -163,33 +167,33 @@ class _HomePageState extends State<homePage> {
                         ),
                       ),
 
-                      SizedBox(height: 20),
+                      const SizedBox(height: 20),
 
                       // Reminders Section
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                      const Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 16.0),
                         child: Text(
                           "Reminders",
                           style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                         ),
                       ),
-                      SizedBox(height: 10),
+                      const SizedBox(height: 10),
                       ListTile(
-                        leading: Icon(Icons.calendar_today),
-                        title: Text("November 22"),
+                        leading: const Icon(Icons.calendar_today),
+                        title: const Text("November 22"),
                         trailing: Container(
-                          padding: EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
                           decoration: BoxDecoration(
                             color: Colors.blue,
                             borderRadius: BorderRadius.circular(12),
                           ),
-                          child: Text(
+                          child: const Text(
                             "Very Important",
                             style: TextStyle(color: Colors.white),
                           ),
                         ),
                       ),
-                      Spacer(), // Ensures that the content adjusts to available space
+                      const Spacer(), // Ensures that the content adjusts to available space
                     ],
                   ),
                 ),
@@ -199,7 +203,7 @@ class _HomePageState extends State<homePage> {
         ),
       ),
       bottomNavigationBar: BottomNavigationBar(
-        items: [
+        items: const [
           BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
           BottomNavigationBarItem(icon: Icon(Icons.task), label: 'Tasks'),
           BottomNavigationBarItem(icon: Icon(Icons.chat), label: 'Messages'),
@@ -216,8 +220,8 @@ class _HomePageState extends State<homePage> {
   Widget projectCard(String title, String priority, String startDate, String endDate) {
     return Container(
       width: 200,
-      margin: EdgeInsets.only(right: 10),
-      padding: EdgeInsets.all(12),
+      margin: const EdgeInsets.only(right: 10),
+      padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
         color: Colors.blue,
         borderRadius: BorderRadius.circular(12),
@@ -227,21 +231,21 @@ class _HomePageState extends State<homePage> {
         children: [
           Text(
             title,
-            style: TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.bold),
+            style: const TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.bold),
           ),
-          SizedBox(height: 10),
+          const SizedBox(height: 10),
           Text(
             priority,
-            style: TextStyle(color: Colors.white70),
+            style: const TextStyle(color: Colors.white70),
           ),
-          Spacer(),
+          const Spacer(),
           Text(
             "Start Date: $startDate",
-            style: TextStyle(color: Colors.white70, fontSize: 12),
+            style: const TextStyle(color: Colors.white70, fontSize: 12),
           ),
           Text(
             "End Date: $endDate",
-            style: TextStyle(color: Colors.white70, fontSize: 12),
+            style: const TextStyle(color: Colors.white70, fontSize: 12),
           ),
         ],
       ),
@@ -251,8 +255,8 @@ class _HomePageState extends State<homePage> {
   // Function for task cards
   Widget taskCard(String title, String description, Color color) {
     return Container(
-      margin: EdgeInsets.only(bottom: 10),
-      padding: EdgeInsets.all(12),
+      margin: const EdgeInsets.only(bottom: 10),
+      padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(12),
@@ -260,7 +264,7 @@ class _HomePageState extends State<homePage> {
           BoxShadow(
             color: Colors.grey[300]!,
             blurRadius: 5,
-            offset: Offset(0, 2),
+            offset: const Offset(0, 2),
           ),
         ],
       ),
@@ -271,13 +275,13 @@ class _HomePageState extends State<homePage> {
             height: 40,
             color: color,
           ),
-          SizedBox(width: 10),
+          const SizedBox(width: 10),
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
                 title,
-                style: TextStyle(fontWeight: FontWeight.bold),
+                style: const TextStyle(fontWeight: FontWeight.bold),
               ),
               Text(description),
             ],
@@ -290,6 +294,8 @@ class _HomePageState extends State<homePage> {
 
 // Notification Page
 class NotificationPage extends StatelessWidget {
+  const NotificationPage({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -297,12 +303,12 @@ class NotificationPage extends StatelessWidget {
         backgroundColor: Colors.white,
         elevation: 0,
         leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: Colors.black),
+          icon: const Icon(Icons.arrow_back, color: Colors.black),
           onPressed: () {
             Navigator.pop(context); // Go back to HomePage
           },
         ),
-        title: Text(
+        title: const Text(
           "Notifications",
           style: TextStyle(color: Colors.black),
         ),
@@ -326,8 +332,8 @@ class NotificationPage extends StatelessWidget {
   // Function for notification cards
   Widget notificationCard(String title, String description, Color color) {
     return Container(
-      margin: EdgeInsets.only(bottom: 16),
-      padding: EdgeInsets.all(12),
+      margin: const EdgeInsets.only(bottom: 16),
+      padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(12),
@@ -335,7 +341,7 @@ class NotificationPage extends StatelessWidget {
           BoxShadow(
             color: Colors.grey[300]!,
             blurRadius: 5,
-            offset: Offset(0, 2),
+            offset: const Offset(0, 2),
           ),
         ],
       ),
@@ -347,16 +353,16 @@ class NotificationPage extends StatelessWidget {
             backgroundColor: color.withOpacity(0.2),
             child: Icon(Icons.notifications, color: color),
           ),
-          SizedBox(width: 10),
+          const SizedBox(width: 10),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
                   title,
-                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                  style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
                 ),
-                SizedBox(height: 4),
+                const SizedBox(height: 4),
                 Text(
                   description,
                   style: TextStyle(color: Colors.grey[600], fontSize: 14),

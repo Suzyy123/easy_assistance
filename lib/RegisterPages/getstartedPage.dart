@@ -60,19 +60,19 @@ class _GetStartedPageState extends State<GetStartedPage> {
                       page['image']!,
                       height: 300,
                     ),
-                    SizedBox(height: 30),
+                    const SizedBox(height: 30),
                     Text(
                       page['title']!,
-                      style: TextStyle(
+                      style: const TextStyle(
                         fontSize: 24,
                         fontWeight: FontWeight.bold,
                       ),
                       textAlign: TextAlign.center,
                     ),
-                    SizedBox(height: 15),
+                    const SizedBox(height: 15),
                     Text(
                       page['description']!,
-                      style: TextStyle(fontSize: 16),
+                      style: const TextStyle(fontSize: 16),
                       textAlign: TextAlign.center,
                     ),
                   ],
@@ -92,7 +92,7 @@ class _GetStartedPageState extends State<GetStartedPage> {
                     onPressed: () {
                       _pageController.jumpToPage(_pages.length - 1);
                     },
-                    child: Text(
+                    child: const Text(
                       "Skip",
                       style: TextStyle(fontSize: 16, color: Colors.blue),
                     ),
@@ -107,7 +107,7 @@ class _GetStartedPageState extends State<GetStartedPage> {
                         ),
                       );
                     },
-                    child: Text("Get Started"),
+                    child: const Text("Get Started"),
                   ),
               ],
             ),

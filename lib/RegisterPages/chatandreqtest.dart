@@ -2,9 +2,11 @@ import 'package:flutter/material.dart';
 
 
 class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return const MaterialApp(
       debugShowCheckedModeBanner: false,
       home: ChatScreen(),
     );
@@ -12,6 +14,8 @@ class MyApp extends StatelessWidget {
 }
 
 class ChatScreen extends StatefulWidget {
+  const ChatScreen({super.key});
+
   @override
   _ChatScreenState createState() => _ChatScreenState();
 }
@@ -25,21 +29,21 @@ class _ChatScreenState extends State<ChatScreen> {
       appBar: AppBar(
         elevation: 0,
         backgroundColor: Colors.white,
-        leading: CircleAvatar(
+        leading: const CircleAvatar(
           backgroundImage: AssetImage('assets/profile_image.jpg'), // Placeholder
         ),
         title: Text(
           _selectedIndex == 0 ? "Messages Page" : "Request Page",
-          style: TextStyle(color: Colors.black),
+          style: const TextStyle(color: Colors.black),
         ),
         actions: [
           IconButton(
-            icon: Icon(Icons.more_vert, color: Colors.black),
+            icon: const Icon(Icons.more_vert, color: Colors.black),
             onPressed: () {}, // Menu functionality
           ),
         ],
       ),
-      body: _selectedIndex == 0 ? MessagesPage() : RequestPage(),
+      body: _selectedIndex == 0 ? const MessagesPage() : const RequestPage(),
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _selectedIndex,
         onTap: (index) {
@@ -47,7 +51,7 @@ class _ChatScreenState extends State<ChatScreen> {
             _selectedIndex = index;
           });
         },
-        items: [
+        items: const [
           BottomNavigationBarItem(
             icon: Icon(Icons.chat_bubble_outline),
             label: 'Messages',
@@ -63,6 +67,8 @@ class _ChatScreenState extends State<ChatScreen> {
 }
 
 class MessagesPage extends StatelessWidget {
+  const MessagesPage({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -72,7 +78,7 @@ class MessagesPage extends StatelessWidget {
           child: TextField(
             decoration: InputDecoration(
               hintText: "Search",
-              prefixIcon: Icon(Icons.search),
+              prefixIcon: const Icon(Icons.search),
               filled: true,
               fillColor: Colors.grey[200],
               border: OutlineInputBorder(
@@ -87,12 +93,12 @@ class MessagesPage extends StatelessWidget {
             itemCount: 5, // Placeholder for message count
             itemBuilder: (context, index) {
               return ListTile(
-                leading: CircleAvatar(
+                leading: const CircleAvatar(
                   backgroundImage: AssetImage('assets/avatar_placeholder.jpg'),
                 ),
                 title: Text("User $index"),
-                subtitle: Text("How are you?"),
-                trailing: Text("4h ago"),
+                subtitle: const Text("How are you?"),
+                trailing: const Text("4h ago"),
                 onTap: () {
                   // Navigate to chat
                 },
@@ -106,22 +112,24 @@ class MessagesPage extends StatelessWidget {
 }
 
 class RequestPage extends StatelessWidget {
+  const RequestPage({super.key});
+
   @override
   Widget build(BuildContext context) {
     return ListView(
       padding: const EdgeInsets.all(16.0),
       children: [
         ListTile(
-          leading: CircleAvatar(
+          leading: const CircleAvatar(
             backgroundImage: AssetImage('assets/avatar_placeholder.jpg'),
           ),
-          title: Text("Hanagaki Takemichi"),
-          subtitle: Text("Python Developer"),
+          title: const Text("Hanagaki Takemichi"),
+          subtitle: const Text("Python Developer"),
           trailing: ElevatedButton(
             onPressed: () {
               // Accept functionality
             },
-            child: Text("Accept"),
+            child: const Text("Accept"),
           ),
         ),
       ],
