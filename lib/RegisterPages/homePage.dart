@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import 'friendRequestPage.dart';
+
 void main() {
   runApp(const MyApp());
 }
@@ -25,34 +27,50 @@ class homePage extends StatefulWidget {
 
 class _HomePageState extends State<homePage> {
   final TextEditingController _searchController = TextEditingController();
-  final List<String> mockData = ['Figma Design', 'Prototype', 'UI Tasks', 'Development']; // Mock search data
+  final List<String> mockData = ['Figma Design', 'Prototype', 'UI Tasks', 'Development'];
+  final List<Map<String, dynamic>> reminders = [
+    {
+      "title": "Team Meeting",
+      "date": "Nov 28, 10:00 AM",
+      "priority": "Urgent",
+      "color": Colors.red,
+    },
+    {
+      "title": "Client Presentation",
+      "date": "Nov 30, 2:00 PM",
+      "priority": "Important",
+      "color": Colors.orange,
+    },
+    {
+      "title": "Submit Report",
+      "date": "Dec 8, 9:00 AM",
+      "priority": "Upcoming",
+      "color": Colors.green,
+    },
+  ];
 
   void _handleSearch() {
     String searchQuery = _searchController.text.trim();
 
-    // Check if the query exists in mock data
-    bool isFound = mockData.any((item) => item.toLowerCase().contains(searchQuery.toLowerCase()));
+    bool isFound = mockData.any(
+          (item) => item.toLowerCase().contains(searchQuery.toLowerCase()),
+    );
 
     if (!isFound) {
       showDialog(
         context: context,
-        builder: (context) {
-          return AlertDialog(
-            title: const Text("Not Found"),
-            content: const Text("No results match your search. Please try another term."),
-            actions: [
-              TextButton(
-                onPressed: () {
-                  Navigator.pop(context); // Close the dialog
-                },
-                child: const Text("OK"),
-              ),
-            ],
-          );
-        },
+        builder: (context) => AlertDialog(
+          title: const Text("Not Found"),
+          content: const Text("No results match your search. Please try another term."),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text("OK"),
+            ),
+          ],
+        ),
       );
     } else {
-      // You can add additional functionality if the item is found (e.g., navigate or filter)
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Found results for "$searchQuery"!')),
       );
@@ -68,7 +86,7 @@ class _HomePageState extends State<homePage> {
         title: const Row(
           children: [
             CircleAvatar(
-              backgroundImage: AssetImage('assets/profile_image.jpg'), // Profile image placeholder
+              backgroundImage: AssetImage('assets/Images/5thProfile.jpg'),
             ),
             SizedBox(width: 10),
             Text(
@@ -79,9 +97,17 @@ class _HomePageState extends State<homePage> {
         ),
         actions: [
           IconButton(
+            icon: const Icon(Icons.group_add, color: Colors.black),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const FriendRequestPage()),
+              );
+            },
+          ),
+          IconButton(
             icon: const Icon(Icons.notifications, color: Colors.black),
             onPressed: () {
-              // Navigate to Notification Page
               Navigator.push(
                 context,
                 MaterialPageRoute(builder: (context) => const NotificationPage()),
@@ -100,20 +126,18 @@ class _HomePageState extends State<homePage> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // Updated Search Bar
+                      // Search Bar
                       Padding(
                         padding: const EdgeInsets.all(16.0),
                         child: TextField(
                           controller: _searchController,
-                          onSubmitted: (value) => _handleSearch(),
+                          onSubmitted: (_) => _handleSearch(),
                           decoration: InputDecoration(
                             hintText: "Search",
                             prefixIcon: const Icon(Icons.search),
                             suffixIcon: IconButton(
                               icon: const Icon(Icons.close),
-                              onPressed: () {
-                                _searchController.clear();
-                              },
+                              onPressed: _searchController.clear,
                             ),
                             filled: true,
                             fillColor: Colors.grey[200],
@@ -125,11 +149,11 @@ class _HomePageState extends State<homePage> {
                         ),
                       ),
 
-                      // Important Projects Section
+                      // Important Projects
                       const Padding(
                         padding: EdgeInsets.symmetric(horizontal: 16.0),
                         child: Text(
-                          "Important Project",
+                          "Important Projects",
                           style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                         ),
                       ),
@@ -140,14 +164,14 @@ class _HomePageState extends State<homePage> {
                           scrollDirection: Axis.horizontal,
                           children: [
                             projectCard("Figma Design for prototype", "Very IMP", "Nov 11", "Dec 8"),
-                            projectCard("Figma Design for prototype", "Very IMP", "Nov 11", "Dec 8"),
-                            projectCard("Figma Design for prototype", "Very IMP", "Nov 11", "Dec 8"),
+                            projectCard("Prototype Development", "High", "Nov 15", "Dec 12"),
+                            projectCard("UI Redesign Tasks", "Critical", "Nov 20", "Dec 18"),
                           ],
                         ),
                       ),
                       const SizedBox(height: 20),
 
-                      // My Tasks Section
+                      // My Tasks
                       const Padding(
                         padding: EdgeInsets.symmetric(horizontal: 16.0),
                         child: Text(
@@ -166,10 +190,9 @@ class _HomePageState extends State<homePage> {
                           ],
                         ),
                       ),
-
                       const SizedBox(height: 20),
 
-                      // Reminders Section
+                      // Reminders
                       const Padding(
                         padding: EdgeInsets.symmetric(horizontal: 16.0),
                         child: Text(
@@ -178,22 +201,23 @@ class _HomePageState extends State<homePage> {
                         ),
                       ),
                       const SizedBox(height: 10),
-                      ListTile(
-                        leading: const Icon(Icons.calendar_today),
-                        title: const Text("November 22"),
+                      ...reminders.map((reminder) => ListTile(
+                        leading: Icon(Icons.calendar_today, color: reminder['color']),
+                        title: Text(reminder['title'] ?? "No Title"),
+                        subtitle: Text(reminder['date'] ?? "No Date Provided"),
                         trailing: Container(
                           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
                           decoration: BoxDecoration(
-                            color: Colors.blue,
+                            color: reminder['color'],
                             borderRadius: BorderRadius.circular(12),
                           ),
-                          child: const Text(
-                            "Very Important",
-                            style: TextStyle(color: Colors.white),
+                          child: Text(
+                            reminder['priority'] ?? "No Priority",
+                            style: const TextStyle(color: Colors.white),
                           ),
                         ),
-                      ),
-                      const Spacer(), // Ensures that the content adjusts to available space
+                      )),
+                      const Spacer(),
                     ],
                   ),
                 ),
@@ -209,9 +233,7 @@ class _HomePageState extends State<homePage> {
           BottomNavigationBarItem(icon: Icon(Icons.chat), label: 'Messages'),
         ],
         currentIndex: 0,
-        onTap: (index) {
-          // Handle bottom navigation
-        },
+        onTap: (index) {},
       ),
     );
   }
@@ -304,9 +326,7 @@ class NotificationPage extends StatelessWidget {
         elevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.black),
-          onPressed: () {
-            Navigator.pop(context); // Go back to HomePage
-          },
+          onPressed: () => Navigator.pop(context),
         ),
         title: const Text(
           "Notifications",
@@ -375,4 +395,3 @@ class NotificationPage extends StatelessWidget {
     );
   }
 }
-
