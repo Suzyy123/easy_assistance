@@ -1,165 +1,113 @@
-import 'package:easy_assistance_app/authServices/AuthServices.dart';
 import 'package:flutter/material.dart';
-import '../Components/buttons.dart';
-import '../Components/textFields.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
-class Loginpage extends StatefulWidget {
-  final void Function()? onTap;
+import '../Components/TextField.dart';
+class Loginpage extends StatelessWidget {
+   final void Function()? onTap;
+   Loginpage({super.key, required this.onTap, });
 
-  Loginpage({super.key, required this.onTap});
+   final TextEditingController emailController = TextEditingController();
+   final TextEditingController passwordController = TextEditingController();
+//display meesage for alert
+   void displayMessageToUser(String message, BuildContext context){
+     showDialog(context: context,
+         builder: (context) => AlertDialog(
+           title: Text(message),
+         ));
+   }
+   void login(BuildContext context) async {
+     // Show loading circle
+     showDialog(
+       context: context,
+       builder: (context) => const Center(
+         child: CircularProgressIndicator(),
+       ),
+     );
+     try {
+       // Attempt to log in
+       await FirebaseAuth.instance.signInWithEmailAndPassword(
+         email: emailController.text.trim(),
+         password: passwordController.text.trim(),
+       );
 
-  @override
-  _LoginpageState createState() => _LoginpageState();
-}
-
-class _LoginpageState extends State<Loginpage> {
-  // Email and password controllers
-  final TextEditingController emailController = TextEditingController();
-  final TextEditingController passwordController = TextEditingController();
-
-  @override
-  void dispose() {
-    // Dispose of controllers to avoid memory leaks
-    emailController.dispose();
-    passwordController.dispose();
-    super.dispose();
-  }
-
-  Future<void> login(BuildContext context) async {
-    // Get auth service instance
-    final authservice = AuthServices();
-
-    // Try login
-    try {
-      await authservice.signInWithEmailPassword(
-        emailController.text.trim(),
-        passwordController.text.trim(),
-      );
-
-      // If successful, display success message
-      showDialog(
-        context: context,
-        builder: (context) => AlertDialog(
-          title: const Text("Login Successful!"),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop(); // Close dialog
-                Navigator.of(context).pushReplacementNamed('/home'); // Navigate to Home
-              },
-              child: const Text("OK"),
-            ),
-          ],
-        ),
-      );
-    } catch (e) {
-      // If login fails, display error message
-      showDialog(
-        context: context,
-        builder: (context) => AlertDialog(
-          title: const Text("Login Failed"),
-          content: Text(e.toString()),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop(); // Close dialog
-              },
-              child: const Text("OK"),
-            ),
-          ],
-        ),
-      );
-    }
-  }
+       // Pop loading circle if login is successful
+       if (context.mounted) Navigator.pop(context);
+     } on FirebaseAuthException catch (e) {
+       // Pop loading circle and show error message
+       Navigator.pop(context);
+       displayMessageToUser(e.code, context); // Fixed missing semicolon
+     }
+   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Theme.of(context).colorScheme.background,
       appBar: AppBar(
-        title: const Text(
-          "Login",
-          style: TextStyle(
-            fontSize: 26,
-            fontWeight: FontWeight.bold,
-            fontStyle: FontStyle.normal,
-          ),
+        title: Text("                 Login ", style: TextStyle(
+          fontSize: 26, fontWeight: FontWeight.bold, fontStyle: FontStyle.normal
         ),
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () => Navigator.of(context).pop(),
         ),
+        leading: Icon(Icons.arrow_back,),
       ),
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            children: [
-              Center(
-                child: Image.asset(
-                  "lib/images/google.jpeg",
-                  height: 100,
-                  width: 100,
-                ),
+      body: Column(
+        children: [
+          GestureDetector(
+            onTap: onTap,
+            child: Padding(
+              padding: const EdgeInsets.only(left: 290),
+              child: Text("New User?",
+              style: TextStyle(
+                decoration: TextDecoration.underline
               ),
-              const SizedBox(height: 20),
-              // Email Input
-              MyTextfield(
-                hintText: "Email",
-                obscureText: false,
-                controller: emailController,
               ),
-              const SizedBox(height: 10),
-              // Password Input
-              MyTextfield(
-                hintText: "Password",
-                obscureText: true,
-                controller: passwordController,
-              ),
-              const SizedBox(height: 10),
-              // Forgot Password
-              GestureDetector(
-                onTap: () {
-                  // Implement forgot password functionality here
-                },
-                child: const Text(
-                  "Forgot password?",
-                  style: TextStyle(decoration: TextDecoration.underline),
-                ),
-              ),
-              const SizedBox(height: 20),
-              // Sign In Button
-              Buttons(
-                text: "Sign in",
-                onTap: () async => await login(context), // Ensure async call
-              ),
-              const SizedBox(height: 20),
-              // Don't have an account? Register Now
+            ),
+          ),
+          Container(
+
+            child:
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Text(
-                    "Don't have an account? ",
-                    style: TextStyle(
-                      color: Theme.of(context).colorScheme.primary,
-                    ),
-                  ),
-                  GestureDetector(
-                    onTap: widget.onTap,
-                    child: Text(
-                      "Register Now",
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        color: Theme.of(context).colorScheme.primary,
-                      ),
-                    ),
-                  ),
+                  Image.asset("lib/images/google.jpeg"),
                 ],
               ),
-            ],
+
+
+            ),
+         MyTextfield(hintText: "Email",
+             obscureText: false, controller: emailController),
+          SizedBox(height: 10,),
+         MyTextfield(hintText: "Password",
+             obscureText: true,
+             controller: passwordController),
+        SizedBox(height: 10),
+        GestureDetector(
+          onTap: (){},
+          child: Container(
+            child: Text("forgot password?", style: TextStyle(decoration: TextDecoration.underline),),
           ),
         ),
+          SizedBox(height: 20,),
+          Center(
+            child: GestureDetector(
+              onTap: () => login(context),//pass to login function
+              child: Container(
+                height: 60,
+                width: 260,
+               decoration: BoxDecoration(
+                 color: Color(0xFF013763),
+                 borderRadius: BorderRadius.circular(10)
+               ),
+              child: Center(child: Text("Sign in", style: TextStyle(color: Colors.white),),
+
+              ),
+              ),
+            ),
+
+          )
+        ],
       ),
     );
   }
 }
+
