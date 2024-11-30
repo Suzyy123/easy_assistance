@@ -2,16 +2,28 @@
 import 'package:easy_assistance_app/firebase_options.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+//import 'package:firebase_messaging/firebase_messaging.dart';
 
+import 'Todo_task/NotificationList.dart';
+import 'Todo_task/TaskListDropdown.dart';
+import 'Todo_task/TaskListPage.dart';
+import 'Todo_task/TodoTask.dart';
 import 'Todo_task/addpage.dart';
 import 'Todo_task/createPage.dart';
+import 'Todo_task/default.dart';
+import 'Todo_task/delete.dart';
+import 'Todo_task/dropdown.dart';
 import 'Todo_task/frontPage.dart';
 import 'Todo_task/personal.dart';
+import 'Todo_task/shopping.dart';
+import 'Todo_task/shoppingService.dart';
+import 'Todo_task/Lists_New.dart';
 
 
 void main() async{
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+  //FirebaseMessaging messaging = FirebaseMessaging.instance;
   runApp(const MyApp());
 }
 
@@ -43,7 +55,8 @@ class MyApp extends StatelessWidget {
         useMaterial3: true,
       ),
       debugShowCheckedModeBanner: false,
-      home: TodoApp(),
+      // home: TodoApp(),
+          home: ShoppingPage(),
     );
   }
 }

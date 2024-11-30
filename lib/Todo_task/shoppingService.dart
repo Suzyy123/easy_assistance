@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'firestore_service.dart';
 import 'task_completion_service.dart';  // Import the new service
 
-class TaskListPage extends StatelessWidget {
+class ShoppingListPage extends StatelessWidget {
   final FirestoreService _firestoreService = FirestoreService();
   final TaskCompletionService _taskCompletionService = TaskCompletionService();
 
@@ -10,28 +10,29 @@ class TaskListPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        toolbarHeight: 95,
-        // title: Text('Task List'),
+        toolbarHeight: 95, // Adjust the height if necessary
         title: const Text(
-          'All Tasks',
-          style: TextStyle(color: Colors.white,
-            fontSize: 27,
-            fontWeight: FontWeight.bold,
-          ), // Make the title text white
-
-        ),
-        backgroundColor: Colors.blue[800],
-        actions: [
-          IconButton(
-            icon: Icon(Icons.notifications, color: Colors.white, size: 30),
-            onPressed: () {
-              //showNotifications(context);
-            },
+          'Shopping List',
+          style: TextStyle(
+            color: Colors.black,       // White color for the title text
+            fontSize: 27,              // Font size set to 27
+            fontWeight: FontWeight.bold, // Bold font weight for the title
           ),
-        ],
+        ),
+        backgroundColor: Colors.white, // Set the app bar background color
+        // actions: [
+        //   IconButton(
+        //     icon: Icon(Icons.notifications, color: Colors.white, size: 30), // Notification icon
+        //     onPressed: () {
+        //       // Optionally handle notifications
+        //     },
+        //   ),
+        // ],
       ),
+      backgroundColor: Colors.white, // Background color of scaffold
+
       body: StreamBuilder<List<Map<String, dynamic>>>(
-        stream: _firestoreService.getTasks(),
+        stream: _firestoreService.getTasks(), // Fetch all tasks
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return Center(child: CircularProgressIndicator());
@@ -42,19 +43,33 @@ class TaskListPage extends StatelessWidget {
           }
 
           if (!snapshot.hasData || snapshot.data!.isEmpty) {
-            return Center(child: Text('No tasks found.'));
+            return Center(child: Text('No tasks found in Shopping list.'));
           }
 
-          final tasks = snapshot.data!;
+          // Filter tasks to only those with "Shopping" list
+          final shoppingTasks = snapshot.data!
+              .where((task) => task['list'] == 'Shopping') // Filter by 'Shopping' list
+              .toList();
 
+          if (shoppingTasks.isEmpty) {
+            return Center(child: Text('No tasks found in Shopping list.'));
+          }
+
+          // Display only shopping tasks
           return ListView.builder(
-            itemCount: tasks.length,
+            itemCount: shoppingTasks.length,
             itemBuilder: (context, index) {
-              final task = tasks[index];
+              final task = shoppingTasks[index];
               return Card(
                 margin: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
                 child: ListTile(
-                  title: Text(task['task'] ?? 'No Task'),
+                  title: Text(
+                    task['task'] ?? 'No Task',
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold, // Bold task title
+                      fontSize: 18, // Set task title font size
+                    ),
+                  ),
                   subtitle: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -77,6 +92,15 @@ class TaskListPage extends StatelessWidget {
                         icon: Icon(Icons.delete, color: Colors.black),
                         onPressed: () {
                           _taskCompletionService.deleteTask(task['id']);
+
+                          // Show the snackbar after deletion
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text('This task has been deleted'),
+                              backgroundColor: Colors.green, // Green for success
+                              duration: Duration(seconds: 2),
+                            ),
+                          );
                         },
                       ),
                     ],

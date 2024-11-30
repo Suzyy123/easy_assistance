@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
+import 'NotificationList.dart';
 import 'firestore_service.dart';
-import 'notification.dart';
-import 'package:easy_assistance_app/Todo_task/notification.dart'; // Adjust path if necessary
+//import 'notification.dart';
+//import 'package:easy_assistance_app/Todo_task/notification.dart'; // Adjust path if necessary
 
 
 
@@ -23,6 +24,8 @@ class _CreateState extends State<Create> {
 
   String _selectedList = 'Default';
   List<String> _lists = ['Default', 'Work', 'Personal', 'Urgent', 'Shopping'];
+
+
 
   @override
   void initState() {
@@ -293,7 +296,11 @@ class _CreateState extends State<Create> {
                       IconButton(
                         icon: Icon(Icons.notifications, color: Colors.blue, size: 30),
                         onPressed: () {
-                          showNotifications(context); // Call the function from notifications.dart.
+                          // Navigate to the NotificationPage
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (context) => NotificationPage()),
+                          );
                         },
                       ),
           

@@ -1,16 +1,16 @@
-
-import 'package:easy_assistance_app/Todo_task/shopping.dart';
+import 'package:easy_assistance_app/Todo_task/default_list.dart';
+import 'package:easy_assistance_app/Todo_task/shoppingService.dart';
 import 'package:flutter/material.dart';
-
 import 'addpage.dart';
+import 'frontPage.dart';
 
-class TodoApp extends StatelessWidget {
+class ShoppingPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       theme: ThemeData(
         primaryColor: Colors.blue[900],
-        scaffoldBackgroundColor: Colors.grey[100],
+        scaffoldBackgroundColor: Colors.grey[200],
       ),
       home: TodoHomeScreen(),
     );
@@ -20,27 +20,14 @@ class TodoApp extends StatelessWidget {
 class TodoHomeScreen extends StatefulWidget {
   @override
   _TodoHomeScreenState createState() => _TodoHomeScreenState();
-
 }
 
 class _TodoHomeScreenState extends State<TodoHomeScreen> {
-  bool _isDropdownOpened = false;
-  bool isLoading = true;
-
   // To track the selected icon
   String selectedNavItem = 'My Day';
   bool isMenuVisible = false;
   Offset menuPosition = Offset(100, 100); // Starting position of the draggable menu
   String selectedList = ''; // Track selected list category
-  // Map<String, List<String>> tasks = {
-  //   //'Personal': ['Buy groceries', 'Call mom'],
-  //   'Personal': ['Personal tasks','Buy groceries', 'Call mom'],
-  //   'Shopping': ['Buy new shoes', 'Order online'],
-  //   'Work': ['Finish report', 'Send emails'],
-  //   'Finished': ['Clean the house'],
-  // };
-
-
 
   @override
   Widget build(BuildContext context) {
@@ -49,6 +36,15 @@ class _TodoHomeScreenState extends State<TodoHomeScreen> {
         toolbarHeight: 80, // Increase the height of the AppBar
         backgroundColor: Colors.blue[900],
         elevation: 0,
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back),
+          onPressed: () {
+            Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (context) => TodoApp()), // Navigate to TodoApp
+            );
+          },
+        ),
         flexibleSpace: SafeArea(
           child: Center(
             child: Text(
@@ -62,20 +58,11 @@ class _TodoHomeScreenState extends State<TodoHomeScreen> {
           ),
         ),
       ),
-      body:GestureDetector(
-        onTap: () {
-          // Close the dropdown if it's open
-          if (_isDropdownOpened) {
-            setState(() {
-              _isDropdownOpened = false;
-            });
-          }
-        },
-
-
-      child: SafeArea(
+      body: SafeArea(
         child: Stack(
           children: [
+
+
             // Main content of the screen
             Container(
               height: 160, // Transparent container height
@@ -87,18 +74,15 @@ class _TodoHomeScreenState extends State<TodoHomeScreen> {
                 ),
               ),
             ),
-
             GestureDetector(
               onTap: () {
-                // Close the dropdown if it's open
-                if (_isDropdownOpened) {
+                if (isMenuVisible) {
                   setState(() {
-                    _isDropdownOpened = false;
+                    isMenuVisible = false; // Close the menu when tapping anywhere
                   });
                 }
               },
-
-              child: Column(  // Main Column widget with all content
+              child: Column(
                 children: [
                   // Search bar and navigation section
                   Container(
@@ -227,48 +211,190 @@ class _TodoHomeScreenState extends State<TodoHomeScreen> {
                       ],
                     ),
                   ),
-                  // Lists section
-                  SizedBox(height: 10),
-                  Expanded(
-                    child: Container(
-                      color: Colors.white,
-                      child: Column(
-                        children: [
-                          ListTile(
-                            title: Text(
-                              'All Lists',
-                              style: TextStyle(fontWeight: FontWeight.bold),
-                            ),
-                            trailing: IconButton(
-                              icon: Icon(_isDropdownOpened ? Icons.arrow_drop_up : Icons.arrow_drop_down),
-                              onPressed: () {
-                                setState(() {
-                                  _isDropdownOpened = !_isDropdownOpened;
-                                });
-                              },
-                            ),
-                          ),
 
-// Conditionally show task list container from Addpage when dropdown is opened
-                          _isDropdownOpened
-                              ? Addpage() // Show task list container from Addpage when dropdown is opened
-                              : Container(), // Empty container when dropdown is closed
-                        ],
-                      ),
-                    ),
-                  ),
+                  SizedBox(height: 10),
+// Below section has been removed to clean up the code and remove lists and dropdown
+    Expanded(
+    child: ShoppingListPage(), // Directly call the ShoppingListPage here
+    ),
                 ],
               ),
             ),
-
-
           ],
         ),
-      ),
       ),
     );
   }
 }
+                  // Lists section
+//                   SizedBox(height: 10),
+//                   Expanded(
+//                     child: Container(
+//                       color: Colors.white,
+//                       child: Column(
+//                         children: [
+//                           ListTile(
+//                             title: Text(
+//                               'All Lists',
+//                               style: TextStyle(fontWeight: FontWeight.bold),
+//                             ),
+//                             trailing: IconButton(
+//                               icon: Icon(Icons.keyboard_arrow_down),
+//                               onPressed: () {
+//                                 setState(() {
+//                                   isMenuVisible = !isMenuVisible;
+//                                 });
+//                               },
+//                             ),
+//                           ),
+//
+//                           // //Show shopping list directly without navigation
+//                           // ListTile(
+//                           //     title: const Text(
+//                           //       'Shopping List',
+//                           //       style: TextStyle(
+//                           //         color: Colors.black,
+//                           //         fontSize: 27,
+//                           //         fontWeight: FontWeight.bold,
+//                           //       ), // Make the title text white
+//                           //     ),
+//                           //   // title: Text('Shopping'),
+//                           //   // onTap: () {
+//                           //   //   setState(() {
+//                           //   //     selectedList = 'Shopping';  // Select the shopping list
+//                           //   //   });
+//                           //   // },
+//                           // ),
+//                           // //Display the shopping list when selected
+//                           // if (selectedList == 'Shopping')
+//                           //   Expanded(
+//                           //     child: ShoppingListPage(),  // Display ShoppingListPage here directly
+//                           //   ),
+//
+//                           // Shopping List section - directly display
+//                           Expanded(
+//                             child: ShoppingListPage(), // Directly call the ShoppingListPage here
+//                           ),
+//
+//
+//                         ],
+//                       ),
+//                     ),
+//                   ),
+//                 ],
+//               ),
+//             ),
+//             if (isMenuVisible)
+//               Positioned(
+//                 left: menuPosition.dx,
+//                 top: menuPosition.dy,
+//                 child: Draggable(
+//                   feedback: _buildMenu(),
+//                   child: _buildMenu(),
+//                   onDragEnd: (details) {
+//                     setState(() {
+//                       menuPosition = details.offset;
+//                     });
+//                   },
+//                 ),
+//               ),
+//           ],
+//         ),
+//       ),
+//     );
+//   }
+//
+//   // Menu widget to be used for the draggable menu
+//   Widget _buildMenu() {
+//     return Material(
+//       elevation: 4,
+//       color: Colors.white,
+//       borderRadius: BorderRadius.circular(8),
+//       child: Container(
+//         width: 220,
+//         padding: EdgeInsets.all(10),
+//         child: Column(
+//           mainAxisSize: MainAxisSize.min,
+//           children: [
+//             ListTile(
+//               leading: Icon(Icons.home),
+//               title: Text('All List'),
+//               onTap: () {},
+//             ),
+//             SizedBox(height: 2),
+//             Padding(
+//               padding: const EdgeInsets.only(left: 40.0),
+//               child: Row(
+//                 children: [
+//                   Icon(Icons.format_list_bulleted_sharp, size: 24),
+//                   SizedBox(width: 10),
+//                   Text('Default', style: TextStyle(fontSize: 16)),
+//                 ],
+//               ),
+//             ),
+//             SizedBox(height: 18),
+//             Padding(
+//               padding: const EdgeInsets.only(left: 40.0),
+//               child: GestureDetector(
+//                 onTap: () {
+//                   setState(() {
+//                     selectedList = 'Personal';
+//                     // Add logic to display personal-related tasks here
+//                   });
+//                 },
+//                 child: Row(
+//                   children: [
+//                     Icon(Icons.format_list_bulleted_sharp, size: 24),
+//                     SizedBox(width: 10),
+//                     Text('Personal', style: TextStyle(fontSize: 16)),
+//                   ],
+//                 ),
+//               ),
+//             ),
+//             SizedBox(height: 18),
+//             Padding(
+//               padding: const EdgeInsets.only(left: 40.0),
+//               child: Row(
+//                 children: [
+//                   Icon(Icons.format_list_bulleted_sharp, size: 24),
+//                   SizedBox(width: 10),
+//                   Text('Shopping', style: TextStyle(fontSize: 16)),
+//                 ],
+//               ),
+//             ),
+//             SizedBox(height: 18),
+//             Padding(
+//               padding: const EdgeInsets.only(left: 40.0),
+//               child: Row(
+//                 children: [
+//                   Icon(Icons.format_list_bulleted_sharp, size: 24),
+//                   SizedBox(width: 10),
+//                   Text('Work', style: TextStyle(fontSize: 16)),
+//                 ],
+//               ),
+//             ),
+//             SizedBox(height: 12),
+//             ListTile(
+//               leading: Icon(Icons.add_card_outlined),
+//               title: Text('Add'),
+//               onTap: () {
+//                 Navigator.push(
+//                   context,
+//                   MaterialPageRoute(builder: (context) => Addpage()), // Replace SecondPage with your target page
+//                 );
+//               },
+//             ),
+//             ListTile(
+//               leading: Icon(Icons.check_box),
+//               title: Text('Finished'),
+//               onTap: () {},
+//             ),
+//           ],
+//         ),
+//       ),
+//     );
+//   }
+// }
 
 class NavItem extends StatelessWidget {
   final IconData icon;
@@ -296,15 +422,15 @@ class NavItem extends StatelessWidget {
           Text(
             label,
             style: TextStyle(
-              fontSize: 12,
               color: isSelected ? Colors.white : Colors.grey,
             ),
           ),
+          SizedBox(height: 4),
+          // Add the white line below the selected item
           if (isSelected)
             Container(
-              margin: EdgeInsets.only(top: 7),
               height: 2,
-              width: 30,
+              width: 40,
               color: Colors.white,
             ),
         ],
@@ -312,58 +438,3 @@ class NavItem extends StatelessWidget {
     );
   }
 }
-
-class ListItem extends StatelessWidget {
-  final IconData icon;
-  final String title;
-  final String? count;
-  final bool isSelected;
-
-  const ListItem({
-    Key? key,
-    required this.icon,
-    required this.title,
-    this.count,
-    this.isSelected = false,
-  }) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      margin: EdgeInsets.symmetric(vertical: 8, horizontal: 12),
-      padding: EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: isSelected ? Colors.grey[200] : Colors.white,
-        borderRadius: BorderRadius.circular(8),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.withOpacity(0.2),
-            blurRadius: 6,
-            spreadRadius: 2,
-          ),
-        ],
-      ),
-      child: Row(
-        children: [
-          Icon(icon, color: Colors.blue[900]),
-          SizedBox(width: 16),
-          Text(
-            title,
-            style: TextStyle(fontSize: 16),
-          ),
-          Spacer(),
-          if (count != null)
-            CircleAvatar(
-              backgroundColor: Colors.blue[900],
-              radius: 12,
-              child: Text(
-                count!,
-                style: TextStyle(color: Colors.white, fontSize: 12),
-              ),
-            ),
-        ],
-      ),
-    );
-  }
-}
-//
