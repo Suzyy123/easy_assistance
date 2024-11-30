@@ -1,5 +1,5 @@
 import 'package:easy_assistance_app/ProfilePage/ProfileMain.dart';
-import 'package:easy_assistance_app/RegisterPages/homePage.dart';
+import 'package:easy_assistance_app/Pages/homePage.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
