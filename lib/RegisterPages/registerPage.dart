@@ -134,7 +134,7 @@ class _RegisterPageState extends State<RegisterPage> {
               // Registration Page Image
               Center(
                 child: Image.asset(
-                  "lib/images/registerPage.png",
+                  "assets/images/registerPage.png",
                   height: 200,
                   width: 200,
                 ),

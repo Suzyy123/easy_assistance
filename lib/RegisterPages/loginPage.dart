@@ -2,6 +2,7 @@ import 'package:easy_assistance_app/authServices/AuthServices.dart';
 import 'package:flutter/material.dart';
 import '../Components/buttons.dart';
 import '../Components/textFields.dart';
+import 'forgotPassword.dart';
 
 class Loginpage extends StatefulWidget {
   final void Function()? onTap;
@@ -97,7 +98,7 @@ class _LoginpageState extends State<Loginpage> {
             children: [
               Center(
                 child: Image.asset(
-                  "lib/images/google.jpeg",
+                  "assets/images/google.jpeg",
                   height: 100,
                   width: 100,
                 ),
@@ -120,7 +121,9 @@ class _LoginpageState extends State<Loginpage> {
               // Forgot Password
               GestureDetector(
                 onTap: () {
-                  // Implement forgot password functionality here
+                 Navigator.push(context, MaterialPageRoute(builder:(context){
+                   return ForgotPasswordPage();
+                 }));
                 },
                 child: const Text(
                   "Forgot password?",

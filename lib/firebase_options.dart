@@ -50,19 +50,21 @@ class DefaultFirebaseOptions {
   }
 
   static const FirebaseOptions web = FirebaseOptions(
-    apiKey: 'AIzaSyC0KEepin575snubK4Ma1459byRDL5g0Yk',
-    appId: '1:633473586686:web:7a8b470f7ad01646279caf',
-    messagingSenderId: '633473586686',
-    projectId: 'easyassitance',
-    authDomain: 'easyassitance.firebaseapp.com',
-    storageBucket: 'easyassitance.firebasestorage.app',
+    apiKey: 'AIzaSyAfMwecmJCQl3-a2YM2NwGDxbm6w79gGsA',
+    appId: '1:699807150469:web:e17ec7d6de22334d2ad4ec',
+    messagingSenderId: '699807150469',
+    projectId: 'easyassistanceapplication',
+    authDomain: 'easyassistanceapplication.firebaseapp.com',
+    storageBucket: 'easyassistanceapplication.firebasestorage.app',
+    measurementId: 'G-92JKQCYJMN',
   );
 
   static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'AIzaSyDAmuDD_lvg_vRl0RkJi-RDQcSp5A6QB4k',
-    appId: '1:633473586686:android:032dcd7632617f15279caf',
-    messagingSenderId: '633473586686',
-    projectId: 'easyassitance',
-    storageBucket: 'easyassitance.firebasestorage.app',
+    apiKey: 'AIzaSyD8snCpjH9Wds1CBoTgHwF2hXq_hsGtxHk',
+    appId: '1:699807150469:android:e0c572403763abbb2ad4ec',
+    messagingSenderId: '699807150469',
+    projectId: 'easyassistanceapplication',
+    storageBucket: 'easyassistanceapplication.firebasestorage.app',
   );
+
 }

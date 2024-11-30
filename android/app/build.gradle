@@ -1,20 +1,32 @@
 plugins {
     id "com.android.application"
+    id 'com.google.gms.google-services' // Firebase plugin
     id "kotlin-android"
-    id "com.google.gms.google-services" // Firebase plugin
     id "dev.flutter.flutter-gradle-plugin" // Flutter plugin
 }
 
 android {
     namespace = "com.example.easy_assistance_app"
-    compileSdk = 34 // Updated to match the required SDK version
+    compileSdk = flutter.compileSdkVersion
+    ndkVersion = flutter.ndkVersion
 
     defaultConfig {
+        // Specify your own unique Application ID
         applicationId = "com.example.easy_assistance_app"
-        minSdk = 21 // Minimum SDK supported by Firebase
-        targetSdk = 34 // Updated to match the compile SDK version
-        versionCode = 1
-        versionName = "1.0"
+        // Updated values to match your app requirements
+        minSdk = flutter.minSdkVersion
+        targetSdk = flutter.targetSdkVersion
+        versionCode = flutter.versionCode
+        versionName = flutter.versionName
+    }
+
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_1_8
+        targetCompatibility = JavaVersion.VERSION_1_8
+    }
+
+    kotlinOptions {
+        jvmTarget = "1.8"
     }
 
     buildTypes {
@@ -27,7 +39,7 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
 
             // Use your signing configuration for release builds
-            signingConfig signingConfigs.debug
+            signingConfig signingConfigs.debug // Update this for production builds
         }
 
         debug {
@@ -37,13 +49,9 @@ android {
         }
     }
 
-    compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
-    }
-
-    kotlinOptions {
-        jvmTarget = "1.8"
+    lintOptions {
+        // Optional: Suppress deprecation warnings
+        warningsAsErrors false
     }
 }
 
