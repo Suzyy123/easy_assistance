@@ -39,3 +39,7 @@ flutter:
     - lib/images/avatar6.png
     - lib/images/avatar7.png
     - lib/images/avatar8.png
+    - lib/Images/1stImage.jpg
+    - lib/Images/2ndImage.jpg
+    - lib/Images/3rdImage.jpg
+    - lib/Images/4thImage.jpg

@@ -1,6 +1,8 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'Pages/getstartedPage.dart';
 import 'auth/login_or_register.dart';
+import 'authServices/AuthGate.dart';
 import 'firebase_options.dart';
 
 Future<void> main() async {
@@ -18,7 +20,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'Easy Assitance',
-      home: LoginOrRegister(),
+      home: GetStartedPage(),
 
     );
   }
