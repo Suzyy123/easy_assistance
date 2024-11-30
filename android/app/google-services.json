@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "185188567460",
+    "project_id": "easyassistance-9a7ee",
+    "storage_bucket": "easyassistance-9a7ee.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:185188567460:android:96d03b186e406f30481931",
+        "android_client_info": {
+          "package_name": "com.example.easy_assistance"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDQCF61yTK2CQ3J0YA_asZFtwuctA54As8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
