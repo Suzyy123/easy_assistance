@@ -18,7 +18,9 @@ import 'Todo_task/personal.dart';
 import 'Todo_task/shopping.dart';
 import 'Todo_task/shoppingService.dart';
 import 'Todo_task/Lists_New.dart';
-
+import 'package:flutter/material.dart';
+import 'Todo_task/notification_icon.dart';
+import 'Todo_task/NotificationHome.dart';
 
 void main() async{
   WidgetsFlutterBinding.ensureInitialized();
@@ -56,7 +58,7 @@ class MyApp extends StatelessWidget {
       ),
       debugShowCheckedModeBanner: false,
       // home: TodoApp(),
-          home: ShoppingPage(),
+          home:  NotificationHome(),
     );
   }
 }
