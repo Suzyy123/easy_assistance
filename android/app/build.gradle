@@ -7,12 +7,12 @@ plugins {
 
 android {
     namespace = "com.example.easy_assistance_app"
-    compileSdk = 34 // Updated to match the required SDK version
+    compileSdk = 34 // Match the required SDK version
 
     defaultConfig {
         applicationId = "com.example.easy_assistance_app"
         minSdk = 21 // Minimum SDK supported by Firebase
-        targetSdk = 34 // Updated to match the compile SDK version
+        targetSdk = 34 // Match the compile SDK version
         versionCode = 1
         versionName = "1.0"
     }
@@ -26,8 +26,8 @@ android {
             // Specify ProGuard rules to avoid breaking Firebase or other libraries
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
 
-            // Use your signing configuration for release builds
-            signingConfig signingConfigs.debug
+            // Ensure proper signing configuration for release builds
+            signingConfig signingConfigs.debug // Update this with your production key if needed
         }
 
         debug {
@@ -38,8 +38,8 @@ android {
     }
 
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
     }
 
     kotlinOptions {

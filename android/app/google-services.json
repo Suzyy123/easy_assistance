@@ -1,13 +1,13 @@
 {
   "project_info": {
-    "project_number": "633473586686",
-    "project_id": "easyassitance",
-    "storage_bucket": "easyassitance.firebasestorage.app"
+    "project_number": "699807150469",
+    "project_id": "easyassistanceapplication",
+    "storage_bucket": "easyassistanceapplication.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:633473586686:android:0c167471cf65feb3279caf",
+        "mobilesdk_app_id": "1:699807150469:android:e0c572403763abbb2ad4ec",
         "android_client_info": {
           "package_name": "com.example.easy_assistance_app"
         }
@@ -15,26 +15,7 @@
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyDAmuDD_lvg_vRl0RkJi-RDQcSp5A6QB4k"
-        }
-      ],
-      "services": {
-        "appinvite_service": {
-          "other_platform_oauth_client": []
-        }
-      }
-    },
-    {
-      "client_info": {
-        "mobilesdk_app_id": "1:633473586686:android:032dcd7632617f15279caf",
-        "android_client_info": {
-          "package_name": "com.example.november14"
-        }
-      },
-      "oauth_client": [],
-      "api_key": [
-        {
-          "current_key": "AIzaSyDAmuDD_lvg_vRl0RkJi-RDQcSp5A6QB4k"
+          "current_key": "AIzaSyD8snCpjH9Wds1CBoTgHwF2hXq_hsGtxHk"
         }
       ],
       "services": {
