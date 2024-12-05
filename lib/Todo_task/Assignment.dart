@@ -1,10 +1,12 @@
 
+import 'package:easy_assistance_app/Todo_task/personalService.dart';
 import 'package:easy_assistance_app/Todo_task/shoppingService.dart';
 import 'package:flutter/material.dart';
 import 'addpage.dart';
+import 'assignmentService.dart';
 import 'frontPage.dart';
 
-class ShoppingPage extends StatelessWidget {
+class AssignmentDetails extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -20,10 +22,10 @@ class ShoppingPage extends StatelessWidget {
 
 class TodoHomeScreen extends StatefulWidget {
   @override
-  _TodoHomeScreenState createState() => _TodoHomeScreenState();
+  _AssignmentDetailsState createState() => _AssignmentDetailsState();
 }
 
-class _TodoHomeScreenState extends State<TodoHomeScreen> {
+class _AssignmentDetailsState extends State<TodoHomeScreen> {
   // To track the selected icon
   String selectedNavItem = 'My Day';
   bool isMenuVisible = false;
@@ -42,8 +44,8 @@ class _TodoHomeScreenState extends State<TodoHomeScreen> {
 
           onPressed: () {
             Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(builder: (context) => TodoApp()), // Navigate to TodoApp
+              context,
+              MaterialPageRoute(builder: (context) => TodoApp()), // Navigate to TodoApp
             );
           },
         ),
@@ -216,9 +218,9 @@ class _TodoHomeScreenState extends State<TodoHomeScreen> {
 
                   SizedBox(height: 10),
 // Below section has been removed to clean up the code and remove lists and dropdown
-    Expanded(
-    child: ShoppingListPage(), // Directly call the ShoppingListPage here
-    ),
+                  Expanded(
+                    child: AssignmentListPage(), // Directly call the ShoppingListPage here
+                  ),
                 ],
               ),
             ),

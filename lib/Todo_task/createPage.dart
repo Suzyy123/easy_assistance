@@ -1,3 +1,4 @@
+
 import 'package:flutter/material.dart';
 import 'NotificationList.dart';
 import 'firestore_service.dart';
@@ -86,6 +87,27 @@ class _CreateState extends State<Create> {
     );
   }
 
+  void _deleteList(String listName) async {
+    // Delete the list from Firestore
+    await _firestoreService.deleteTaskList(listName); // Delete from Firestore
+
+    // Remove the list from the local list immediately
+    setState(() {
+      _lists.remove(listName); // Remove from the local list
+      if (_selectedList == listName) {
+        _selectedList = 'Default'; // Reset selected list if deleted
+      }
+    });
+
+    // Close the dropdown menu programmatically
+    Navigator.of(context).pop(); // Close the dropdown menu
+
+    // Show a SnackBar with a confirmation message
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text("List '$listName' deleted successfully"), backgroundColor: Colors.green,),
+    );
+  }
+
   Future<void> _pickDate() async {
     DateTime currentDate = DateTime.now();
     DateTime? pickedDate = await showDatePicker(
@@ -136,190 +158,202 @@ class _CreateState extends State<Create> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(
-          backgroundColor: Colors.blue[800],
-          toolbarHeight: 120,
-          leading: IconButton(
-            icon: Icon(
-              Icons.arrow_back,
-              size: 40,
-              color: Colors.white,
-            ),
-            onPressed: () {
-              Navigator.pop(context);
-            },
+      appBar: AppBar(
+        backgroundColor: Colors.blue[800],
+        toolbarHeight: 120,
+        leading: IconButton(
+          icon: Icon(
+            Icons.arrow_back,
+            size: 40,
+            color: Colors.white,
           ),
-          title: Text(
-            "New Task",
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 30,
-              fontWeight: FontWeight.bold,
-            ),
+          onPressed: () {
+            Navigator.pop(context);
+          },
+        ),
+        title: Text(
+          "New Task",
+          style: TextStyle(
+            color: Colors.white,
+            fontSize: 30,
+            fontWeight: FontWeight.bold,
           ),
         ),
-        body: SingleChildScrollView(
-          child: Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+      ),
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                "What is to be done?",
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+              ),
+              SizedBox(height: 8),
+              TextField(
+                controller: _taskController,
+                decoration: InputDecoration(
+                  suffixIcon: Icon(Icons.calendar_today),
+                  border: OutlineInputBorder(),
+                  hintText: 'Enter task',
+                  hintStyle: TextStyle(color: Colors.grey),
+                ),
+              ),
+              SizedBox(height: 20),
+
+              Text(
+                "Due Date",
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+              ),
+              SizedBox(height: 8),
+              TextField(
+                controller: _dateController,
+                decoration: InputDecoration(
+                  suffixIcon: IconButton(
+                    icon: Icon(Icons.date_range),
+                    onPressed: _pickDate,
+                  ),
+                  border: OutlineInputBorder(),
+                  hintText: 'Select due date',
+                  hintStyle: TextStyle(color: Colors.grey),
+                ),
+                readOnly: true,
+              ),
+              SizedBox(height: 20),
+
+              Text(
+                "Due Time",
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+              ),
+              SizedBox(height: 8),
+              TextField(
+                controller: _timeController,
+                decoration: InputDecoration(
+                  suffixIcon: IconButton(
+                    icon: Icon(Icons.access_time),
+                    onPressed: _pickTime,
+                  ),
+                  border: OutlineInputBorder(),
+                  hintText: 'Select due time',
+                  hintStyle: TextStyle(color: Colors.grey),
+                ),
+                readOnly: true,
+              ),
+              SizedBox(height: 20),
+
+              Text(
+                "Add to List",
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+              ),
+              SizedBox(height: 8),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text(
-                    "What is to be done?",
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                  ),
-                  SizedBox(height: 8),
-                  TextField(
-                    controller: _taskController,
-                    decoration: InputDecoration(
-                      suffixIcon: Icon(Icons.calendar_today),
-                      border: OutlineInputBorder(),
-                      hintText: 'Enter task',
-                      hintStyle: TextStyle(color: Colors.grey),
-                    ),
-                  ),
-                  SizedBox(height: 20),
-          
-                  Text(
-                    "Due Date",
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                  ),
-                  SizedBox(height: 8),
-                  TextField(
-                    controller: _dateController,
-                    decoration: InputDecoration(
-                      suffixIcon: IconButton(
-                        icon: Icon(Icons.date_range),
-                        onPressed: _pickDate,
-                      ),
-                      border: OutlineInputBorder(),
-                      hintText: 'Select due date',
-                      hintStyle: TextStyle(color: Colors.grey),
-                    ),
-                    readOnly: true,
-                  ),
-                  SizedBox(height: 20),
-          
-                  Text(
-                    "Due Time",
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                  ),
-                  SizedBox(height: 8),
-                  TextField(
-                    controller: _timeController,
-                    decoration: InputDecoration(
-                      suffixIcon: IconButton(
-                        icon: Icon(Icons.access_time),
-                        onPressed: _pickTime,
-                      ),
-                      border: OutlineInputBorder(),
-                      hintText: 'Select due time',
-                      hintStyle: TextStyle(color: Colors.grey),
-                    ),
-                    readOnly: true,
-                  ),
-                  SizedBox(height: 20),
-          
-                  Text(
-                    "Add to List",
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                  ),
-                  SizedBox(height: 8),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Expanded(
-                        child: DropdownButton<String>(
-                          value: _lists.contains(_selectedList) ? _selectedList : null,
-                          onChanged: (String? newValue) {
-                            setState(() {
-                              _selectedList = newValue!;
-                            });
-                          },
-                          items: _lists.map<DropdownMenuItem<String>>((String value) {
-                            return DropdownMenuItem<String>(
-                              value: value,
-                              child: Text(value),
-                            );
-                          }).toList(),
-                          isExpanded: true,
-                          hint: Text('Select a list'),
-                        )
-                      ),
-                      IconButton(
-                        icon: Icon(Icons.add, color: Colors.blue, size: 30),
-                        onPressed: _showAddListDialog,
-                      ),
-                    ],
-                  ),
-                  SizedBox(height: 40),
-          
-                  Row(
-                    children: [
-                      ElevatedButton(
-                        onPressed: () async {
-                          if (_taskController.text.isNotEmpty && _dateController.text.isNotEmpty && _timeController.text.isNotEmpty) {
-                            try {
-                              await _firestoreService.addTask(
-                                _taskController.text,
-                                _dateController.text,
-                                _timeController.text,
-                                _selectedList,
-                              );
-          
-                              _clearFields();
-          
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(content: Text('Task added successfully')),
-                              );
-                            } catch (e) {
-                              print('Error adding task: $e');
-          
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(content: Text('Failed to add task')),
-                              );
-                            }
-                          } else {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(content: Text('Please fill in all fields')),
-                            );
-                          }
+                  Expanded(
+                      child: DropdownButton<String>(
+                        value: _lists.contains(_selectedList) ? _selectedList : null,
+                        onChanged: (String? newValue) {
+                          setState(() {
+                            _selectedList = newValue!;
+                          });
                         },
-                        child: Text('Add'),
-                        style: ElevatedButton.styleFrom(
-                          padding: EdgeInsets.symmetric(vertical: 14),
-                          backgroundColor: Colors.white,
-                          textStyle: TextStyle(fontSize: 20),
-                        ),
-                      ),
-          
-                      IconButton(
-                        icon: Icon(Icons.notifications, color: Colors.blue, size: 30),
-                        onPressed: () {
-                          // Navigate to the NotificationPage
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(builder: (context) => NotificationPage()),
+                        items: _lists.map<DropdownMenuItem<String>>((String value) {
+                          return DropdownMenuItem<String>(
+                            value: value,
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text(value),
+                                if (value != 'Default')
+                                  IconButton(
+                                    icon: Icon(Icons.delete, size: 20, color: Colors.black),
+                                    onPressed: () {
+                                      _deleteList(value);
+                                    },
+                                  ),
+                              ],
+                            ),
                           );
-                        },
-                      ),
-          
-                      SizedBox(width: 16),
-                      ElevatedButton(
-                        onPressed: _clearFields,
-                        child: Text('Clear'),
-                        style: ElevatedButton.styleFrom(
-                          padding: EdgeInsets.symmetric(vertical: 14),
-                          backgroundColor: Colors.white,
-                          textStyle: TextStyle(fontSize: 20),
-                        ),
-                      ),
-                    ],
+                        }).toList(),
+                        isExpanded: true,
+                        hint: Text('Select a list'),
+                      )
+                  ),
+                  IconButton(
+                    icon: Icon(Icons.add, color: Colors.blue, size: 30),
+                    onPressed: _showAddListDialog,
                   ),
                 ],
               ),
-            ),
+              SizedBox(height: 40),
+
+              Row(
+                children: [
+                  ElevatedButton(
+                    onPressed: () async {
+                      if (_taskController.text.isNotEmpty && _dateController.text.isNotEmpty && _timeController.text.isNotEmpty) {
+                        try {
+                          await _firestoreService.addTask(
+                            _taskController.text,
+                            _dateController.text,
+                            _timeController.text,
+                            _selectedList,
+                          );
+
+                          _clearFields();
+
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(content: Text('Task added successfully')),
+                          );
+                        } catch (e) {
+                          print('Error adding task: $e');
+
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(content: Text('Failed to add task')),
+                          );
+                        }
+                      } else {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text('Please fill in all fields')),
+                        );
+                      }
+                    },
+                    child: Text('Add'),
+                    style: ElevatedButton.styleFrom(
+                      padding: EdgeInsets.symmetric(vertical: 14),
+                      backgroundColor: Colors.white,
+                      textStyle: TextStyle(fontSize: 20),
+                    ),
+                  ),
+
+                  IconButton(
+                    icon: Icon(Icons.notifications, color: Colors.blue, size: 30),
+                    onPressed: () {
+                      // Navigate to the NotificationPage
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => NotificationPage()),
+                      );
+                    },
+                  ),
+
+                  SizedBox(width: 16),
+                  ElevatedButton(
+                    onPressed: _clearFields,
+                    child: Text('Clear'),
+                    style: ElevatedButton.styleFrom(
+                      padding: EdgeInsets.symmetric(vertical: 14),
+                      backgroundColor: Colors.white,
+                      textStyle: TextStyle(fontSize: 20),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
         ),
-        );
-    }
+      ),
+    );
+  }
 }

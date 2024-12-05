@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'firestore_service.dart';
 import 'task_completion_service.dart';  // Import the new service
 
-class ShoppingListPage extends StatelessWidget {
+class AssignmentListPage extends StatelessWidget {
   final FirestoreService _firestoreService = FirestoreService();
   final FirestoreService _taskCompletionService = FirestoreService();
 
@@ -12,7 +12,7 @@ class ShoppingListPage extends StatelessWidget {
       appBar: AppBar(
         toolbarHeight: 95, // Adjust the height if necessary
         title: const Text(
-          'Shopping List',
+          'Assignment List',
           style: TextStyle(
             color: Colors.black,       // White color for the title text
             fontSize: 27,              // Font size set to 27
@@ -43,23 +43,23 @@ class ShoppingListPage extends StatelessWidget {
           }
 
           if (!snapshot.hasData || snapshot.data!.isEmpty) {
-            return Center(child: Text('No tasks found in Shopping list.'));
+            return Center(child: Text('No tasks found in Assignment list.'));
           }
 
           // Filter tasks to only those with "Shopping" list
-          final shoppingTasks = snapshot.data!
-              .where((task) => task['list'] == 'Shopping') // Filter by 'Shopping' list
+          final assignmentTasks = snapshot.data!
+              .where((task) => task['list'] == 'Assignment') // Filter by 'Shopping' list
               .toList();
 
-          if (shoppingTasks.isEmpty) {
-            return Center(child: Text('No tasks found in Shopping list.'));
+          if (assignmentTasks.isEmpty) {
+            return Center(child: Text('No tasks found in Assignment list.'));
           }
 
           // Display only shopping tasks
           return ListView.builder(
-            itemCount: shoppingTasks.length,
+            itemCount: assignmentTasks.length,
             itemBuilder: (context, index) {
-              final task = shoppingTasks[index];
+              final task = assignmentTasks[index];
               return Card(
                 margin: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
                 child: ListTile(

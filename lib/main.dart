@@ -1,26 +1,35 @@
 
+import 'package:easy_assistance_app/Todo_task/Image.dart';
 import 'package:easy_assistance_app/firebase_options.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 //import 'package:firebase_messaging/firebase_messaging.dart';
 
+// import 'Todo_task/My Work.dart';
+import 'Todo_task/All_Notes.dart';
+import 'Todo_task/CompletedTasks.dart';
+import 'Todo_task/DirectCalendarPage.dart';
+import 'Todo_task/DocsPage.dart';
+import 'Todo_task/FavoriteTasks.dart';
+import 'Todo_task/ListsPgae.dart';
+import 'Todo_task/Meeting.dart';
+import 'Todo_task/My Work.dart';
+import 'Todo_task/NotificationHome.dart';
 import 'Todo_task/NotificationList.dart';
+import 'Todo_task/Recents.dart';
 import 'Todo_task/TaskListDropdown.dart';
 import 'Todo_task/TaskListPage.dart';
 import 'Todo_task/TodoTask.dart';
 import 'Todo_task/addpage.dart';
 import 'Todo_task/createPage.dart';
 import 'Todo_task/default.dart';
-import 'Todo_task/delete.dart';
-import 'Todo_task/dropdown.dart';
 import 'Todo_task/frontPage.dart';
 import 'Todo_task/personal.dart';
 import 'Todo_task/shopping.dart';
 import 'Todo_task/shoppingService.dart';
-import 'Todo_task/Lists_New.dart';
 import 'package:flutter/material.dart';
 import 'Todo_task/notification_icon.dart';
-import 'Todo_task/NotificationHome.dart';
+
 
 void main() async{
   WidgetsFlutterBinding.ensureInitialized();
@@ -36,6 +45,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
       title: 'Flutter Demo',
       theme: ThemeData(
         // This is the theme of your application.
@@ -56,9 +66,11 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      debugShowCheckedModeBanner: false,
+      // debugShowCheckedModeBanner: false,
       // home: TodoApp(),
-          home:  NotificationHome(),
+          home:  NotePage(),
+      //home: CalendarPage(upcomingTasks: [], overdueTasks: []),
+
     );
   }
 }
