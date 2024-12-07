@@ -7,7 +7,8 @@ import '../Components/icons.dart';
 import '../Components/textFields.dart';
 import '../Components/buttons.dart';
 import '../authServices/AuthServices.dart';
-import 'ProfileChangingPage.dart'; // Ensure this is the correct import path
+import 'ProfileChangingPage.dart';
+import 'Settings/Drawer.dart'; // Ensure this is the correct import path
 
 
 class ProfilePage extends StatefulWidget {
@@ -117,7 +118,8 @@ class _ProfilePageState extends State<ProfilePage> {
           ),
         ],
       ),
-      body: SafeArea(
+      drawer: const MyDrawer(), // The drawer is here
+    body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.fromLTRB(16.0, 16.0, 16.0, 100.0), // Added padding at the bottom
           child: Column(

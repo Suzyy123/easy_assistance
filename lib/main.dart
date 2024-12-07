@@ -3,12 +3,6 @@ import 'package:easy_assistance_app/firebase_options.dart';
 import 'package:easy_assistance_app/themes/lightMode.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'ChatPage/ChatPageUI.dart';
-import 'ProfilePage/ProfileMain.dart';
-import 'RegisterPages/homePage.dart';
-import 'RegisterPages/loginPage.dart';
-import 'RegisterPages/registerPage.dart';
-import 'auth/login_or_register.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();

@@ -1,6 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:easy_assistance_app/ChatPage/ChatBubble.dart';
-import 'package:easy_assistance_app/Components/textFields.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'chatfucntions.dart';
