@@ -156,6 +156,53 @@ class _LoginpageState extends State<Loginpage> {
                   ),
                 ],
               ),
+              const SizedBox(height: 20),
+              GestureDetector(
+                onTap: () async {
+                  try {
+                    // Use the AuthServices to sign in with Google
+                    await AuthServices().signInWithGoogle();
+
+                    // Show success dialog
+                    showDialog(
+                      context: context,
+                      builder: (context) => AlertDialog(
+                        title: const Text("Sign-In Successful!"),
+                        actions: [
+                          TextButton(
+                            onPressed: () {
+                              Navigator.of(context).pop(); // Close the dialog
+                            },
+                            child: const Text("OK"),
+                          ),
+                        ],
+                      ),
+                    );
+                  } catch (e) {
+                    // Show error dialog if sign-in fails
+                    showDialog(
+                      context: context,
+                      builder: (context) => AlertDialog(
+                        title: const Text("Sign-In Failed"),
+                        content: Text(e.toString()),
+                        actions: [
+                          TextButton(
+                            onPressed: () {
+                              Navigator.of(context).pop(); // Close the dialog
+                            },
+                            child: const Text("OK"),
+                          ),
+                        ],
+                      ),
+                    );
+                  }
+                },
+                child: Image(
+                  image: AssetImage("lib/images/google.jpeg"),
+                  width: 80,
+                  height: 80,
+                ),
+              ),
             ],
           ),
         ),
