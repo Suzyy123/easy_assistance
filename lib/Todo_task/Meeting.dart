@@ -48,7 +48,7 @@ class _CreateMeetingPageState extends State<CreateMeetingPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Schedule Meeting'),
+        title: Text('Schedule Meeting', style: TextStyle(color: Colors.white),),
         backgroundColor: Colors.blue[800],
       ),
       body: Padding(

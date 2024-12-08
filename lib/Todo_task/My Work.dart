@@ -235,114 +235,116 @@ class _CalendarPageState extends State<CalendarPage> {
 
   // Build the calendar grid
   Widget _buildCalendar(List<Map<String, dynamic>> tasks) {
-    return Column(
-      children: [
-        SingleChildScrollView(
-          child: Column(
-            children: [
-              SizedBox(height: 12),
-              // Display days of the month
-              Container(
-                child: SingleChildScrollView(
-                  scrollDirection: Axis.horizontal,
-                  child: Row(
-                    children: _daysInMonth.map((day) {
-                      final isSelected = _selectedDate != null &&
-                          _selectedDate!.day == day &&
-                          _selectedDate!.month == _currentDate.month &&
-                          _selectedDate!.year == _currentDate.year;
-
-                      return GestureDetector(
-                        onTap: () {
-                          final selectedDate = DateTime(_currentDate.year, _currentDate.month, day);
-                          _updateTasksForDate(selectedDate, tasks);
-                        },
-                        child: Container(
-                          alignment: Alignment.center,
-                          margin: EdgeInsets.all(6),
-                          width: 70,
-                          height: 70,
-                          decoration: BoxDecoration(
-                            color: isSelected ? Colors.blue[900] : Colors.transparent,
-                            //color: Colors.transparent,
-                            border: Border.all(color: Colors.black, width: 1),
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              // Display the day name (abbreviated)
-                              Text(
-                                DateFormat('EEE').format(DateTime(_currentDate.year, _currentDate.month, day)),
-                                style: TextStyle(
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.bold,
-                                  //color: Colors.blue[900],
-                                  color: isSelected ? Colors.white : Colors.blue[900],
+    return SingleChildScrollView(
+      child: Column(
+        children: [
+          SingleChildScrollView(
+            child: Column(
+              children: [
+                SizedBox(height: 12),
+                // Display days of the month
+                Container(
+                  child: SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    child: Row(
+                      children: _daysInMonth.map((day) {
+                        final isSelected = _selectedDate != null &&
+                            _selectedDate!.day == day &&
+                            _selectedDate!.month == _currentDate.month &&
+                            _selectedDate!.year == _currentDate.year;
+      
+                        return GestureDetector(
+                          onTap: () {
+                            final selectedDate = DateTime(_currentDate.year, _currentDate.month, day);
+                            _updateTasksForDate(selectedDate, tasks);
+                          },
+                          child: Container(
+                            alignment: Alignment.center,
+                            margin: EdgeInsets.all(6),
+                            width: 70,
+                            height: 70,
+                            decoration: BoxDecoration(
+                              color: isSelected ? Colors.blue[900] : Colors.transparent,
+                              //color: Colors.transparent,
+                              border: Border.all(color: Colors.black, width: 1),
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                // Display the day name (abbreviated)
+                                Text(
+                                  DateFormat('EEE').format(DateTime(_currentDate.year, _currentDate.month, day)),
+                                  style: TextStyle(
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.bold,
+                                    //color: Colors.blue[900],
+                                    color: isSelected ? Colors.white : Colors.blue[900],
+                                  ),
                                 ),
-                              ),
-                              // Display the date
-                              Text(
-                                '${day.toString().padLeft(2, '0')}',
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  //color: Colors.grey[700],
-                                  color: isSelected ? Colors.white : Colors.grey[700],
+                                // Display the date
+                                Text(
+                                  '${day.toString().padLeft(2, '0')}',
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    //color: Colors.grey[700],
+                                    color: isSelected ? Colors.white : Colors.grey[700],
+                                  ),
                                 ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      );
-                    }).toList(),
-                  ),
-                ),
-              ),
-              // Display tasks for the selected date
-              if (_tasksForSelectedDate.isNotEmpty)
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: _tasksForSelectedDate.map((task) {
-                      final dueDate = DateFormat('dd, MMM yyyy').parse(task['dueDate']);
-                      final status = _getTaskStatus(dueDate);
-                      // Determine color based on task status (Blue color for all tasks)
-                      Color taskColor = Colors.grey[300]!; // Use blue for all task containers
-
-
-                      return Card(
-                        color: taskColor, // Light blue color for task container
-                        child: ListTile(
-                          title: Text(task['task']),
-                          subtitle: Text('Due: ${task['dueDate']} at ${task['dueTime']}'),
-                          trailing: Text(
-                            status,
-                            style: TextStyle(
-                              color: status == 'Overdue' ? Colors.red : Colors.green,
-                              fontWeight: FontWeight.bold,
+                              ],
                             ),
                           ),
-                        ),
-                      );
-                    }).toList(),
+                        );
+                      }).toList(),
+                    ),
                   ),
                 ),
-              // If no tasks for selected date
-              SizedBox(height: 30),
-              if (_tasksForSelectedDate.isEmpty)
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Text(
-                    'No tasks for this date.',
-                    style: TextStyle(fontSize: 16, color: Colors.black),
+                // Display tasks for the selected date
+                if (_tasksForSelectedDate.isNotEmpty)
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: _tasksForSelectedDate.map((task) {
+                        final dueDate = DateFormat('dd, MMM yyyy').parse(task['dueDate']);
+                        final status = _getTaskStatus(dueDate);
+                        // Determine color based on task status (Blue color for all tasks)
+                        Color taskColor = Colors.grey[300]!; // Use blue for all task containers
+      
+      
+                        return Card(
+                          color: taskColor, // Light blue color for task container
+                          child: ListTile(
+                            title: Text(task['task']),
+                            subtitle: Text('Due: ${task['dueDate']} at ${task['dueTime']}'),
+                            trailing: Text(
+                              status,
+                              style: TextStyle(
+                                color: status == 'Overdue' ? Colors.red : Colors.green,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                        );
+                      }).toList(),
+                    ),
                   ),
-                ),
-            ],
+                // If no tasks for selected date
+                SizedBox(height: 30),
+                if (_tasksForSelectedDate.isEmpty)
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Text(
+                      'No tasks for this date.',
+                      style: TextStyle(fontSize: 16, color: Colors.black),
+                    ),
+                  ),
+              ],
+            ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 

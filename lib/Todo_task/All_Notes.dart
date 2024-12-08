@@ -9,7 +9,7 @@ class NotesPage extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         iconTheme: IconThemeData(color: Colors.white),
-        backgroundColor: Colors.blue[800],
+        backgroundColor: Colors.blue[900],
         title: Text("Notes",
         style: TextStyle(color: Colors.white),),
       ),

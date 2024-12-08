@@ -1,4 +1,20 @@
-
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:easy_assistance_app/Todo_task/All_Notes.dart';
+import 'package:easy_assistance_app/Todo_task/FavoriteTasks.dart';
+import 'package:easy_assistance_app/Todo_task/ListsPgae.dart';
+import 'package:easy_assistance_app/Todo_task/My%20Work.dart';
+import 'package:easy_assistance_app/Todo_task/TaskListPage.dart';
+import 'package:easy_assistance_app/Todo_task/shopping.dart';
+import 'package:flutter/material.dart';
+import 'Assignment.dart';
+import 'MeetingPage.dart';
+import 'default.dart';
+import 'firestore_service.dart';
+import 'package:easy_assistance_app/Todo_task/shopping.dart'; // Shopping page import
+import 'package:easy_assistance_app/Todo_task/personal.dart'; // Personal page import
+import 'package:easy_assistance_app/Todo_task/notification_icon.dart'; // Import NotificationIcon
+import 'package:intl/intl.dart'; // Ensure this is imported for DateFormat
+import 'package:flutter/material.dart';
 import 'package:easy_assistance_app/Todo_task/personalService.dart';
 import 'package:easy_assistance_app/Todo_task/shoppingService.dart';
 import 'package:flutter/material.dart';
@@ -108,7 +124,7 @@ class _DefaultPageState extends State<TodoHomeScreen> {
                               Expanded(
                                 child: TextField(
                                   decoration: InputDecoration(
-                                    hintText: 'Search here...',
+                                    hintText: 'Search',
                                     border: InputBorder.none,
                                   ),
                                 ),
@@ -254,19 +270,19 @@ class NavItem extends StatelessWidget {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(icon, color: isSelected ? Colors.white : Colors.grey),
+          Icon(icon, color: isSelected ? Colors.white : Colors.grey), // icon recents
           SizedBox(height: 4),
           Text(
             label,
             style: TextStyle(
-              color: isSelected ? Colors.white : Colors.grey,
+              fontSize: 12,
+              color: isSelected ? Colors.white : Colors.grey, //txt icon
             ),
           ),
-          SizedBox(height: 4),
-          // Add the white line below the selected item
           if (isSelected)
             Container(
-              height: 2,
+              margin: EdgeInsets.only(top: 2), //line icon
+              height: 1.5,
               width: 40,
               color: Colors.white,
             ),
@@ -275,3 +291,4 @@ class NavItem extends StatelessWidget {
     );
   }
 }
+

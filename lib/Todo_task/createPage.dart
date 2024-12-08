@@ -37,7 +37,7 @@ class _CreateState extends State<Create> {
   Future<void> _loadTaskLists() async {
     List<String> taskLists = await _firestoreService.getTaskLists();
     setState(() {
-      _lists = ['Default', 'Work', 'Personal', 'Urgent', 'Shopping'] + taskLists;
+      _lists = ['Default'] + taskLists;
       _lists = _lists.toSet().toList(); // Remove duplicates
       if (!_lists.contains(_selectedList)) {
         _selectedList = 'Default'; // Ensure default value is valid
@@ -104,7 +104,7 @@ class _CreateState extends State<Create> {
 
     // Show a SnackBar with a confirmation message
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text("List '$listName' deleted successfully"), backgroundColor: Colors.green,),
+      SnackBar(content: Text("List '$listName' deleted successfully !"), backgroundColor: Colors.green,),
     );
   }
 
@@ -159,7 +159,7 @@ class _CreateState extends State<Create> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.blue[800],
+        backgroundColor: Colors.blue[900],
         toolbarHeight: 120,
         leading: IconButton(
           icon: Icon(
@@ -304,47 +304,47 @@ class _CreateState extends State<Create> {
                           _clearFields();
 
                           ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(content: Text('Task added successfully')),
+                            SnackBar(content: Text('Task added successfully !'), backgroundColor: Colors.green,),
                           );
                         } catch (e) {
                           print('Error adding task: $e');
 
                           ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(content: Text('Failed to add task')),
+                            SnackBar(content: Text('Failed to add task !')),
                           );
                         }
                       } else {
                         ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text('Please fill in all fields')),
+                          SnackBar(content: Text('Please fill in all fields !', style: TextStyle(color: Colors.black),), backgroundColor: Colors.yellow[600],),
                         );
                       }
                     },
-                    child: Text('Add'),
+                    child: Text('Add', style: TextStyle(color: Colors.white),),
                     style: ElevatedButton.styleFrom(
-                      padding: EdgeInsets.symmetric(vertical: 14),
-                      backgroundColor: Colors.white,
+                      padding: EdgeInsets.symmetric(vertical: 14, horizontal: 20),
+                      backgroundColor: Colors.blue[900],
                       textStyle: TextStyle(fontSize: 20),
                     ),
                   ),
 
-                  IconButton(
-                    icon: Icon(Icons.notifications, color: Colors.blue, size: 30),
-                    onPressed: () {
-                      // Navigate to the NotificationPage
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) => NotificationPage()),
-                      );
-                    },
-                  ),
+                  // IconButton(
+                  //   icon: Icon(Icons.notifications, color: Colors.blue, size: 30),
+                  //   onPressed: () {
+                  //     // Navigate to the NotificationPage
+                  //     Navigator.push(
+                  //       context,
+                  //       MaterialPageRoute(builder: (context) => NotificationPage()),
+                  //     );
+                  //   },
+                  // ),
 
                   SizedBox(width: 16),
                   ElevatedButton(
                     onPressed: _clearFields,
-                    child: Text('Clear'),
+                    child: Text('Clear', style: TextStyle(color: Colors.white),),
                     style: ElevatedButton.styleFrom(
-                      padding: EdgeInsets.symmetric(vertical: 14),
-                      backgroundColor: Colors.white,
+                      padding: EdgeInsets.symmetric(vertical: 14, horizontal: 20),
+                      backgroundColor: Colors.blue[900],
                       textStyle: TextStyle(fontSize: 20),
                     ),
                   ),

@@ -1,14 +1,17 @@
 
-import 'package:easy_assistance_app/Todo_task/Image.dart';
+import 'package:easy_assistance_app/Todo_task/MeetingPage.dart';
 import 'package:easy_assistance_app/firebase_options.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-//import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:easy_assistance_app/firebase_options.dart'; // Your Firebase options
+import 'package:easy_assistance_app/services/notification_mobile_service.dart'; // Import the new file
+//import 'mobilenotification.dart';
+
 
 // import 'Todo_task/My Work.dart';
 import 'Todo_task/All_Notes.dart';
 import 'Todo_task/CompletedTasks.dart';
-import 'Todo_task/DirectCalendarPage.dart';
 import 'Todo_task/DocsPage.dart';
 import 'Todo_task/FavoriteTasks.dart';
 import 'Todo_task/ListsPgae.dart';
@@ -25,6 +28,7 @@ import 'Todo_task/createPage.dart';
 import 'Todo_task/default.dart';
 import 'Todo_task/frontPage.dart';
 import 'Todo_task/personal.dart';
+import 'Todo_task/premium.dart';
 import 'Todo_task/shopping.dart';
 import 'Todo_task/shoppingService.dart';
 import 'package:flutter/material.dart';
@@ -34,16 +38,26 @@ import 'Todo_task/notification_icon.dart';
 void main() async{
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
-  //FirebaseMessaging messaging = FirebaseMessaging.instance;
+  //FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
   runApp(const MyApp());
 }
 
+// // This function handles background messages
+// Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
+//   await Firebase.initializeApp();
+//   print("Handling a background message: ${message.messageId}");
+// }
+//
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
+  //final NotificationService _notificationService = NotificationService();
+
+
 
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
+    //_notificationService.requestNotificationPermissions();  // Call the method here
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'Flutter Demo',
@@ -68,7 +82,7 @@ class MyApp extends StatelessWidget {
       ),
       // debugShowCheckedModeBanner: false,
       // home: TodoApp(),
-          home:  NotePage(),
+          home: TodoApp(),
       //home: CalendarPage(upcomingTasks: [], overdueTasks: []),
 
     );

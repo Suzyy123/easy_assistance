@@ -36,7 +36,7 @@ class _NotePageState extends State<NotePage> {
     return Scaffold(
       appBar: AppBar(
         iconTheme: IconThemeData(color: Colors.white),
-        backgroundColor: Colors.blue[800],
+        backgroundColor: Colors.blue[900],
         title: Text('Write a Note',
         style: TextStyle(color: Colors.white),),
       ),
@@ -53,7 +53,7 @@ class _NotePageState extends State<NotePage> {
             //     border: OutlineInputBorder(),
             //   ),
             // ),
-                labelStyle: TextStyle(color: Colors.blue), // Label text color
+                labelStyle: TextStyle(color: Colors.grey), // Label text color
                 border: OutlineInputBorder(
                   borderSide: BorderSide(color: Colors.blue), // Default border color
                 ),
@@ -68,7 +68,7 @@ class _NotePageState extends State<NotePage> {
               controller: _contentController,
               decoration: InputDecoration(
                 labelText: 'Note Content',
-                labelStyle: TextStyle(color: Colors.blue),
+                labelStyle: TextStyle(color: Colors.grey),
                 border: OutlineInputBorder(
                   borderSide: BorderSide(color: Colors.blue), // Default border color
                 ),
@@ -87,7 +87,7 @@ class _NotePageState extends State<NotePage> {
                 style: TextStyle(color: Colors.white), // Text color
               ),
               style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.blue, // Background color of the button
+                backgroundColor: Colors.blue[900], // Background color of the button
               ),
             )
           ],

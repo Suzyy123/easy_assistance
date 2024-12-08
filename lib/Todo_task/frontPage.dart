@@ -10,15 +10,10 @@ import 'Assignment.dart';
 import 'MeetingPage.dart';
 import 'default.dart';
 import 'firestore_service.dart';
-import 'resuable_ui.dart';
-import 'package:easy_assistance_app/Todo_task/shopping.dart'; // Shopping page import
 import 'package:easy_assistance_app/Todo_task/personal.dart'; // Personal page import
 import 'package:easy_assistance_app/Todo_task/notification_icon.dart'; // Import NotificationIcon
 import 'package:intl/intl.dart'; // Ensure this is imported for DateFormat
-import 'package:flutter/material.dart';
-
 import 'CompletedTasks.dart';
-//import 'SearchResults.dart';
 import 'addpage.dart';
 import 'calendarScreen.dart';
 
@@ -26,6 +21,7 @@ class TodoApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
       theme: ThemeData(
         primaryColor: Colors.blue[900],
         scaffoldBackgroundColor: Colors.grey[100],
@@ -38,31 +34,70 @@ class TodoApp extends StatelessWidget {
 class TodoHomeScreen extends StatefulWidget {
   @override
   _TodoHomeScreenState createState() => _TodoHomeScreenState();
-
-
 }
-
-
 
 class _TodoHomeScreenState extends State<TodoHomeScreen> {
   final FirestoreService _firestoreService = FirestoreService();
-  List<String> taskLists = [];  // To hold task lists from Firestore
-  String? selectedList;  // The selected value in the dropdown
+  List<String> taskLists = [];
+  String? selectedList;
   bool _isDropdownOpened = false;
   bool isLoading = true;
-  int taskCount = 0; // Initialize taskCount
+  int taskCount = 0;
   String selectedNavItem = 'My Day';
-  bool showCalendar = false; // Flag to show CalendarPage
+  bool showCalendar = false;
   List<Map<String, String>> recentPages = [];
-  List<Map<String, String>> searchResults = []; // Store search results
-  TextEditingController searchController = TextEditingController(); // Controller for search input
-  bool isSearching = false; // Track whether the user is searching
+  List<Map<String, dynamic>> searchResults = [];
+  TextEditingController searchController = TextEditingController();
+  bool isSearching = false;
 
   @override
   void initState() {
     super.initState();
-    _loadTaskCount(); // Load task count on init
-    _loadTaskLists(); // Load task lists on init
+    _loadTaskCount();
+    _loadTaskLists();
+    searchController.addListener(onSearchChanged);
+  }
+
+  void onSearchChanged() {
+    if (searchController.text.isNotEmpty) {
+      setState(() => isSearching = true);
+      searchFirestore(searchController.text);
+    } else {
+      setState(() {
+        isSearching = false;
+        searchResults = [];
+      });
+    }
+  }
+
+  void searchFirestore(String query) async {
+    List<Map<String, dynamic>> tempResults = [];
+
+    // Search tasks
+    final tasksSnapshot = await FirebaseFirestore.instance
+        .collection('tasks')
+        .where('task', isGreaterThanOrEqualTo: query)
+        .where('task', isLessThanOrEqualTo: query + '\uf8ff')
+        .get();
+    tempResults.addAll(tasksSnapshot.docs.map((doc) => {...doc.data(), 'type': 'task'}));
+
+    // Search meetings
+    final meetingsSnapshot = await FirebaseFirestore.instance
+        .collection('meetings')
+        .where('title', isGreaterThanOrEqualTo: query)
+        .where('title', isLessThanOrEqualTo: query + '\uf8ff')
+        .get();
+    tempResults.addAll(meetingsSnapshot.docs.map((doc) => {...doc.data(), 'type': 'meeting'}));
+
+    // Search notes
+    final notesSnapshot = await FirebaseFirestore.instance
+        .collection('notes')
+        .where('title', isGreaterThanOrEqualTo: query)
+        .where('title', isLessThanOrEqualTo: query + '\uf8ff')
+        .get();
+    tempResults.addAll(notesSnapshot.docs.map((doc) => {...doc.data(), 'type': 'note'}));
+
+    setState(() => searchResults = tempResults);
   }
 
   Future<void> _loadTaskCount() async {
@@ -74,7 +109,7 @@ class _TodoHomeScreenState extends State<TodoHomeScreen> {
     }).toList();
 
     setState(() {
-      taskCount = upcomingTasks.length; // Update the task count
+      taskCount = upcomingTasks.length;
     });
   }
 
@@ -107,28 +142,12 @@ class _TodoHomeScreenState extends State<TodoHomeScreen> {
   void addToRecentPages(String page) {
     setState(() {
       if (recentPages.length >= 5) {
-        recentPages.removeAt(0); // Keep only the last 5 pages
+        recentPages.removeAt(0);
       }
       recentPages.add({
         'page': page,
-        'timestamp': DateTime.now().toString(), // Store the current time
+        'timestamp': DateTime.now().toString(),
       });
-    });
-  }
-
-  void search(String query) {
-    setState(() {
-      searchResults = recentPages
-          .where((page) => page['page']!.toLowerCase().contains(query.toLowerCase()))
-          .toList();
-      isSearching = true; // Update the searching state
-    });
-  }
-
-  Future<void> _loadTaskLists() async {
-    taskLists = await _firestoreService.getTaskLists(); // Fetch data
-    setState(() {
-      isLoading = false;
     });
   }
 
@@ -137,6 +156,13 @@ class _TodoHomeScreenState extends State<TodoHomeScreen> {
       searchController.clear();
       isSearching = false;
       searchResults.clear();
+    });
+  }
+
+  Future<void> _loadTaskLists() async {
+    taskLists = await _firestoreService.getTaskLists();
+    setState(() {
+      isLoading = false;
     });
   }
 
@@ -162,10 +188,32 @@ class _TodoHomeScreenState extends State<TodoHomeScreen> {
         actions: [
           Padding(
             padding: const EdgeInsets.only(right: 16.0),
-            child: NotificationIcon(taskCount: taskCount),
+            child: StreamBuilder<List<Map<String, dynamic>>>(
+              stream: _firestoreService.getTasks(),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return CircularProgressIndicator();
+                }
+                if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                  return NotificationIcon(taskCount: 0);  // No tasks to display
+                }
+                final tasks = snapshot.data!;
+                final now = DateTime.now();
+
+                // Filter tasks due within the next 3 days
+                final upcomingTasks = tasks.where((task) {
+                  final dueDate = _parseDueDate(task['dueDate'], task['dueTime']);
+                  return dueDate.isAfter(now) && dueDate.difference(now).inDays <= 3;
+                }).toList();
+
+                // Update the task count in NotificationIcon
+                return NotificationIcon(taskCount: upcomingTasks.length);
+              },
+            ),
           ),
         ],
       ),
+
       body: SafeArea(
         child: GestureDetector(
           onTap: () {
@@ -177,7 +225,6 @@ class _TodoHomeScreenState extends State<TodoHomeScreen> {
           },
           child: Stack(
             children: [
-              // Main content of the screen
               Container(
                 height: 160,
                 decoration: BoxDecoration(
@@ -190,12 +237,10 @@ class _TodoHomeScreenState extends State<TodoHomeScreen> {
               ),
               Column(
                 children: [
-                  // Search bar and navigation section
                   Container(
                     padding: EdgeInsets.all(16),
                     child: Column(
                       children: [
-                        // Search bar
                         Container(
                           padding: EdgeInsets.symmetric(horizontal: 16),
                           decoration: BoxDecoration(
@@ -216,7 +261,7 @@ class _TodoHomeScreenState extends State<TodoHomeScreen> {
                                   ),
                                   onChanged: (value) {
                                     if (value.isNotEmpty) {
-                                      search(value);
+                                      onSearchChanged();
                                     } else {
                                       clearSearch();
                                     }
@@ -231,7 +276,6 @@ class _TodoHomeScreenState extends State<TodoHomeScreen> {
                           ),
                         ),
                         SizedBox(height: 16),
-                        // Navigation container
                         Container(
                           height: 64,
                           width: double.infinity,
@@ -266,17 +310,8 @@ class _TodoHomeScreenState extends State<TodoHomeScreen> {
                                   onTap: () {
                                     setState(() {
                                       selectedNavItem = 'All Tasks';
-                                      showCalendar = false; // Hide calendar
-
-                                      if (!recentPages.any((page) => page['page'] == 'All Tasks')) {
-                                        recentPages.add({
-                                          'page': 'All Tasks',
-                                          'timestamp': DateTime.now().toString(), // Store the current time
-                                        });
-                                      }
-
+                                      showCalendar = false;
                                     });
-                                    // Navigate to the Calendar screen when tapped
                                     Navigator.push(
                                       context,
                                       MaterialPageRoute(builder: (context) => TaskListPage()),
@@ -293,17 +328,8 @@ class _TodoHomeScreenState extends State<TodoHomeScreen> {
                                   onTap: () {
                                     setState(() {
                                       selectedNavItem = 'Meetings';
-                                      showCalendar = false; // Hide calendar
-
-                                      if (!recentPages.any((page) => page['page'] == 'Meetings')) {
-                                        recentPages.add({
-                                          'page': 'Meetings',
-                                          'timestamp': DateTime.now().toString(), // Store the current time
-                                        });
-                                      }
-
+                                      showCalendar = false;
                                     });
-                                    // Navigate to the Calendar screen when tapped
                                     Navigator.push(
                                       context,
                                       MaterialPageRoute(builder: (context) => MeetingsPage()),
@@ -320,17 +346,8 @@ class _TodoHomeScreenState extends State<TodoHomeScreen> {
                                   onTap: () {
                                     setState(() {
                                       selectedNavItem = 'Calendar';
-                                      showCalendar = false; // Hide calendar
-
-                                      if (!recentPages.any((page) => page['page'] == 'Table Calendar')) {
-                                        recentPages.add({
-                                          'page': 'Table Calendar',
-                                          'timestamp': DateTime.now().toString(), // Store the current time
-                                        });
-                                      }
-
+                                      showCalendar = false;
                                     });
-                                    // Navigate to the Calendar screen when tapped
                                     Navigator.push(
                                       context,
                                       MaterialPageRoute(builder: (context) => CalendarScreen()),
@@ -347,18 +364,8 @@ class _TodoHomeScreenState extends State<TodoHomeScreen> {
                                   onTap: () {
                                     setState(() {
                                       selectedNavItem = 'Favorites';
-                                      showCalendar = false; // Hide calendar
-
-
-                                      if (!recentPages.any((page) => page['page'] == 'Favorite Tasks')) {
-                                        recentPages.add({
-                                          'page': 'Favorite Tasks',
-                                          'timestamp': DateTime.now().toString(), // Store the current time
-                                        });
-                                      }
-
+                                      showCalendar = false;
                                     });
-                                    //Navigate to the Calendar screen when "My Work" is tapped
                                     Navigator.push(
                                       context,
                                       MaterialPageRoute(builder: (context) => FavoriteTasksPage()),
@@ -375,15 +382,7 @@ class _TodoHomeScreenState extends State<TodoHomeScreen> {
                                   onTap: () {
                                     setState(() {
                                       selectedNavItem = 'My Work';
-                                      showCalendar = !showCalendar; // Toggle the calendar visibility
-
-
-                                      if (!recentPages.any((page) => page['page'] == 'My Work')) {
-                                        recentPages.add({
-                                          'page': 'Completed Tasks',
-                                          'timestamp': DateTime.now().toString(), // Store the current time
-                                        });
-                                      }
+                                      showCalendar = !showCalendar;
                                     });
                                   },
                                 ),
@@ -397,17 +396,8 @@ class _TodoHomeScreenState extends State<TodoHomeScreen> {
                                   onTap: () {
                                     setState(() {
                                       selectedNavItem = 'Notes';
-
-                                      showCalendar = false; // Hide calendar
-                                      if (!recentPages.any((page) => page['page'] == 'Notes')) {
-                                        recentPages.add({
-                                          'page': 'Notes',
-                                          'timestamp': DateTime.now().toString(), // Store the current time
-                                        });
-                                      }
+                                      showCalendar = false;
                                     });
-
-
                                     Navigator.push(
                                       context,
                                       MaterialPageRoute(builder: (context) => NotesPage()),
@@ -424,21 +414,12 @@ class _TodoHomeScreenState extends State<TodoHomeScreen> {
                                   onTap: () {
                                     setState(() {
                                       selectedNavItem = 'Done tasks';
-                                      showCalendar = false; // Hide calendar
-
-                                      if (!recentPages.any((page) => page['page'] == 'Completed Tasks')) {
-                                        recentPages.add({
-                                          'page': 'Completed Tasks',
-                                          'timestamp': DateTime.now().toString(), // Store the current time
-                                        });
-                                      }
+                                      showCalendar = false;
                                     });
                                     Navigator.push(
                                       context,
                                       MaterialPageRoute(builder: (context) => CompletedTasksPage()),
                                     );
-
-
                                   },
                                 ),
                               ),
@@ -453,7 +434,6 @@ class _TodoHomeScreenState extends State<TodoHomeScreen> {
                                       selectedNavItem = 'Lists';
                                       showCalendar = false;
                                     });
-
                                     Navigator.push(
                                       context,
                                       MaterialPageRoute(builder: (context) => ListPage()),
@@ -467,7 +447,6 @@ class _TodoHomeScreenState extends State<TodoHomeScreen> {
                       ],
                     ),
                   ),
-                  // Lists section
                   SizedBox(height: 12),
                   Expanded(
                     child: Container(
@@ -545,7 +524,7 @@ class _TodoHomeScreenState extends State<TodoHomeScreen> {
                                   ...menuOptions.map((option) {
                                     return InkWell(
                                       onTap: () {
-                                        addToRecentPages(option); // Add to recent pages
+                                        addToRecentPages(option);
                                         _navigateToPage(option);
                                       },
                                       child: Padding(
@@ -566,71 +545,53 @@ class _TodoHomeScreenState extends State<TodoHomeScreen> {
                                 ],
                               ),
                             ),
-                          // Conditionally show the CalendarPage widget below All Lists text
-                          if (showCalendar) // Conditionally show the CalendarPage widget
+                          if (showCalendar)
                             Expanded(
                               child: Container(
                                 color: Colors.white,
-                                child: CalendarPage(), // Calendar will show here
+                                child: CalendarPage(),
                               ),
                             ),
                           Expanded(
-                            child: selectedNavItem == 'Recents'
-                                ? Container(
-                              padding: EdgeInsets.all(16),
-                              decoration: BoxDecoration(
-                                color: Colors.white,
-                                borderRadius: BorderRadius.circular(12),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: Colors.blue.withOpacity(0.2),
-                                    blurRadius: 6,
-                                    spreadRadius: 2,
+                            child: isSearching && searchResults.isNotEmpty
+                                ? ListView.builder(
+                              itemCount: searchResults.length,
+                              itemBuilder: (context, index) {
+                                final item = searchResults[index];
+                                return Card(
+                                  child: ListTile(
+                                    title: Text(
+                                      item['type'] == 'note'
+                                          ? (item['title'] ?? 'No Title')
+                                          : (item['task'] ?? 'No Task'),
+                                    ),
+                                    subtitle: Text(
+                                      item['type'] == 'note'
+                                          ? (item['content'] ?? 'No Content')
+                                          : item['type'] == 'meeting'
+                                          ? 'Meeting'
+                                          : 'List: ${item['list'] ?? 'No List'}\nDue Date: ${item['dueDate'] ?? 'N/A'}\nDue Time: ${item['dueTime'] ?? 'N/A'}',
+                                    ),
+                                    trailing: IconButton(
+                                      icon: Icon(Icons.delete),
+                                      onPressed: () {
+                                        // Handle delete
+                                      },
+                                    ),
                                   ),
-                                ],
-                              ),
-                              child: ListView.builder(
-                                itemCount: recentPages.length,
-                                itemBuilder: (context, index) {
-                                  // Sort the recentPages list by timestamp before displaying
-                                  recentPages.sort((a, b) => DateTime.parse(b['timestamp']!).compareTo(DateTime.parse(a['timestamp']!)));
-
-                                  var pageData = recentPages[index];
-                                  return Container(
-                                    margin: EdgeInsets.only(bottom: 10),
-                                    padding: EdgeInsets.all(12),
-                                    decoration: BoxDecoration(
-                                      color: Colors.grey[200],
-                                      borderRadius: BorderRadius.circular(15),
-                                    ),
-                                    child: Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                      children: [
-                                        Text(
-                                          pageData['page']!,
-                                          style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                                        ),
-                                        SizedBox(height: 4),
-                                        Text(
-                                          'Visited on: ${pageData['timestamp']}', // Display date and time
-                                          style: TextStyle(color: Colors.grey[600], fontSize: 14),
-                                        ),
-                                      ],
-                                    ),
-                                  );
-                                },
-                              ),
+                                );
+                              },
                             )
-                                : Container(), // Show other content if not 'Recents'
+                                : isSearching && searchResults.isEmpty
+                                ? Center(child: Text('No results found'))
+                                : Container(),
                           ),
-
                         ],
                       ),
                     ),
                   ),
                 ],
               ),
-
             ],
           ),
         ),
@@ -638,6 +599,7 @@ class _TodoHomeScreenState extends State<TodoHomeScreen> {
     );
   }
 }
+
 class NavItem extends StatelessWidget {
   final IconData icon;
   final String label;
@@ -655,83 +617,28 @@ class NavItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: onTap,
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(icon, color: isSelected ? Colors.white : Colors.grey), // icon recents
-          SizedBox(height: 4),
-          Text(
-            label,
-            style: TextStyle(
-              fontSize: 12,
-              color: isSelected ? Colors.white : Colors.grey, //txt icon
-            ),
-          ),
-          if (isSelected)
-            Container(
-              margin: EdgeInsets.only(top: 2), //line icon
-              height: 1.5,
-              width: 40,
-              color: Colors.white,
-            ),
-        ],
-      ),
-    );
-  }
-}
-
-class ListItem extends StatelessWidget {
-  final IconData icon;
-  final String title;
-  final String? count;
-  final bool isSelected;
-
-  const ListItem({
-    Key? key,
-    required this.icon,
-    required this.title,
-    this.count,
-    this.isSelected = false,
-  }) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      margin: EdgeInsets.symmetric(vertical: 8, horizontal: 12),
-      padding: EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: isSelected ? Colors.grey[200] : Colors.white,
-        borderRadius: BorderRadius.circular(8),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.withOpacity(0.2),
-            blurRadius: 6,
-            spreadRadius: 2,
-          ),
-        ],
-      ),
-      child: Row(
-        children: [
-          Icon(icon, color: Colors.blue[900]),
-          SizedBox(width: 16),
-          Text(
-            title,
-            style: TextStyle(fontSize: 16),
-          ),
-          Spacer(),
-          if (count != null)
-            CircleAvatar(
-              backgroundColor: Colors.blue[900],
-              radius: 12,
-              child: Text(
-                count!,
-                style: TextStyle(color: Colors.white, fontSize: 12),
+        onTap: onTap,
+        child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(icon, color: isSelected ? Colors.white : Colors.grey),
+              SizedBox(height: 4),
+              Text(
+                label,
+                style: TextStyle(
+                  fontSize: 12,
+                  color: isSelected ? Colors.white : Colors.grey,
+                ),
               ),
-            ),
-        ],
-      ),
-    );
-  }
+              if (isSelected)
+                Container(
+                  margin: EdgeInsets.only(top: 2),
+                  height: 1.5,
+                  width: 40,
+                  color: Colors.white,
+                ),
+            ],
+        ),
+     );
+    }
 }
-//

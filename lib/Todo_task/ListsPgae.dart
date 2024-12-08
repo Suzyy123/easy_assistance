@@ -90,7 +90,7 @@ class _ListPageState extends State<ListPage> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
-            '$listName deleted successfully',
+            '$listName deleted successfully !',
             style: TextStyle(color: Colors.white),  // Set text color to white
           ),
           backgroundColor: Colors.green,  // Set the background color to green
@@ -109,7 +109,7 @@ class _ListPageState extends State<ListPage> {
     return Scaffold(
       appBar: AppBar(
         iconTheme: IconThemeData(color: Colors.white),
-        backgroundColor: Colors.blue[800],  // Set the appbar color to blue
+        backgroundColor: Colors.blue[900],  // Set the appbar color to blue
         title: Text('Task Lists',
         style: TextStyle(color: Colors.white),),
         centerTitle: true,
@@ -142,7 +142,7 @@ class _ListPageState extends State<ListPage> {
                 style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
-                  color: Colors.blue,
+                  color: Colors.blue[900],
                 ),
               ),
               SizedBox(height: 16.0),
@@ -166,24 +166,24 @@ class _ListPageState extends State<ListPage> {
                           mainAxisSize: MainAxisSize.min,
                           children: [
                             IconButton(
-                              icon: Icon(Icons.delete, color: Colors.black),
+                              icon: Icon(Icons.delete, color: Colors.blue[900]),
                               onPressed: () {
                                 showDialog(
                                   context: context,
                                   builder: (context) => AlertDialog(
                                     title: Text('Delete Task List'),
-                                    content: Text('Are you sure you want to delete,  ${taskLists[index]}?, '),
+                                    content: Text('Are you sure you want to delete,  ${taskLists[index]}? '),
                                     actions: [
                                       TextButton(
                                         onPressed: () => Navigator.of(context).pop(),
-                                        child: Text('Cancel', style: TextStyle(color: Colors.blue[700]),),
+                                        child: Text('Cancel', style: TextStyle(color: Colors.blue[900]),),
                                       ),
                                       TextButton(
                                         onPressed: () {
                                           deleteTaskList(taskLists[index]);
                                           Navigator.of(context).pop();
                                         },
-                                        child: Text('Delete', style: TextStyle(color: Colors.red),),
+                                        child: Text('Delete', style: TextStyle(color: Colors.blue[900]),),
                                       ),
                                     ],
                                   ),
@@ -216,7 +216,7 @@ class _ListPageState extends State<ListPage> {
                 child: Align(
                   alignment: Alignment.bottomRight,
                   child: IconButton(
-                    icon: Icon(Icons.add_circle, color: Colors.blue, size: 50),
+                    icon: Icon(Icons.add_circle, color: Colors.blue[900], size: 50),
                     onPressed: () {
                       // Show a dialog to input the new list name
                       showDialog(

@@ -45,7 +45,11 @@ dependencies:
   firebase_storage: ^12.3.6 # For file upload to Firebase Storage
   file_picker: ^5.4.0  # For selecting files from the device
 #  flutter_local_notifications: ^13.0.0
-#  firebase_messaging: ^15.1.5
+  firebase_messaging: ^15.1.5
+#  app_settings: ^4.2.0
+  http: 1.2.2
+#  firebase_in_app_messaging: ^0.8.0+11
+#  14.0.0
 
 
 dev_dependencies:

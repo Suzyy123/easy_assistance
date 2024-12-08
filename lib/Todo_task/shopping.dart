@@ -251,19 +251,19 @@ class NavItem extends StatelessWidget {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(icon, color: isSelected ? Colors.white : Colors.grey),
+          Icon(icon, color: isSelected ? Colors.white : Colors.grey), // icon recents
           SizedBox(height: 4),
           Text(
             label,
             style: TextStyle(
-              color: isSelected ? Colors.white : Colors.grey,
+              fontSize: 12,
+              color: isSelected ? Colors.white : Colors.grey, //txt icon
             ),
           ),
-          SizedBox(height: 4),
-          // Add the white line below the selected item
           if (isSelected)
             Container(
-              height: 2,
+              margin: EdgeInsets.only(top: 2), //line icon
+              height: 1.5,
               width: 40,
               color: Colors.white,
             ),

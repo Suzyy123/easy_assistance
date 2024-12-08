@@ -18,7 +18,7 @@ class FavoriteTasksPage extends StatelessWidget {
             fontWeight: FontWeight.bold,
           ),
         ),
-        backgroundColor: Colors.blue[800],
+        backgroundColor: Colors.blue[900],
       ),
       body: StreamBuilder<List<Map<String, dynamic>>>(
         stream: _firestoreService.getFavoriteTasks(), // Fetch favorite tasks

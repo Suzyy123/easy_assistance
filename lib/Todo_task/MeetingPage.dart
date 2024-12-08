@@ -22,13 +22,13 @@ class _MeetingsPageState extends State<MeetingsPage> {
             TextButton(
               onPressed: () => Navigator.pop(context, false),
               child: Text('Cancel',
-                style: TextStyle(color: Colors.blue),
+                style: TextStyle(color: Colors.blue[900]),
               ),
             ),
             TextButton(
               onPressed: () => Navigator.pop(context, true),
               child: Text('Delete',
-                style: TextStyle(color: Colors.red),
+                style: TextStyle(color: Colors.blue[900]),
               ),
             ),
           ],
@@ -43,7 +43,7 @@ class _MeetingsPageState extends State<MeetingsPage> {
       // Show success message
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Meeting deleted successfully'),
+          content: Text('Meeting deleted successfully !'),
           backgroundColor: Colors.green, // Set the background color to green
         ),
       );
@@ -66,7 +66,7 @@ class _MeetingsPageState extends State<MeetingsPage> {
       builder: (BuildContext context) {
         return SingleChildScrollView(
           child: AlertDialog(
-            title: Text('Edit Meeting', style: TextStyle(color: Colors.blue),),
+            title: Text('Edit Meeting', style: TextStyle(color: Colors.blue[900]),),
             content: Form(
               key: _formKey,
               child: Column(
@@ -75,7 +75,8 @@ class _MeetingsPageState extends State<MeetingsPage> {
                 children: [
                   TextFormField(
                     initialValue: _editedTitle,
-                    decoration: InputDecoration(labelText: 'Title', labelStyle: TextStyle(color: Colors.blue),
+                    decoration: InputDecoration(labelText: 'Title', labelStyle: TextStyle(color: Colors.grey
+                    ),
                       focusedBorder: UnderlineInputBorder(
                         borderSide: BorderSide(color: Colors.blue), // Change the border color to blue
                       ),
@@ -91,7 +92,7 @@ class _MeetingsPageState extends State<MeetingsPage> {
                   TextFormField(
                     initialValue: _editedDescription,
                     decoration: InputDecoration(labelText: 'Description',
-                      labelStyle: TextStyle(color: Colors.blue), // Change label color to blue
+                      labelStyle: TextStyle(color: Colors.grey), // Change label color to blue
                       focusedBorder: UnderlineInputBorder(
                         borderSide: BorderSide(color: Colors.blue), // Change the border color to blue
                       ),
@@ -108,7 +109,7 @@ class _MeetingsPageState extends State<MeetingsPage> {
                   TextFormField(
                     readOnly: true,
                     decoration: InputDecoration(labelText: 'Date',
-                      labelStyle: TextStyle(color: Colors.blue), // Change label color to blue
+                      labelStyle: TextStyle(color: Colors.grey), // Change label color to blue
                       focusedBorder: UnderlineInputBorder(
                         borderSide: BorderSide(color: Colors.blue), // Change the border color to blue
                       ),
@@ -132,7 +133,7 @@ class _MeetingsPageState extends State<MeetingsPage> {
                   TextFormField(
                     readOnly: true,
                     decoration: InputDecoration(labelText: 'Time',
-                      labelStyle: TextStyle(color: Colors.blue), // Change label color to blue
+                      labelStyle: TextStyle(color: Colors.grey), // Change label color to blue
                       focusedBorder: UnderlineInputBorder(
                         borderSide: BorderSide(color: Colors.blue), // Change the border color to blue
                       ),
@@ -173,12 +174,12 @@ class _MeetingsPageState extends State<MeetingsPage> {
                     items: ['Virtual', 'In-Person'].map((location) {
                       return DropdownMenuItem<String>(
                         value: location,
-                        child: Text(location, style: TextStyle(color: Colors.blue)), // Set text color to blue
+                        child: Text(location, style: TextStyle(color: Colors.black)), // Set text color to blue
                       );
                     }).toList(),
                     decoration: InputDecoration(
                       labelText: 'Location',
-                      labelStyle: TextStyle(color: Colors.blue), // Change label color to blue
+                      labelStyle: TextStyle(color: Colors.grey), // Change label color to blue
                       focusedBorder: UnderlineInputBorder(
                         borderSide: BorderSide(color: Colors.blue), // Change the border color to blue
                       ),
@@ -194,7 +195,7 @@ class _MeetingsPageState extends State<MeetingsPage> {
                 },
                 child: Text(
                   'Cancel',
-                  style: TextStyle(color: Colors.blue), // Change text color to blue
+                  style: TextStyle(color: Colors.black), // Change text color to blue
                 ),
               ),
               ElevatedButton(
@@ -218,7 +219,7 @@ class _MeetingsPageState extends State<MeetingsPage> {
                   }
                 },
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.blue, // Set the background color of the button to blue
+                  backgroundColor: Colors.blue[900], // Set the background color of the button to blue
                 ),
                 child: Text('Update', style: TextStyle(color: Colors.white)),
               ),

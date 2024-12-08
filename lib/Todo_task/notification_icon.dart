@@ -15,7 +15,7 @@ class NotificationIcon extends StatefulWidget {
 
 class _NotificationIconState extends State<NotificationIcon> {
   late int _taskCount;
-  late int _meetingCount; // Track the meeting count
+  //late int _meetingCount; // Track the meeting count
 
   @override
   void initState() {

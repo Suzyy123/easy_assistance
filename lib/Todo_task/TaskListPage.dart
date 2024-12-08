@@ -11,6 +11,7 @@ class TaskListPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        backgroundColor: Colors.blue[900],
         toolbarHeight: 95,
         // title: Text('Task List'),
         title: const Text(
@@ -21,7 +22,6 @@ class TaskListPage extends StatelessWidget {
           ), // Make the title text white
 
         ),
-        backgroundColor: Colors.blue[800],
         iconTheme: IconThemeData(color: Colors.white), // Set the back arrow color to white
         // actions: [
         //   IconButton(
