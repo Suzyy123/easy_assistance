@@ -16,14 +16,14 @@ class UserSearchService {
           .collection('users')
           .orderBy('username')
           .startAt([lowerQuery])
-          .endAt([lowerQuery + '\uf8ff'])
+          .endAt(['$lowerQuery\uf8ff'])
           .get();
 
       QuerySnapshot<Map<String, dynamic>> usersByEmail = await FirebaseFirestore.instance
           .collection('users')
           .orderBy('email')
           .startAt([lowerQuery])
-          .endAt([lowerQuery + '\uf8ff'])
+          .endAt(['$lowerQuery\uf8ff'])
           .get();
 
       // Combine results from both username and email search

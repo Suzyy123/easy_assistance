@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'homePage.dart';
-import 'homePageEdits.dart'; // Ensure you import the correct Home Page file.
+// Ensure you import the correct Home Page file.
 
 class FriendRequestPage extends StatefulWidget {
   const FriendRequestPage({super.key});

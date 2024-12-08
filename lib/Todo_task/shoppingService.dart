@@ -6,6 +6,8 @@ class ShoppingListPage extends StatelessWidget {
   final FirestoreService _firestoreService = FirestoreService();
   final TaskCompletionService _taskCompletionService = TaskCompletionService();
 
+  ShoppingListPage({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(

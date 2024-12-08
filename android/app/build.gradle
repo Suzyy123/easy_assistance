@@ -11,14 +11,13 @@ android {
     ndkVersion = flutter.ndkVersion
 
     defaultConfig {
-        // Specify your own unique Application ID
         applicationId = "com.example.easy_assistance_app"
-        // Updated values to match your app requirements
-        minSdk = flutter.minSdkVersion
+        minSdk = 23 // Set explicitly to 23
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode
         versionName = flutter.versionName
     }
+
 
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_1_8

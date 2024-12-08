@@ -1,10 +1,11 @@
 
-import 'package:easy_assistance_app/Todo_task/shopping.dart';
 import 'package:flutter/material.dart';
 
 import 'addpage.dart';
 
 class TodoApp extends StatelessWidget {
+  const TodoApp({super.key});
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -18,6 +19,8 @@ class TodoApp extends StatelessWidget {
 }
 
 class TodoHomeScreen extends StatefulWidget {
+  const TodoHomeScreen({super.key});
+
   @override
   _TodoHomeScreenState createState() => _TodoHomeScreenState();
 
@@ -277,12 +280,12 @@ class NavItem extends StatelessWidget {
   final Function() onTap;
 
   const NavItem({
-    Key? key,
+    super.key,
     required this.icon,
     required this.label,
     required this.isSelected,
     required this.onTap,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -320,12 +323,12 @@ class ListItem extends StatelessWidget {
   final bool isSelected;
 
   const ListItem({
-    Key? key,
+    super.key,
     required this.icon,
     required this.title,
     this.count,
     this.isSelected = false,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

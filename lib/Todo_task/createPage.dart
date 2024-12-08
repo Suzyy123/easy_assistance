@@ -111,7 +111,7 @@ class _CreateState extends State<Create> {
 
     if (pickedTime != null) {
       setState(() {
-        _timeController.text = '${pickedTime.format(context)}';
+        _timeController.text = pickedTime.format(context);
       });
     }
   }
@@ -285,12 +285,12 @@ class _CreateState extends State<Create> {
                             );
                           }
                         },
-                        child: Text('Add'),
                         style: ElevatedButton.styleFrom(
                           padding: EdgeInsets.symmetric(vertical: 14),
                           backgroundColor: Colors.white,
                           textStyle: TextStyle(fontSize: 20),
                         ),
+                        child: Text('Add'),
                       ),
           
                       IconButton(
@@ -307,12 +307,12 @@ class _CreateState extends State<Create> {
                       SizedBox(width: 16),
                       ElevatedButton(
                         onPressed: _clearFields,
-                        child: Text('Clear'),
                         style: ElevatedButton.styleFrom(
                           padding: EdgeInsets.symmetric(vertical: 14),
                           backgroundColor: Colors.white,
                           textStyle: TextStyle(fontSize: 20),
                         ),
+                        child: Text('Clear'),
                       ),
                     ],
                   ),

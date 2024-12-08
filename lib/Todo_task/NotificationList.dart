@@ -5,7 +5,7 @@ import 'package:intl/intl.dart';
 class NotificationPage extends StatelessWidget {
   final FirestoreService firestoreService = FirestoreService();
 
-  NotificationPage({Key? key}) : super(key: key);
+  NotificationPage({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -99,7 +99,7 @@ class NotificationPage extends StatelessWidget {
                   ),
                 ),
               );
-            }).toList(),
+            }),
           ],
         ),
       ),

@@ -6,6 +6,8 @@ class TaskListPage extends StatelessWidget {
   final FirestoreService _firestoreService = FirestoreService();
   final TaskCompletionService _taskCompletionService = TaskCompletionService();
 
+  TaskListPage({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(

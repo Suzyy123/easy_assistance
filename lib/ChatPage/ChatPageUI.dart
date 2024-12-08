@@ -4,7 +4,7 @@ import '../Components/icons.dart';
 import '../authServices/AuthServices.dart';
 import 'Searchfucntion.dart';
 import 'chatListPage.dart';
-import 'chatfucntions.dart';
+import 'friendRequestPage.dart'; // Import the FriendRequestPage
 
 class ChatPage extends StatefulWidget {
   const ChatPage({super.key});
@@ -18,7 +18,7 @@ class _ChatPageState extends State<ChatPage> {
   String searchQuery = "";
   List<Map<String, dynamic>> searchResults = [];
 
-  final UserSearchService _userSearchService = UserSearchService(); // Instance of UserSearchService
+  final UserSearchService _userSearchService = UserSearchService();
 
   @override
   void initState() {
@@ -26,14 +26,12 @@ class _ChatPageState extends State<ChatPage> {
     _loadProfileAvatar();
   }
 
-  // Log out the user
   void logoutfrompage() async {
     final auth = AuthServices();
     await auth.signOut();
-    Navigator.of(context).pushReplacementNamed('/login'); // Replace with your actual route
+    Navigator.of(context).pushReplacementNamed('/login');
   }
 
-  // Load avatar from SharedPreferences
   Future<void> _loadProfileAvatar() async {
     final prefs = await SharedPreferences.getInstance();
     setState(() {
@@ -41,7 +39,6 @@ class _ChatPageState extends State<ChatPage> {
     });
   }
 
-  // Function to handle searching users by username or email
   Future<void> searchUsers(String query) async {
     if (query.isEmpty) {
       setState(() {
@@ -123,23 +120,31 @@ class _ChatPageState extends State<ChatPage> {
                   Padding(
                     padding: const EdgeInsets.only(right: 16.0),
                     child: Row(
-                      children: const [
-                        Text(
+                      children: [
+                        const Text(
                           "Messages",
                           style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                         ),
-                        Spacer(), // This will push "Requests" to the right
-                        Padding(
-                          padding: EdgeInsets.only(left: 10),
-                          child: Text(
-                            "Requests",
-                            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                        Spacer(),
+                        GestureDetector(
+                          onTap: () {
+                            // Navigate to FriendRequestPage
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(builder: (context) => const FriendRequestPage()),
+                            );
+                          },
+                          child: const Padding(
+                            padding: EdgeInsets.only(left: 10),
+                            child: Text(
+                              "Requests",
+                              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                            ),
                           ),
                         ),
                       ],
                     ),
                   ),
-
                 // Display Search Results label
                 if (searchQuery.isNotEmpty)
                   const Align(
@@ -152,7 +157,6 @@ class _ChatPageState extends State<ChatPage> {
               ],
             ),
           ),
-
           // Search Results or Main Content
           Expanded(
             child: searchQuery.isNotEmpty && searchResults.isNotEmpty
@@ -164,8 +168,8 @@ class _ChatPageState extends State<ChatPage> {
                   margin: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
                   padding: const EdgeInsets.all(16.0),
                   decoration: BoxDecoration(
-                    color: Colors.pink, // Purple background color
-                    borderRadius: BorderRadius.circular(12.0), // Rounded corners
+                    color: Colors.pink,
+                    borderRadius: BorderRadius.circular(12.0),
                   ),
                   child: Row(
                     children: [
@@ -205,7 +209,6 @@ class _ChatPageState extends State<ChatPage> {
                 ? const Center(child: Text("No users found"))
                 : const ChatList(),
           ),
-
           // Bottom Navigation Bar
           const NavigatorBar(),
         ],

@@ -7,7 +7,7 @@ import 'forgotPassword.dart';
 class Loginpage extends StatefulWidget {
   final void Function()? onTap;
 
-  Loginpage({super.key, required this.onTap});
+  const Loginpage({super.key, required this.onTap});
 
   @override
   _LoginpageState createState() => _LoginpageState();
@@ -76,7 +76,7 @@ class _LoginpageState extends State<Loginpage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Theme.of(context).colorScheme.background,
+      backgroundColor: Theme.of(context).colorScheme.surface,
       appBar: AppBar(
         title: const Text(
           "Login",

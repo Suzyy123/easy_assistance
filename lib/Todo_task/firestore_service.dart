@@ -51,7 +51,7 @@ class FirestoreService {
   Stream<List<Map<String, dynamic>>> getTasks() {
     return _firestore.collection('tasks').snapshots().map((snapshot) =>
         snapshot.docs.map((doc) {
-          final data = doc.data() as Map<String, dynamic>;
+          final data = doc.data();
           data['id'] = doc.id; // Add document ID for reference
           return data;
         }).toList());

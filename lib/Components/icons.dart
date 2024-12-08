@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 
 import '../ChatPage/ChatPageUI.dart';
 import '../ProfilePage/ProfileMain.dart';
-import '../Pages/homePage.dart';
 
 class NavigationBarButton extends StatelessWidget {
   final IconData icon;

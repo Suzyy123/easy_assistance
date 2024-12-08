@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'firestore_service.dart'; // Import your FirestoreService
 
 class Addpage extends StatefulWidget {
+  const Addpage({super.key});
+
   @override
   _AddpageState createState() => _AddpageState();
 }

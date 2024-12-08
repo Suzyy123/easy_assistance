@@ -35,9 +35,7 @@ class _AvatarSelectionPageState extends State<AvatarSelectionPage> {
     String? avatarUrl = prefs.getString('selectedAvatar'); // Load selected avatar locally
 
     // Load from backend if not available locally
-    if (avatarUrl == null) {
-      avatarUrl = await _loadSelectedAvatarFromBackend("USER_ID"); // Replace "USER_ID" with actual user ID
-    }
+    avatarUrl ??= await _loadSelectedAvatarFromBackend("USER_ID");
 
     setState(() {
       selectedAvatar = avatarUrl;
