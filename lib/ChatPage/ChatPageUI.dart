@@ -29,8 +29,8 @@ class _ChatPageState extends State<ChatPage> {
 
   void logoutfrompage() async {
     final auth = AuthServices();
-    await auth.signOut();
-    Navigator.of(context).pushReplacementNamed('/login');
+    await auth.signOut(); // Sign out the user
+    Navigator.of(context).pushReplacementNamed('/login'); // Redirect to Login Page
   }
 
   Future<void> _loadProfileAvatar() async {
@@ -93,7 +93,7 @@ class _ChatPageState extends State<ChatPage> {
         title: const Text("Chat Page"),
         actions: [
           IconButton(
-            onPressed: logoutfrompage,
+            onPressed: logoutfrompage, // Logout functionality
             icon: const Icon(Icons.logout),
             tooltip: 'Logout',
           ),
@@ -219,7 +219,7 @@ class _ChatPageState extends State<ChatPage> {
                       const Spacer(),
                       ElevatedButton(
                         onPressed: () async {
-                          String fromUserId = 'Prapti@123'; //
+                          String fromUserId = 'Prapti@123'; // Replace with actual user ID
                           String toUserId = user['id'];  // ID of the user being searched
                           await sendFriendRequest(fromUserId, toUserId);
                         },

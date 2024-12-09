@@ -1,6 +1,8 @@
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'homePage.dart';
-// Ensure you import the correct Home Page file.
+import '../services/FriendRequestService.dart';
+
 
 class FriendRequestPage extends StatefulWidget {
   const FriendRequestPage({super.key});
@@ -10,64 +12,97 @@ class FriendRequestPage extends StatefulWidget {
 }
 
 class _FriendRequestPageState extends State<FriendRequestPage> {
-  final List<Map<String, String>> friendRequests = [
-    {
-      "name": "John Doe",
-      "description": "Software Engineer at Google",
-      "imageUrl": "https://via.placeholder.com/150",
-    },
-    {
-      "name": "Jane Smith",
-      "description": "Product Manager at Amazon",
-      "imageUrl": "https://via.placeholder.com/150",
-    },
-    {
-      "name": "Mike Johnson",
-      "description": "UI/UX Designer at Adobe",
-      "imageUrl": "https://via.placeholder.com/150",
-    },
-  ];
+  List<Map<String, dynamic>> friendRequests = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _loadFriendRequests();
+  }
+
+  void _loadFriendRequests() async {
+    final currentUserId = FirebaseAuth.instance.currentUser?.uid;
+    if (currentUserId == null) {
+      print("User not logged in");
+      return;
+    }
+
+    try {
+      QuerySnapshot snapshot = await FirebaseFirestore.instance
+          .collection('friend_requests')
+          .where('to', isEqualTo: currentUserId)
+          .where('status', isEqualTo: 'pending')
+          .get();
+
+      setState(() {
+        friendRequests = snapshot.docs.map((doc) {
+          return {
+            "id": doc.id,
+            "from": doc['from'], // sender's ID
+            "name": doc['senderName'], // sender's name
+            "imageUrl": doc['senderImageUrl'], // sender's image
+          };
+        }).toList();
+      });
+    } catch (e) {
+      print("Error loading friend requests: $e");
+    }
+  }
+
+  void acceptRequest(String requestId, String fromUserId) async {
+    final currentUserId = FirebaseAuth.instance.currentUser?.uid;
+    if (currentUserId == null) {
+      print("User not logged in");
+      return;
+    }
+
+    // Call the method to accept the request and add the users to the friends collection
+    await FriendRequestService().acceptRequest(requestId, fromUserId, currentUserId);
+    setState(() {
+      friendRequests.removeWhere((request) => request['id'] == requestId);
+    });
+  }
+
+  void declineRequest(String requestId) async {
+    final currentUserId = FirebaseAuth.instance.currentUser?.uid;
+    if (currentUserId == null) {
+      print("User not logged in");
+      return;
+    }
+
+    // Call the method to decline the request and remove it
+    await FriendRequestService().declineRequest(requestId);
+    setState(() {
+      friendRequests.removeWhere((request) => request['id'] == requestId);
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.white,
-        elevation: 0,
+        backgroundColor: Colors.blue,
+        title: const Text("Friend Requests"),
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.black),
+          icon: const Icon(Icons.arrow_back),
           onPressed: () {
-            Navigator.pushReplacement(
-              context,
-              MaterialPageRoute(builder: (context) => const homePage()),
-            );
+            Navigator.pop(context); // Go back to the previous screen
           },
         ),
-        title: const Text(
-          "Friend Requests",
-          style: TextStyle(color: Colors.black),
-        ),
       ),
-      body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: ListView.builder(
-            itemCount: friendRequests.length,
-            itemBuilder: (context, index) {
-              final request = friendRequests[index];
-              return FriendRequestCard(
-                name: request["name"]!,
-                description: request["description"]!,
-                imageUrl: request["imageUrl"]!,
-                onDelete: () {
-                  setState(() {
-                    friendRequests.removeAt(index);
-                  });
-                },
-              );
-            },
-          ),
-        ),
+      body: friendRequests.isEmpty
+          ? const Center(child: Text("No friend requests"))
+          : ListView.builder(
+        itemCount: friendRequests.length,
+        itemBuilder: (context, index) {
+          final request = friendRequests[index];
+          return FriendRequestCard(
+            name: request['name'],
+            imageUrl: request['imageUrl'],
+            onAccept: () => acceptRequest(request['id'], request['from']),
+            onDelete: () => declineRequest(request['id']),
+          );
+        },
       ),
     );
   }
@@ -75,76 +110,50 @@ class _FriendRequestPageState extends State<FriendRequestPage> {
 
 class FriendRequestCard extends StatelessWidget {
   final String name;
-  final String description;
   final String imageUrl;
+  final VoidCallback onAccept;
   final VoidCallback onDelete;
 
   const FriendRequestCard({
     super.key,
     required this.name,
-    required this.description,
     required this.imageUrl,
+    required this.onAccept,
     required this.onDelete,
   });
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 16),
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey[300]!,
-            blurRadius: 5,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Row(
-        children: [
-          CircleAvatar(
-            radius: 30,
-            backgroundImage: NetworkImage(imageUrl),
-          ),
-          const SizedBox(width: 10),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  name,
-                  style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  description,
-                  style: TextStyle(color: Colors.grey[600], fontSize: 14),
-                ),
-              ],
+    return Card(
+      margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Row(
+          children: [
+            CircleAvatar(
+              radius: 30,
+              backgroundImage: NetworkImage(imageUrl),
             ),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              // Add accept action here if needed
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.blue,
-              foregroundColor: Colors.white,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(8),
+            const SizedBox(width: 16),
+            Expanded(
+              child: Text(
+                name,
+                style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
               ),
             ),
-            child: const Text("Confirm"),
-          ),
-          const SizedBox(width: 8),
-          TextButton(
-            onPressed: onDelete,
-            child: const Text("Delete", style: TextStyle(color: Colors.red)),
-          ),
-        ],
+            ElevatedButton(
+              onPressed: onAccept,
+              style: ElevatedButton.styleFrom(backgroundColor: Colors.blue),
+              child: const Text("Accept"),
+            ),
+            const SizedBox(width: 8),
+            TextButton(
+              onPressed: onDelete,
+              style: TextButton.styleFrom(foregroundColor: Colors.red),
+              child: const Text("Decline"),
+            ),
+          ],
+        ),
       ),
     );
   }
