@@ -7,30 +7,7 @@ class ChatList extends StatelessWidget {
   Widget build(BuildContext context) {
     // Dummy messages for the chat list
     final List<Map<String, String>> messages = [
-      {
-        "name": "Alice",
-        "lastMessage": "Hey, how are you?",
-        "time": "10:30 AM",
-        "imageUrl": "https://via.placeholder.com/150",
-      },
-      {
-        "name": "Bob",
-        "lastMessage": "Let's catch up later.",
-        "time": "9:15 AM",
-        "imageUrl": "https://via.placeholder.com/150",
-      },
-      {
-        "name": "Charlie",
-        "lastMessage": "Did you complete the task?",
-        "time": "Yesterday",
-        "imageUrl": "https://via.placeholder.com/150",
-      },
-      {
-        "name": "Diana",
-        "lastMessage": "Happy Birthday!",
-        "time": "2 days ago",
-        "imageUrl": "https://via.placeholder.com/150",
-      },
+
     ];
 
     return ListView.builder(

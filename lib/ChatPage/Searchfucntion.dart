@@ -1,7 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class UserSearchService {
-  // Function to handle searching users by username or email
+  // Function to search users by username or email
   Future<List<Map<String, dynamic>>> searchUsers(String query) async {
     if (query.isEmpty) {
       return [];
@@ -11,7 +11,7 @@ class UserSearchService {
       // Convert query to lowercase for case-insensitive matching
       String lowerQuery = query.toLowerCase();
 
-      // Perform prefix-based search using startAt and endAt
+      // Search by username using prefix matching
       QuerySnapshot<Map<String, dynamic>> usersByUsername = await FirebaseFirestore.instance
           .collection('users')
           .orderBy('username')
@@ -19,6 +19,7 @@ class UserSearchService {
           .endAt(['$lowerQuery\uf8ff'])
           .get();
 
+      // Search by email using prefix matching
       QuerySnapshot<Map<String, dynamic>> usersByEmail = await FirebaseFirestore.instance
           .collection('users')
           .orderBy('email')
@@ -26,13 +27,24 @@ class UserSearchService {
           .endAt(['$lowerQuery\uf8ff'])
           .get();
 
-      // Combine results from both username and email search
-      List<Map<String, dynamic>> combinedResults = [
-        ...usersByUsername.docs.map((doc) => doc.data()),
-        ...usersByEmail.docs.map((doc) => doc.data())
-      ];
+      // Combine results, ensuring no duplicates
+      Map<String, Map<String, dynamic>> uniqueResults = {};
 
-      return combinedResults;
+      for (var doc in usersByUsername.docs) {
+        uniqueResults[doc.id] = {
+          'id': doc.id,
+          ...doc.data(),
+        };
+      }
+
+      for (var doc in usersByEmail.docs) {
+        uniqueResults[doc.id] = {
+          'id': doc.id,
+          ...doc.data(),
+        };
+      }
+
+      return uniqueResults.values.toList();
     } catch (e) {
       print('Error searching users: $e');
       return [];

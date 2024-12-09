@@ -1,10 +1,12 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import '../Components/icons.dart';
 import '../authServices/AuthServices.dart';
-import 'Searchfucntion.dart';
-import 'chatListPage.dart';
+import '../Components/icons.dart';
 import 'friendRequestPage.dart'; // Import the FriendRequestPage
+import 'Searchfucntion.dart'; // Import your user search function
+import 'chatListPage.dart';
 
 class ChatPage extends StatefulWidget {
   const ChatPage({super.key});
@@ -17,7 +19,6 @@ class _ChatPageState extends State<ChatPage> {
   String? profileAvatar;
   String searchQuery = "";
   List<Map<String, dynamic>> searchResults = [];
-
   final UserSearchService _userSearchService = UserSearchService();
 
   @override
@@ -57,6 +58,21 @@ class _ChatPageState extends State<ChatPage> {
       setState(() {
         searchResults = [];
       });
+    }
+  }
+
+  // Send friend request method
+  Future<void> sendFriendRequest(String fromUserId, String toUserId) async {
+    try {
+      await FirebaseFirestore.instance.collection('friend_requests').add({
+        'from': fromUserId,   // ID of the user sending the request
+        'to': toUserId,       // ID of the user receiving the request
+        'status': 'pending',  // Default status of the request
+        'timestamp': FieldValue.serverTimestamp(), // Timestamp of the request
+      });
+      print('Friend request sent successfully!');
+    } catch (e) {
+      print('Error sending friend request: $e');
     }
   }
 
@@ -200,6 +216,15 @@ class _ChatPageState extends State<ChatPage> {
                           ),
                         ],
                       ),
+                      const Spacer(),
+                      ElevatedButton(
+                        onPressed: () async {
+                          String fromUserId = 'Prapti@123'; //
+                          String toUserId = user['id'];  // ID of the user being searched
+                          await sendFriendRequest(fromUserId, toUserId);
+                        },
+                        child: const Text('Send Request'),
+                      ),
                     ],
                   ),
                 );
@@ -207,7 +232,7 @@ class _ChatPageState extends State<ChatPage> {
             )
                 : searchQuery.isNotEmpty && searchResults.isEmpty
                 ? const Center(child: Text("No users found"))
-                : const ChatList(),
+                : const ChatList(), // Display your chat list if no search query
           ),
           // Bottom Navigation Bar
           const NavigatorBar(),

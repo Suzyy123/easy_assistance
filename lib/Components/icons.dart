@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../ChatPage/ChatPageUI.dart';
 import '../ProfilePage/ProfileMain.dart';
+import '../RegisterPages/userlist.dart';
 
 class NavigationBarButton extends StatelessWidget {
   final IconData icon;
@@ -54,7 +55,7 @@ class NavigatorBar extends StatelessWidget {
               onTap: () {
                 Navigator.pushReplacement(
                   context,
-                  MaterialPageRoute(builder: (context) => const ChatPage()),
+                  MaterialPageRoute(builder: (context) => const Homepage()),
                 );
               },
             ),

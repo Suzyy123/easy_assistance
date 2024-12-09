@@ -5,7 +5,10 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 
 
+import 'ChatPage/ChatBubble.dart';
 import 'ChatPage/ChatPageUI.dart';
+import 'ChatPage/Message.dart';
+import 'ChatPage/Messenger.dart';
 import 'ChatPage/chatListPage.dart';
 
 
@@ -24,7 +27,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Flutter Demo',
       debugShowCheckedModeBanner: false,
-      home: ChatPage(),
+      home: Authgate(),
       theme: lightMode,
     );
   }
