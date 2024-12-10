@@ -16,17 +16,18 @@ class Buttons extends StatelessWidget {
       onTap: onTap,
       child: Container(
         decoration: BoxDecoration(
-          color: const Color(0xFF013763),
-          borderRadius: BorderRadius.circular(8), // Adjusted corner radius
+          color: Colors.blue[800],
+          borderRadius: BorderRadius.circular(200), // Adjusted corner radius
         ),
         padding: const EdgeInsets.all(15), // Reduced padding for smaller size
-        margin: const EdgeInsets.symmetric(horizontal: 20), // Adjusted margin
+        margin: const EdgeInsets.symmetric(horizontal: 40), // Adjusted margin
         child: Center(
           child: Text(
             text,
             style: const TextStyle(
               color: Colors.white,
-              fontSize: 16, // Reduced font size for the text
+              fontSize: 16,
+              fontWeight: FontWeight.bold// Reduced font size for the text
             ),
           ),
         ),
