@@ -61,7 +61,8 @@ class _AddpageState extends State<Addpage> {
           // List of task names with Menu icon on the left
           Expanded(
             child: _taskNames.isEmpty
-                ? Center(child: CircularProgressIndicator()) // Loading state
+                //? Center(child: CircularProgressIndicator()) // Loading state
+                ? Container() // No loading sign, just empty space
                 : ListView.builder(
               itemCount: _taskNames.length,
               itemBuilder: (context, index) {

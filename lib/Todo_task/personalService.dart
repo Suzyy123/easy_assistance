@@ -2,11 +2,9 @@ import 'package:flutter/material.dart';
 import 'firestore_service.dart';
 import 'task_completion_service.dart';  // Import the new service
 
-class ShoppingListPage extends StatelessWidget {
+class PersonalListPage extends StatelessWidget {
   final FirestoreService _firestoreService = FirestoreService();
   final FirestoreService _taskCompletionService = FirestoreService();
-
-  ShoppingListPage({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -14,7 +12,7 @@ class ShoppingListPage extends StatelessWidget {
       appBar: AppBar(
         toolbarHeight: 95, // Adjust the height if necessary
         title: const Text(
-          'Shopping List',
+          'Personal List',
           style: TextStyle(
             color: Colors.black,       // White color for the title text
             fontSize: 27,              // Font size set to 27
@@ -45,23 +43,23 @@ class ShoppingListPage extends StatelessWidget {
           }
 
           if (!snapshot.hasData || snapshot.data!.isEmpty) {
-            return Center(child: Text('No tasks found in Shopping list.'));
+            return Center(child: Text('No tasks found in Personal list.'));
           }
 
           // Filter tasks to only those with "Shopping" list
-          final shoppingTasks = snapshot.data!
-              .where((task) => task['list'] == 'Shopping') // Filter by 'Shopping' list
+          final personalTasks = snapshot.data!
+              .where((task) => task['list'] == 'Personal') // Filter by 'Shopping' list
               .toList();
 
-          if (shoppingTasks.isEmpty) {
-            return Center(child: Text('No tasks found in Shopping list.'));
+          if (personalTasks.isEmpty) {
+            return Center(child: Text('No tasks found in Personal list.'));
           }
 
           // Display only shopping tasks
           return ListView.builder(
-            itemCount: shoppingTasks.length,
+            itemCount: personalTasks.length,
             itemBuilder: (context, index) {
-              final task = shoppingTasks[index];
+              final task = personalTasks[index];
               return Card(
                 margin: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
                 child: ListTile(
@@ -93,7 +91,7 @@ class ShoppingListPage extends StatelessWidget {
                       IconButton(
                         icon: Icon(Icons.delete, color: Colors.black),
                         onPressed: () {
-                          //_taskCompletionService.deleteTask(task['id']);
+                         // _taskCompletionService.deleteTask(task['id']);
 
                           // Show the snackbar after deletion
                           ScaffoldMessenger.of(context).showSnackBar(

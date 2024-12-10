@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:easy_assistance_app/Todo_task/firestore_service.dart';
 import 'package:intl/intl.dart';
+import 'package:easy_assistance_app/Todo_task/firestore_service.dart';
+import 'My Work.dart';  // Import the CalendarPage
+
 
 class NotificationPage extends StatelessWidget {
   final FirestoreService firestoreService = FirestoreService();
 
-  NotificationPage({super.key});
+  NotificationPage({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -51,12 +53,28 @@ class NotificationPage extends StatelessWidget {
                 _buildTaskSection('Tasks Approaching Due Date', upcomingTasks, now, false),
               if (overdueTasks.isNotEmpty)
                 _buildTaskSection('Overdue Tasks', overdueTasks, now, true),
+
+
+              // Navigate to CalendarPage with filtered tasks
+              // ElevatedButton(
+              //   onPressed: () {
+              //     Navigator.push(
+              //         context,
+              //         MaterialPageRoute(
+              //           builder: (context) => CalendarPage(tasks: tasks),
+              //     ),
+              //     );
+              //   },
+              //   child: Text('Go to Calendar'),
+              // ),
             ],
           );
         },
       ),
     );
   }
+
+
 
   // Helper: Parse due date and time
   DateTime _parseDueDate(String dueDate, String dueTime) {
@@ -80,10 +98,19 @@ class NotificationPage extends StatelessWidget {
               final dueDate = _parseDueDate(task['dueDate'], task['dueTime']);
               final difference = dueDate.difference(now).inDays;
 
+              // // If it's overdue, we don't show remaining days
+              // final status = isOverdue
+              //     ? 'Overdue' // Only show "Overdue" for overdue tasks
+              //     : '$difference day(s) remaining'; // Show remaining days for upcoming tasks
               // If it's overdue, we don't show remaining days
-              final status = isOverdue
-                  ? 'Overdue' // Only show "Overdue" for overdue tasks
-                  : '$difference day(s) remaining'; // Show remaining days for upcoming tasks
+              String status = '';
+              if (isOverdue) {
+                status = 'Overdue'; // Only show "Overdue" for overdue tasks
+              } else if (difference == 0) {
+                status = 'Today'; // Show "Today" if due date is today
+              } else {
+                status = '$difference day(s) remaining'; // Show remaining days for upcoming tasks
+              }
 
               return Card(
                 margin: const EdgeInsets.symmetric(vertical: 5.0),
@@ -99,10 +126,11 @@ class NotificationPage extends StatelessWidget {
                   ),
                 ),
               );
-            }),
+            }).toList(),
           ],
         ),
       ),
     );
   }
 }
+

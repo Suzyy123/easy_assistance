@@ -1,11 +1,29 @@
-
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:easy_assistance_app/Todo_task/All_Notes.dart';
+import 'package:easy_assistance_app/Todo_task/FavoriteTasks.dart';
+import 'package:easy_assistance_app/Todo_task/ListsPgae.dart';
+import 'package:easy_assistance_app/Todo_task/My%20Work.dart';
+import 'package:easy_assistance_app/Todo_task/TaskListPage.dart';
+import 'package:easy_assistance_app/Todo_task/shopping.dart';
+import 'package:flutter/material.dart';
+import 'Assignment.dart';
+import 'MeetingPage.dart';
+import 'default.dart';
+import 'firestore_service.dart';
+import 'package:easy_assistance_app/Todo_task/shopping.dart'; // Shopping page import
+import 'package:easy_assistance_app/Todo_task/personal.dart'; // Personal page import
+import 'package:easy_assistance_app/Todo_task/notification_icon.dart'; // Import NotificationIcon
+import 'package:intl/intl.dart'; // Ensure this is imported for DateFormat
+import 'package:flutter/material.dart';
+import 'package:easy_assistance_app/Todo_task/personalService.dart';
 import 'package:easy_assistance_app/Todo_task/shoppingService.dart';
 import 'package:flutter/material.dart';
+import 'addpage.dart';
+import 'defaultService.dart';
 import 'frontPage.dart';
 
-class ShoppingPage extends StatelessWidget {
-  const ShoppingPage({super.key});
 
+class DefaultPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -20,13 +38,11 @@ class ShoppingPage extends StatelessWidget {
 }
 
 class TodoHomeScreen extends StatefulWidget {
-  const TodoHomeScreen({super.key});
-
   @override
-  _TodoHomeScreenState createState() => _TodoHomeScreenState();
+  _DefaultPageState createState() => _DefaultPageState();
 }
 
-class _TodoHomeScreenState extends State<TodoHomeScreen> {
+class _DefaultPageState extends State<TodoHomeScreen> {
   // To track the selected icon
   String selectedNavItem = 'My Day';
   bool isMenuVisible = false;
@@ -45,8 +61,8 @@ class _TodoHomeScreenState extends State<TodoHomeScreen> {
 
           onPressed: () {
             Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(builder: (context) => TodoApp()), // Navigate to TodoApp
+              context,
+              MaterialPageRoute(builder: (context) => TodoApp()), // Navigate to TodoApp
             );
           },
         ),
@@ -108,7 +124,7 @@ class _TodoHomeScreenState extends State<TodoHomeScreen> {
                               Expanded(
                                 child: TextField(
                                   decoration: InputDecoration(
-                                    hintText: 'Search here...',
+                                    hintText: 'Search',
                                     border: InputBorder.none,
                                   ),
                                 ),
@@ -219,9 +235,9 @@ class _TodoHomeScreenState extends State<TodoHomeScreen> {
 
                   SizedBox(height: 10),
 // Below section has been removed to clean up the code and remove lists and dropdown
-    Expanded(
-    child: ShoppingListPage(), // Directly call the ShoppingListPage here
-    ),
+                  Expanded(
+                    child: DefaultListPage(), // Directly call the ShoppingListPage here
+                  ),
                 ],
               ),
             ),
@@ -240,12 +256,12 @@ class NavItem extends StatelessWidget {
   final Function() onTap;
 
   const NavItem({
-    super.key,
+    Key? key,
     required this.icon,
     required this.label,
     required this.isSelected,
     required this.onTap,
-  });
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -275,3 +291,4 @@ class NavItem extends StatelessWidget {
     );
   }
 }
+
