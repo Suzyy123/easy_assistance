@@ -2,23 +2,25 @@ name: easy_assistance_app
 description: "A new Flutter project."
 publish_to: 'none'
 
-# Application version
 version: 1.0.0+1
 
 environment:
-  sdk: ">=3.0.0 <4.0.0" # Adjusted for compatibility with Dart 3.x
+  sdk: ">=3.0.0 <4.0.0"
 
 dependencies:
   flutter:
     sdk: flutter
   cupertino_icons: ^1.0.8
   firebase_core: ^3.8.1
-  firebase_auth: ^5.3.4 # Updated to a compatible, working version
+  firebase_auth: ^5.3.4
   cloud_firestore: ^5.5.1
   shared_preferences: ^2.0.18
-  provider: ^6.1.2 # Added a specific compatible version
+  provider: ^6.1.2
   http: ^1.2.2
-  intl: ^0.20.1 # Added the `intl` package for internationalization and date formatting
+  intl: ^0.20.1
+  flutterfire_cli: ^0.1.1+2
+  google_sign_in: 5.4.2
+  email_otp: ^2.0.0
 
 dev_dependencies:
   flutter_test:

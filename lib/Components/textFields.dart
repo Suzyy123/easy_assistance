@@ -23,6 +23,7 @@ class MyTextfield extends StatelessWidget {
             borderSide: BorderSide(
               color: Theme.of(context).colorScheme.tertiary,
             ),
+            borderRadius: BorderRadius.circular(10)
           ),
           focusedBorder: OutlineInputBorder(
             borderSide: BorderSide(
