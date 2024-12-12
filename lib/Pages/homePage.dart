@@ -1,5 +1,8 @@
+import 'package:easy_assistance_app/Components/icons.dart';
 import 'package:flutter/material.dart';
-
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import '../ProfilePage/Settings/Drawer.dart';
 import 'friendRequestPage.dart';
 
 void main() {
@@ -13,19 +16,19 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return const MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: homePage(),
+      home: HomePage(),
     );
   }
 }
 
-class homePage extends StatefulWidget {
-  const homePage({super.key});
+class HomePage extends StatefulWidget {
+  const HomePage({super.key});
 
   @override
   _HomePageState createState() => _HomePageState();
 }
 
-class _HomePageState extends State<homePage> {
+class _HomePageState extends State<HomePage> {
   final TextEditingController _searchController = TextEditingController();
   final List<String> mockData = ['Figma Design', 'Prototype', 'UI Tasks', 'Development'];
   final List<Map<String, dynamic>> reminders = [
@@ -83,17 +86,22 @@ class _HomePageState extends State<homePage> {
       appBar: AppBar(
         elevation: 0,
         backgroundColor: Colors.white,
-        title: const Row(
-          children: [
-            CircleAvatar(
-              backgroundImage: AssetImage('assets/Images/5thProfile.jpg'),
-            ),
-            SizedBox(width: 10),
-            Text(
-              'Hi, Prapti. Welcome Back!',
-              style: TextStyle(color: Colors.black, fontSize: 16),
-            ),
-          ],
+        title: FutureBuilder<DocumentSnapshot>(
+          future: FirebaseFirestore.instance
+              .collection('users')
+              .doc(FirebaseAuth.instance.currentUser?.uid)
+              .get(),
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const Text("Loading...");
+            }
+            if (!snapshot.hasData || !snapshot.data!.exists) {
+              return const Text("Hi, User");
+            }
+            final userData = snapshot.data!;
+            return Text("Hi, ${userData['username'] ?? ' Username'}",
+                style: const TextStyle(color: Colors.black));
+          },
         ),
         actions: [
           IconButton(
@@ -116,6 +124,7 @@ class _HomePageState extends State<homePage> {
           ),
         ],
       ),
+      drawer: const MyDrawer(),
       body: SafeArea(
         child: LayoutBuilder(
           builder: (context, constraints) {
@@ -226,15 +235,7 @@ class _HomePageState extends State<homePage> {
           },
         ),
       ),
-      bottomNavigationBar: BottomNavigationBar(
-        items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
-          BottomNavigationBarItem(icon: Icon(Icons.task), label: 'Tasks'),
-          BottomNavigationBarItem(icon: Icon(Icons.chat), label: 'Messages'),
-        ],
-        currentIndex: 0,
-        onTap: (index) {},
-      ),
+      bottomNavigationBar: NavigatorBar(),
     );
   }
 

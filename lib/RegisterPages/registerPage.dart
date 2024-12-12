@@ -2,7 +2,8 @@ import 'package:cloud_firestore/cloud_firestore.dart'; // For Firestore
 import 'package:flutter/material.dart';
 import '../Components/buttons.dart';
 import '../Components/textFields.dart';
-import '../authServices/AuthServices.dart'; // Your custom AuthServices class
+import '../authServices/AuthServices.dart';
+import 'forgotPassword.dart'; // Your custom AuthServices class
 
 class RegisterPage extends StatefulWidget {
   final void Function()? onTap;
@@ -112,86 +113,21 @@ class _RegisterPageState extends State<RegisterPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Theme.of(context).colorScheme.surface,
-      appBar: AppBar(
-        title: const Text(
-          "Register Here",
-          style: TextStyle(
-            fontSize: 26,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () => Navigator.of(context).pop(),
-        ),
-      ),
+      backgroundColor: Theme.of(context).colorScheme.background,
       body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.all(16.0),
           child: Column(
             children: [
+              const SizedBox(height: 10,),
+              Text("Register Here", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 28),),
               // Registration Page Image
               Center(
                 child: Image.asset(
-                  "assets/images/registerPage.png",
-                  height: 200,
-                  width: 200,
+                  "lib/images/registerPage.png",
+                  height: 220,
                 ),
               ),
-              const SizedBox(height: 20),
-
-              // Username Field
-              MyTextfield(
-                hintText: "Username",
-                obscureText: false,
-                controller: usernameController,
-              ),
-              const SizedBox(height: 10),
-
-              // Email Field
-              MyTextfield(
-                hintText: "Email",
-                obscureText: false,
-                controller: emailController,
-              ),
-              const SizedBox(height: 10),
-
-              // Password Field
-              MyTextfield(
-                hintText: "Password",
-                obscureText: true,
-                controller: passwordController,
-              ),
-              const SizedBox(height: 10),
-
-              // Confirm Password Field
-              MyTextfield(
-                hintText: "Confirm Password",
-                obscureText: true,
-                controller: confirmpassController,
-              ),
-              const SizedBox(height: 20),
-
-              // Forgot Password Link
-              GestureDetector(
-                onTap: () {
-                  // Implement forgot password functionality here
-                },
-                child: const Text(
-                  "Forgot password?",
-                  style: TextStyle(decoration: TextDecoration.underline),
-                ),
-              ),
-              const SizedBox(height: 20),
-
-              // Register Button
-              Buttons(
-                text: "Register",
-                onTap: () async => await register(context), // Register on tap
-              ),
-              const SizedBox(height: 20),
-
               // Login Link
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -214,53 +150,135 @@ class _RegisterPageState extends State<RegisterPage> {
                   ),
                 ],
               ),
-              const SizedBox(height: 20),
-              GestureDetector(
-                onTap: () async {
-                  try {
-                    // Use the AuthServices to sign in with Google
-                    await AuthServices().signInWithGoogle();
+              // Username Field
+              MyTextfield(
+                hintText: "Username",
+                obscureText: false,
+                controller: usernameController,
+              ),
+              const SizedBox(height: 10),
+              // Email Field
+              MyTextfield(
+                hintText: "Email",
+                obscureText: false,
+                controller: emailController,
+              ),
+              const SizedBox(height: 10),
+              // Password Field
+              MyTextfield(
+                hintText: "Password",
+                obscureText: true,
+                controller: passwordController,
+              ),
+              const SizedBox(height: 10),
 
-                    // Show success dialog
-                    showDialog(
-                      context: context,
-                      builder: (context) => AlertDialog(
-                        title: const Text("Sign-In Successful!"),
-                        actions: [
-                          TextButton(
-                            onPressed: () {
-                              Navigator.of(context).pop(); // Close the dialog
-                            },
-                            child: const Text("OK"),
-                          ),
-                        ],
-                      ),
-                    );
-                  } catch (e) {
-                    // Show error dialog if sign-in fails
-                    showDialog(
-                      context: context,
-                      builder: (context) => AlertDialog(
-                        title: const Text("Sign-In Failed"),
-                        content: Text(e.toString()),
-                        actions: [
-                          TextButton(
-                            onPressed: () {
-                              Navigator.of(context).pop(); // Close the dialog
-                            },
-                            child: const Text("OK"),
-                          ),
-                        ],
-                      ),
-                    );
-                  }
+              // Confirm Password Field
+              MyTextfield(
+                hintText: "Confirm Password",
+                obscureText: true,
+                controller: confirmpassController,
+              ),
+              const SizedBox(height: 15),
+              // Forgot Password Link
+              GestureDetector(
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => ForgotPasswordPage()), // Add parentheses
+                  );
                 },
-                child: Image(
-                  image: AssetImage("lib/images/google.jpeg"),
-                  width: 80,
-                  height: 80,
+                child: const Text(
+                  "Forgot password?",
+                  style: TextStyle(decoration: TextDecoration.underline),
                 ),
               ),
+
+              const SizedBox(height: 15),
+
+              // Register Button
+              Buttons(
+                text: "Register",
+                onTap: () async => await register(context), // Register on tap
+              ),
+              const SizedBox(height: 10),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center, // Center the images horizontally
+                children: [
+                  // Google sign-in image with GestureDetector
+                  GestureDetector(
+                    onTap: () async {
+                      try {
+                        // Use the AuthServices to sign in with Google
+                        await AuthServices().registerWithGoogle();
+
+                        // Show success dialog
+                        showDialog(
+                          context: context,
+                          builder: (context) => AlertDialog(
+                            title: const Text("Sign-In Successful!"),
+                            actions: [
+                              TextButton(
+                                onPressed: () {
+                                  Navigator.of(context).pop(); // Close the dialog
+                                },
+                                child: const Text("OK"),
+                              ),
+                            ],
+                          ),
+                        );
+                      } catch (e) {
+                        // Show error dialog if sign-in fails
+                        showDialog(
+                          context: context,
+                          builder: (context) => AlertDialog(
+                            title: const Text("Sign-In Failed"),
+                            content: Text(e.toString()),
+                            actions: [
+                              TextButton(
+                                onPressed: () {
+                                  Navigator.of(context).pop(); // Close the dialog
+                                },
+                                child: const Text("OK"),
+                              ),
+                            ],
+                          ),
+                        );
+                      }
+                    },
+                    child: ClipOval(
+                      child: Image.asset(
+                        "lib/images/google.jpeg",
+                        width: 60,
+                        height: 60,
+                        fit: BoxFit.cover,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 20), // Add spacing between images
+
+                  // First additional circular image
+                  ClipOval(
+                    child: Image.asset(
+                      "lib/images/google.jpeg", // Replace with the actual path to your second image
+                      width: 60,
+                      height: 60,
+                      fit: BoxFit.cover,
+                    ),
+                  ),
+                  const SizedBox(width: 20), // Add spacing between images
+
+                  // Second additional circular image
+                  ClipOval(
+                    child: Image.asset(
+                      "lib/images/google.jpeg", // Replace with the actual path to your third image
+                      width: 60,
+                      height: 60,
+                      fit: BoxFit.cover,
+                    ),
+                  ),
+                ],
+              )
+
 
             ],
           ),

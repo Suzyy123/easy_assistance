@@ -4,14 +4,16 @@ import 'package:easy_assistance_app/authServices/AuthServices.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
-class Homepage extends StatefulWidget {
-  const Homepage({super.key});
+import '../Components/icons.dart';
+
+class userList extends StatefulWidget {
+  const userList({super.key});
 
   @override
-  State<Homepage> createState() => _HomepageState();
+  State<userList> createState() => _HomepageState();
 }
 
-class _HomepageState extends State<Homepage> {
+class _HomepageState extends State<userList> {
   // Instance of FirebaseAuth
   final FirebaseAuth auth = FirebaseAuth.instance;
 
@@ -26,38 +28,53 @@ class _HomepageState extends State<Homepage> {
     return Scaffold(
       appBar: AppBar(
         title: const Text("Home Page"),
-        leading: Icon(Icons.arrow_back),
       ),
-      body: _showUserList(),
-      // bottomNavigationBar: const NavigatorBar(),
+      body: _showFriendsList(), // Displays the list of friends
+      bottomNavigationBar: const NavigatorBar(), // Correct usage of bottomNavigationBar
     );
   }
 
-  // Function to show user list
-  Widget _showUserList() {
+
+  // Function to show friends list
+  Widget _showFriendsList() {
+    final currentUser = auth.currentUser;
+
+    if (currentUser == null) {
+      return const Center(
+        child: Text("Please log in to see your friends."),
+      );
+    }
+
+    // Query to get only accepted friend requests where the current user is involved
     return StreamBuilder<QuerySnapshot>(
-      stream: FirebaseFirestore.instance.collection('users').snapshots(), // Listening to the users collection
+      stream: FirebaseFirestore.instance
+          .collection('friend_requests')
+          .where('status', isEqualTo: 'accepted')
+          .where('toEmail', isEqualTo: currentUser.email) // Requests accepted by the current user
+          .snapshots(),
       builder: (context, snapshot) {
         if (snapshot.hasError) {
-          return const Text('Error');
+          return const Center(child: Text('Error loading friend requests.'));
         }
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Center(child: CircularProgressIndicator()); // Show loading spinner when waiting
+          return const Center(child: CircularProgressIndicator());
         }
         if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-          return const Center(child: Text('No users found'));
+          return const Center(child: Text('No friends found.'));
         }
 
-        // Return list view after data is fetched
+        final friendRequests = snapshot.data!.docs;
+
+        // Fetch details of accepted friends
         return ListView(
-          children: snapshot.data!.docs.map<Widget>((doc) => buildUserList(doc)).toList(),
+          children: friendRequests.map<Widget>((doc) => buildFriendList(doc)).toList(),
         );
       },
     );
   }
 
-  // Individual user list items
-  Widget buildUserList(DocumentSnapshot document) {
+  // Individual friend list items
+  Widget buildFriendList(DocumentSnapshot document) {
     // Safely cast the document to Map
     Map<String, dynamic>? data = document.data() as Map<String, dynamic>?;
 
@@ -66,36 +83,31 @@ class _HomepageState extends State<Homepage> {
       return Container();
     }
 
-    // Check if auth.currentUser is null
-    if (auth.currentUser == null) {
-      return Container(); // If no user is logged in, avoid building the list
+    final friendEmail = data['fromEmail'];
+    final friendUsername = data['fromUsername'];
+
+    if (friendEmail != null && friendUsername != null) {
+      return ListTile(
+        leading: const CircleAvatar(
+          child: Icon(Icons.person),
+        ),
+        title: Text(friendUsername),
+        subtitle: Text(friendEmail),
+        onTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => Messenger(
+                receiveruserEmail: friendEmail,
+                receiveruserUsername: friendUsername,
+              ),
+            ),
+          );
+        },
+      );
+    } else {
+      return Container(); // Return an empty container if fields are missing
     }
 
-    // All users except the current user
-    if (auth.currentUser!.email != data['email']) {
-      // Check if email and username fields are present
-      final email = data['email'];
-      final username = data['username'];
-      if (email != null && username != null) {
-        return ListTile(
-          title: Text(email),
-          onTap: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => Messenger(
-                  receiveruserEmail: email,
-                  receiveruserUsername: username,
-                ),
-              ),
-            );
-          },
-        );
-      } else {
-        return Container(); // Return an empty container if fields are missing
-      }
-    } else {
-      return Container(); // Return an empty container for the current user to avoid null issues
-    }
   }
 }

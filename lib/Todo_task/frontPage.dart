@@ -6,6 +6,7 @@ import 'package:easy_assistance_app/Todo_task/My%20Work.dart';
 import 'package:easy_assistance_app/Todo_task/TaskListPage.dart';
 import 'package:easy_assistance_app/Todo_task/shopping.dart';
 import 'package:flutter/material.dart';
+import '../Components/icons.dart';
 import 'Assignment.dart';
 import 'MeetingPage.dart';
 import 'default.dart';
@@ -14,7 +15,6 @@ import 'package:easy_assistance_app/Todo_task/personal.dart'; // Personal page i
 import 'package:easy_assistance_app/Todo_task/notification_icon.dart'; // Import NotificationIcon
 import 'package:intl/intl.dart'; // Ensure this is imported for DateFormat
 import 'CompletedTasks.dart';
-import 'addpage.dart';
 import 'calendarScreen.dart';
 
 class TodoApp extends StatelessWidget {
@@ -596,6 +596,7 @@ class _TodoHomeScreenState extends State<TodoHomeScreen> {
           ),
         ),
       ),
+      bottomNavigationBar: const NavigatorBar(),
     );
   }
 }
@@ -638,7 +639,11 @@ class NavItem extends StatelessWidget {
                   color: Colors.white,
                 ),
             ],
+
         ),
+      // Bottom Navigation Bar
+
      );
+
     }
 }

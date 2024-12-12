@@ -10,6 +10,9 @@ import 'ChatPage/ChatPageUI.dart';
 import 'ChatPage/Message.dart';
 import 'ChatPage/Messenger.dart';
 import 'ChatPage/chatListPage.dart';
+import 'Pages/homePage.dart';
+import 'ProfilePage/ProfileMain.dart';
+import 'Todo_task/frontPage.dart';
 
 
 Future<void> main() async {

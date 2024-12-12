@@ -4,10 +4,14 @@ import 'package:firebase_auth/firebase_auth.dart';
 class FriendRequestService {
   // Method to send a friend request
   Future<void> sendFriendRequest(String receiverId) async {
-    final currentUserId = FirebaseAuth.instance.currentUser?.uid;
-    if (currentUserId == null) {
+    final currentUser = FirebaseAuth.instance.currentUser;
+    if (currentUser == null) {
       throw Exception("User not logged in");
     }
+
+    final currentUserId = currentUser.uid;
+    final senderName = currentUser.displayName ?? 'Anonymous';
+    final senderImageUrl = currentUser.photoURL ?? '';
 
     try {
       await FirebaseFirestore.instance.collection('friend_requests').add({
@@ -15,9 +19,10 @@ class FriendRequestService {
         'to': receiverId,
         'status': 'pending',
         'timestamp': FieldValue.serverTimestamp(),
-        'senderName': 'User Name', // Set the sender's name
-        'senderImageUrl': 'Image URL', // Set the sender's image URL
+        'senderName': senderName,
+        'senderImageUrl': senderImageUrl,
       });
+      print("Friend request sent successfully!");
     } catch (e) {
       print("Error sending friend request: $e");
     }
@@ -27,15 +32,16 @@ class FriendRequestService {
   Future<void> acceptRequest(String requestId, String fromUserId, String toUserId) async {
     try {
       // Update the friend request status to "accepted"
-      await FirebaseFirestore.instance
-          .collection('friend_requests')
-          .doc(requestId)
-          .update({
-        'status': 'accepted', // Update the status field to "accepted"
+      await FirebaseFirestore.instance.collection('friend_requests').doc(requestId).update({
+        'status': 'accepted',
       });
 
-      // Optionally, you can add code to create a friend document in another collection if needed
-      // (e.g., "friends" collection where the user pair is added as friends).
+      // Add to the "friends" collection
+      await FirebaseFirestore.instance.collection('friends').add({
+        'user1': fromUserId,
+        'user2': toUserId,
+        'timestamp': FieldValue.serverTimestamp(),
+      });
 
       print("Friend request accepted for $fromUserId and $toUserId");
     } catch (e) {
@@ -46,15 +52,9 @@ class FriendRequestService {
   // Decline friend request
   Future<void> declineRequest(String requestId) async {
     try {
-      // Update the friend request status to "rejected"
-      await FirebaseFirestore.instance
-          .collection('friend_requests')
-          .doc(requestId)
-          .update({
-        'status': 'rejected', // Update the status field to the "rejected"
-      });
-
-      print("Friend request rejected for request ID: $requestId");
+      // Delete the friend request upon rejection
+      await FirebaseFirestore.instance.collection('friend_requests').doc(requestId).delete();
+      print("Friend request rejected and removed for request ID: $requestId");
     } catch (e) {
       print("Error declining friend request: $e");
     }
