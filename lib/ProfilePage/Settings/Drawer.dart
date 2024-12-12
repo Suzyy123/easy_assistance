@@ -2,6 +2,8 @@ import 'package:easy_assistance_app/ProfilePage/Settings/settingPage.dart';
 import 'package:flutter/material.dart';
 
 import '../../ChatPage/ChatPageUI.dart';
+import '../../RegisterPages/loginPage.dart';
+import '../../authServices/AuthGate.dart';
 import '../../authServices/AuthServices.dart';
 
 class MyDrawer extends StatelessWidget {
@@ -103,14 +105,23 @@ class MyDrawer extends StatelessWidget {
                     try {
                       // Call the logout method from AuthServices
                       await AuthServices().signOut();
-                      // Optionally, show a success message or navigate to the login screen
+
+                      // Navigate to LoginPage directly
+                      Navigator.pushReplacement(
+                        context,
+                        MaterialPageRoute(builder: (context) => Authgate()), // Replace LoginPage with your actual login page class
+                      );
+
                       print('Logged out successfully');
                     } catch (e) {
-                      // Handle errors, e.g., show an error message
-                      print('Error during logout: $e');
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text('Logout failed: $e')),
+                      );
                     }
                   },
                 ),
+
+
 
               ],
             ),

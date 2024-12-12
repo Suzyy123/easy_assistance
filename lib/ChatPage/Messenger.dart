@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:easy_assistance_app/ChatPage/ChatBubble.dart';
+import 'package:easy_assistance_app/Components/textFields.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'chatfucntions.dart';
@@ -7,11 +8,12 @@ import 'chatfucntions.dart';
 class Messenger extends StatefulWidget {
   final String receiveruserEmail;
   final String receiveruserUsername;
+
   const Messenger({
-    super.key,
+    Key? key,
     required this.receiveruserEmail,
     required this.receiveruserUsername,
-  });
+  }) : super(key: key);
 
   @override
   State<Messenger> createState() => _MessengerState();
@@ -20,36 +22,89 @@ class Messenger extends StatefulWidget {
 class _MessengerState extends State<Messenger> {
   final TextEditingController messageController = TextEditingController();
   final ChatFunction chatFunction = ChatFunction();
-
-  // instance of the auth
   final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
 
+  bool isChatDeleted = false; // Flag to check if the chat was deleted
+
+  Future<void> deleteChat() async {
+    try {
+      String currentUserEmail = _firebaseAuth.currentUser!.email!;
+      String chatDocId = getChatDocumentId(currentUserEmail, widget.receiveruserEmail);
+
+      DocumentReference chatDocRef = FirebaseFirestore.instance.collection('chats').doc(chatDocId);
+
+      // Check if the chat document exists
+      DocumentSnapshot chatDocSnapshot = await chatDocRef.get();
+      if (!chatDocSnapshot.exists) {
+        print("Chat document does not exist.");
+        return;
+      }
+
+      // Step 1: Delete all messages in the chat
+      QuerySnapshot messagesSnapshot = await chatDocRef.collection('messages').get();
+      for (var messageDoc in messagesSnapshot.docs) {
+        await messageDoc.reference.delete();
+      }
+
+      // Step 2: Delete the chat document itself
+      await chatDocRef.delete();
+      print("Chat and all messages deleted successfully!");
+
+      setState(() {
+        // Update UI to reflect the chat deletion
+        Navigator.of(context).pop(); // Navigate back after chat deletion
+      });
+    } catch (e) {
+      print("Error deleting chat: $e");
+    }
+  }
+
+  // Function to delete a specific message
+  Future<void> deleteMessage(DocumentReference messageRef) async {
+    try {
+      await messageRef.delete();
+      print("Message deleted successfully!");
+      setState(() {}); // Update UI after deletion
+    } catch (e) {
+      print("Error deleting message: $e");
+    }
+  }
+
+  // Function to send a message
   void sendMessage() async {
     if (messageController.text.isNotEmpty) {
-      await chatFunction.sendMessage(
-          widget.receiveruserEmail, messageController.text);
-      // clear controller after sending the message
+      await chatFunction.sendMessage(widget.receiveruserEmail, messageController.text);
       messageController.clear();
+      setState(() {});
     }
   }
 
   // Function to get username from email
   Future<String> getUsernameFromEmail(String email) async {
     try {
-      var userSnapshot = await FirebaseFirestore.instance.collection('users')
-          .where('email', isEqualTo: email).limit(1)
+      var userSnapshot = await FirebaseFirestore.instance
+          .collection('users')
+          .where('email', isEqualTo: email)
+          .limit(1)
           .get();
+
       if (userSnapshot.docs.isNotEmpty) {
         var userData = userSnapshot.docs.first.data();
-        return userData['username'] ??
-            email; // Return username or email if no username found
+        return userData['username'] ?? email;
       } else {
-        return email; // Return email if no user found
+        return email;
       }
     } catch (e) {
       print("Error fetching username: $e");
-      return email; // Return email in case of error
+      return email;
     }
+  }
+
+  // Helper function to get consistent chat document ID
+  String getChatDocumentId(String user1, String user2) {
+    List<String> users = [user1.trim().toLowerCase(), user2.trim().toLowerCase()];
+    users.sort(); // Ensure consistent document ID
+    return users.join("_");
   }
 
   @override
@@ -58,25 +113,25 @@ class _MessengerState extends State<Messenger> {
       appBar: AppBar(
         title: Padding(
           padding: const EdgeInsets.only(left: 80),
-          child: Text(widget.receiveruserUsername, style:
-          TextStyle(color: Colors.white),),
+          child: Text(widget.receiveruserUsername),
         ),
-        backgroundColor: Color(0xFF013763),
+        backgroundColor: Colors.blue[800],
         actions: [
           IconButton(
-            icon: Icon(Icons.more_vert, color: Colors.white,), // Corrected icon
+            icon: const Icon(Icons.more_vert),
             onPressed: () {
-              // You can add functionality here if needed
+              _showDeleteChatDialog();
             },
           ),
         ],
       ),
-      body: Column(
+      body: isChatDeleted
+          ? const Center(child: Text('Chat deleted successfully'))
+          : Column(
         children: [
           Expanded(
             child: buildMessageList(),
           ),
-          // user input
           buildMessageInput(),
           const SizedBox(height: 25),
         ],
@@ -84,77 +139,70 @@ class _MessengerState extends State<Messenger> {
     );
   }
 
-  // build message list
+  // Build message list
   Widget buildMessageList() {
+    if (isChatDeleted) {
+      return const Center(child: Text('Chat deleted successfully'));
+    }
+
     return StreamBuilder(
-      stream: chatFunction.getMessages(
-          widget.receiveruserEmail, _firebaseAuth.currentUser!.email!),
+      stream: chatFunction.getMessages(widget.receiveruserEmail, _firebaseAuth.currentUser?.email ?? ""),
       builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
         if (snapshot.hasError) {
           return Text('Error: ${snapshot.error}');
         }
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Text('Loading');
+          return const Center(child: CircularProgressIndicator());
         }
         if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-          return const Text('No messages yet');
+          return const Center(child: Text('No messages yet'));
         }
-        // Displaying the list of messages using buildMessageItem()
+
         return ListView(
-          children: snapshot.data!.docs.map((document) =>
-              buildMessageItem(document)).toList(),
+          children: snapshot.data!.docs.map((document) => buildMessageItem(document)).toList(),
         );
       },
     );
   }
 
-  // build message item
+  // Build individual message item
   Widget buildMessageItem(DocumentSnapshot document) {
-    // Create a map from the Firestore document snapshot
     Map<String, dynamic> data = document.data() as Map<String, dynamic>;
+    var alignment = (data['senderEmail'] == _firebaseAuth.currentUser?.email) ? Alignment.centerRight : Alignment.centerLeft;
 
-    // Align the message to the right if the sender is the current user
-    var alignment = (data['senderEmail'] == _firebaseAuth.currentUser!.email)
-        ? Alignment.centerRight
-        : Alignment.centerLeft;
-
-    // Fetch username for the sender email
     return FutureBuilder<String>(
       future: getUsernameFromEmail(data['senderEmail']),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return Text("Loading"); // Loading indicator until username is fetched
+          return const Text("Loading");
         }
         if (snapshot.hasError) {
           return const Text('Error loading username');
         }
 
-        // Check if the sender is the current user
         String senderUsername = snapshot.data ?? 'Unknown User';
-        if (data['senderEmail'] == _firebaseAuth.currentUser!.email) {
-          senderUsername = "You"; // Display "You" for the current user
+        if (data['senderEmail'] == _firebaseAuth.currentUser?.email) {
+          senderUsername = "You";
         }
 
-        return Container(
-          alignment: alignment,
-          child: Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Column(
-              crossAxisAlignment: (data['senderEmail'] ==
-                  _firebaseAuth.currentUser!.email)
-                  ? CrossAxisAlignment.end
-                  : CrossAxisAlignment.start,
-              mainAxisAlignment: (data['senderEmail'] ==
-                  _firebaseAuth.currentUser!.email)
-                  ? MainAxisAlignment.end
-                  : MainAxisAlignment.start,
-              children: [
-                // Show the sender username
-                Text(senderUsername),
-                const SizedBox(height: 8),
-                // Show the message content
-                chatBubble(message: data['message']),
-              ],
+        return GestureDetector(
+          onLongPress: () {
+            if (data['senderEmail'] == _firebaseAuth.currentUser?.email) {
+              _showDeleteDialog(document.reference);
+            }
+          },
+          child: Container(
+            alignment: alignment,
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Column(
+                crossAxisAlignment: alignment == Alignment.centerRight ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+                children: [
+                  Text(senderUsername),
+                  const SizedBox(height: 8),
+                  chatBubble(message: data['message']),
+                ],
+              ),
             ),
           ),
         );
@@ -162,49 +210,81 @@ class _MessengerState extends State<Messenger> {
     );
   }
 
-  // build message input
+  // Build message input
   Widget buildMessageInput() {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20),
-      child: TextField(
-        controller: messageController,
-        decoration: InputDecoration(
-          hintText: "Enter a message",
-          hintStyle: TextStyle(color: Colors.grey[400]),
-          // Hint text color
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(8), // Rounded corners
-            borderSide: BorderSide(color: Color(0xFF013763)), // Border color
-          ),
-          focusedBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(8),
-            borderSide: BorderSide(
-                color: Color(0xFF013763), width: 2), // Focus border color and width
-          ),
-          enabledBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(8),
-            borderSide: BorderSide(
-                color: Colors.blueGrey), // Enabled border color
-          ),
-          filled: true,
-          // Fill the background
-          fillColor: Colors.grey[300],
-          // Background color
-          suffixIcon: IconButton(
-            onPressed: sendMessage, // Action for the upward arrow
-            icon: Icon(
-              Icons.arrow_upward,
-              size: 30, // Size of the icon
-              color: Color(0xFF013763), // Icon color
+      padding: const EdgeInsets.symmetric(horizontal: 25),
+      child: Row(
+        children: [
+          Expanded(
+            child: MyTextfield(
+              hintText: "Enter a message",
+              obscureText: false,
+              controller: messageController,
             ),
           ),
-          contentPadding: const EdgeInsets.symmetric(
-            vertical: 15, // Adjust vertical padding inside the TextField
-            horizontal: 10, // Adjust horizontal padding inside the TextField
+          IconButton(
+            onPressed: sendMessage,
+            icon: const Icon(Icons.arrow_upward, size: 40),
           ),
-        ),
-        style: TextStyle(color: Colors.black), // Text input color
+        ],
       ),
+    );
+  }
+
+  // Show delete chat confirmation dialog
+  void _showDeleteChatDialog() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text("Delete Chat"),
+          content: const Text("Are you sure you want to delete the entire chat?"),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: const Text("Cancel"),
+            ),
+            TextButton(
+              onPressed: () async {
+                await deleteChat();
+                Navigator.of(context).pop();
+              },
+              child: const Text("Delete"),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  // Show delete message confirmation dialog
+  void _showDeleteDialog(DocumentReference messageRef) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text("Delete Message"),
+          content: const Text("Are you sure you want to delete this message?"),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: const Text("Cancel"),
+            ),
+            TextButton(
+              onPressed: () async {
+                await deleteMessage(messageRef);
+                Navigator.of(context).pop();
+              },
+              child: const Text("Delete"),
+            ),
+          ],
+        );
+      },
     );
   }
 }

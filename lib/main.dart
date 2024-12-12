@@ -4,6 +4,17 @@ import 'package:easy_assistance_app/themes/lightMode.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 
+
+import 'ChatPage/ChatBubble.dart';
+import 'ChatPage/ChatPageUI.dart';
+import 'ChatPage/Message.dart';
+import 'ChatPage/Messenger.dart';
+import 'ChatPage/chatListPage.dart';
+import 'Pages/homePage.dart';
+import 'ProfilePage/ProfileMain.dart';
+import 'Todo_task/frontPage.dart';
+
+
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
@@ -24,4 +35,3 @@ class MyApp extends StatelessWidget {
     );
   }
 }
-
