@@ -209,7 +209,7 @@ class _RegisterPageState extends State<RegisterPage> {
                     onTap: () async {
                       try {
                         // Use the AuthServices to sign in with Google
-                        await AuthServices().loginWithGoogle();
+                        await AuthServices().registerWithGoogle();
 
                         // Show success dialog
                         showDialog(
