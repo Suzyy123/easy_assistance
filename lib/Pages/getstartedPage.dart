@@ -1,3 +1,4 @@
+import 'package:easy_assistance_app/authServices/AuthGate.dart';
 import 'package:flutter/material.dart';
 import '../RegisterPages/loginPage.dart';
 
@@ -16,22 +17,22 @@ class _GetStartedPageState extends State<GetStartedPage> {
     {
       "title": "Welcome to Easy Assistance",
       "description": "Your perfect productivity partner.",
-      "image": "assets/images/1stImage.jpg",
+      "image": "lib/images/getstart1.jpg",
     },
     {
       "title": "Organize Your Tasks",
       "description": "Manage tasks efficiently and prioritize what matters.",
-      "image": "assets/images/2ndImage.jpg",
+      "image": "lib/images/getstart2.jpg",
     },
     {
       "title": "Collaborate Seamlessly",
       "description": "Chat, share, and work together with ease.",
-      "image": "assets/images/3rdImage.jpg",
+      "image": "lib/images/getstart3.jpg",
     },
     {
       "title": "Track Your Progress",
       "description": "Monitor your goals and achievements.",
-      "image": "assets/images/4thImage.jpg",
+      "image": "lib/images/getstart4.jpg",
     },
   ];
 
@@ -144,8 +145,7 @@ class _GetStartedPageState extends State<GetStartedPage> {
                       Navigator.pushReplacement(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => Loginpage(onTap: () {  },),
-                        ),
+                          builder: (context) => Authgate()),
                       );
                     },
                     child: const Text("Get Started"),

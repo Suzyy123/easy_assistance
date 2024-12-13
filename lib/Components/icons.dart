@@ -22,7 +22,7 @@ class NavigationBarButton extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        padding: const EdgeInsets.all(10),
+        padding: const EdgeInsets.only(top: 2, bottom: 6),
         decoration: const BoxDecoration(
           color: Colors.transparent,
           shape: BoxShape.circle,
@@ -44,11 +44,12 @@ class NavigatorBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BottomAppBar(
-      color: Color(0xFF013763), // Background color of the navigation bar
+      color: Colors.blue[900], // Background color of the navigation bar
+      height: 60,
       child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 10), // Add padding to adjust height
+        padding: const EdgeInsets.symmetric(vertical: 2), // Add padding to adjust height
         child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             NavigationBarButton(
               icon: Icons.home,
@@ -61,7 +62,7 @@ class NavigatorBar extends StatelessWidget {
               },
             ),
             NavigationBarButton(
-              icon: Icons.calendar_month,
+              icon: Icons.library_add_check,
               color: Colors.white, // Set icon color to white
               onTap: () {
                 Navigator.pushReplacement(
@@ -71,7 +72,7 @@ class NavigatorBar extends StatelessWidget {
               },
             ),
             NavigationBarButton(
-              icon: Icons.messenger,
+              icon: Icons.mark_unread_chat_alt_rounded,
               color: Colors.white, // Set icon color to white
               onTap: () {
                 Navigator.pushReplacement(

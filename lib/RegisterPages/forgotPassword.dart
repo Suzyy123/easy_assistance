@@ -41,6 +41,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
         appBar: AppBar(
           backgroundColor: Color(0xFF013763),
           elevation: 0,
+          title: Text("Forgot Your Password??",style: TextStyle(color: Colors.white),),
         ),
         body:Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -60,8 +61,8 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
             SizedBox(height:10 ),
             MaterialButton(
               onPressed: passwordReset ,
-              color: Color(0xFF013763),
-              child: Text("Reset Password"),// Move `child` property outside the `onPressed` function
+              color: Colors.blue[800],
+              child: Text("Reset Password", style: TextStyle(color: Colors.white),),// Move `child` property outside the `onPressed` function
             ),
 
           ],

@@ -62,6 +62,7 @@ class _ChatPageState extends State<ChatPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        backgroundColor: Colors.blue[800],
         leading: Padding(
           padding: const EdgeInsets.all(8.0),
           child: CircleAvatar(
@@ -69,7 +70,7 @@ class _ChatPageState extends State<ChatPage> {
             backgroundColor: Colors.grey,
             backgroundImage: profileAvatar != null
                 ? AssetImage(profileAvatar!)
-                : const AssetImage('lib/images/avatar1.png'),
+                : const AssetImage('lib/images/avatar2.png'),
           ),
         ),
         title: FutureBuilder<DocumentSnapshot>(
@@ -79,29 +80,28 @@ class _ChatPageState extends State<ChatPage> {
               .get(),
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
-              return const Text("Loading...");
+              return const Text(
+                "Loading...",
+                style: TextStyle(color: Colors.white), // Loading text in white
+              );
             }
             if (!snapshot.hasData || !snapshot.data!.exists) {
-              return const Text("Unknown User");
+              return const Text(
+                "Unknown User",
+                style: TextStyle(color: Colors.white), // Unknown user text in white
+              );
             }
             final userData = snapshot.data!;
-            return Text(userData['username'] ?? 'No Username');
+            return Text(
+              userData['username'] ?? 'No Username',
+              style: const TextStyle(
+                color: Colors.white,
+
+              ),
+            );
           },
         ),
-        actions: [
-          IconButton(
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => Authgate(),
-                ),
-              );
-            },
-            icon: const Icon(Icons.logout),
-            tooltip: 'Logout',
-          ),
-        ],
+
       ),
       body: Column(
         children: [
@@ -111,7 +111,7 @@ class _ChatPageState extends State<ChatPage> {
               decoration: InputDecoration(
                 hintText: "Search by username or email",
                 border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(10),
+                  borderRadius: BorderRadius.circular(30),
                 ),
                 filled: true,
                 fillColor: Colors.white,

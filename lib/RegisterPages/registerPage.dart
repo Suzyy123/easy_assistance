@@ -257,25 +257,25 @@ class _RegisterPageState extends State<RegisterPage> {
                   const SizedBox(width: 20), // Add spacing between images
 
                   // First additional circular image
-                  ClipOval(
-                    child: Image.asset(
-                      "lib/images/google.jpeg", // Replace with the actual path to your second image
-                      width: 60,
-                      height: 60,
-                      fit: BoxFit.cover,
-                    ),
-                  ),
-                  const SizedBox(width: 20), // Add spacing between images
-
-                  // Second additional circular image
-                  ClipOval(
-                    child: Image.asset(
-                      "lib/images/google.jpeg", // Replace with the actual path to your third image
-                      width: 60,
-                      height: 60,
-                      fit: BoxFit.cover,
-                    ),
-                  ),
+                  // ClipOval(
+                  //   child: Image.asset(
+                  //     "lib/images/google.jpeg", // Replace with the actual path to your second image
+                  //     width: 60,
+                  //     height: 60,
+                  //     fit: BoxFit.cover,
+                  //   ),
+                  // ),
+                  // const SizedBox(width: 20), // Add spacing between images
+                  //
+                  // // Second additional circular image
+                  // ClipOval(
+                  //   child: Image.asset(
+                  //     "lib/images/google.jpeg", // Replace with the actual path to your third image
+                  //     width: 60,
+                  //     height: 60,
+                  //     fit: BoxFit.cover,
+                  //   ),
+                  // ),
                 ],
               )
 

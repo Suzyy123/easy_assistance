@@ -1,25 +1,5 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:easy_assistance_app/Todo_task/All_Notes.dart';
-import 'package:easy_assistance_app/Todo_task/FavoriteTasks.dart';
-import 'package:easy_assistance_app/Todo_task/ListsPgae.dart';
-import 'package:easy_assistance_app/Todo_task/My%20Work.dart';
-import 'package:easy_assistance_app/Todo_task/TaskListPage.dart';
-import 'package:easy_assistance_app/Todo_task/shopping.dart';
 import 'package:flutter/material.dart';
-import 'Assignment.dart';
-import 'MeetingPage.dart';
-import 'default.dart';
-import 'firestore_service.dart';
-import 'package:easy_assistance_app/Todo_task/shopping.dart'; // Shopping page import
-import 'package:easy_assistance_app/Todo_task/personal.dart'; // Personal page import
-import 'package:easy_assistance_app/Todo_task/notification_icon.dart'; // Import NotificationIcon
-import 'package:intl/intl.dart'; // Ensure this is imported for DateFormat
-import 'package:flutter/material.dart';
-import 'package:easy_assistance_app/Todo_task/personalService.dart';
-import 'package:easy_assistance_app/Todo_task/shoppingService.dart';
-import 'package:flutter/material.dart';
-import 'addpage.dart';
-import 'defaultService.dart';
+import '../TodoTask_Service/defaultService.dart';
 import 'frontPage.dart';
 
 
@@ -234,7 +214,7 @@ class _DefaultPageState extends State<TodoHomeScreen> {
                   ),
 
                   SizedBox(height: 10),
-// Below section has been removed to clean up the code and remove lists and dropdown
+
                   Expanded(
                     child: DefaultListPage(), // Directly call the ShoppingListPage here
                   ),

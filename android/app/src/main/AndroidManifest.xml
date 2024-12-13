@@ -3,7 +3,7 @@
     <application
         android:label="easy_assistance_app"
         android:name="${applicationName}"
-        android:icon="@mipmap/ic_launcher">
+        android:icon="@mipmap/easy_assistance_logo">
         <activity
             android:name=".MainActivity"
             android:exported="true"
