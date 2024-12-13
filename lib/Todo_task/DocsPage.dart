@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
-import 'firestore_service.dart'; // Adjust the import as necessary
+import 'package:easy_assistance_app/TodoTask_Service/firestore_service.dart';
+
+import 'All_Notes.dart';
 
 class NotePage extends StatefulWidget {
   @override
@@ -38,7 +40,7 @@ class _NotePageState extends State<NotePage> {
         iconTheme: IconThemeData(color: Colors.white),
         backgroundColor: Colors.blue[900],
         title: Text('Write a Note',
-        style: TextStyle(color: Colors.white),),
+          style: TextStyle(color: Colors.white),),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -50,9 +52,9 @@ class _NotePageState extends State<NotePage> {
               controller: _titleController,
               decoration: InputDecoration(
                 labelText: 'Note Title',
-            //     border: OutlineInputBorder(),
-            //   ),
-            // ),
+                //     border: OutlineInputBorder(),
+                //   ),
+                // ),
                 labelStyle: TextStyle(color: Colors.grey), // Label text color
                 border: OutlineInputBorder(
                   borderSide: BorderSide(color: Colors.blue), // Default border color
@@ -78,10 +80,30 @@ class _NotePageState extends State<NotePage> {
               ),
               maxLines: 5, // Allows multiple lines for note content
             ),
+            // SizedBox(height: 16),
+            // // Save button
+            // ElevatedButton(
+            //   onPressed: _saveNote,
+            //   child: Text(
+            //     'Save Note',
+            //     style: TextStyle(color: Colors.white), // Text color
+            //   ),
+            //   style: ElevatedButton.styleFrom(
+            //     backgroundColor: Colors.blue[900], // Background color of the button
+            //   ),
+            // )
             SizedBox(height: 16),
-            // Save button
+// Save button
             ElevatedButton(
-              onPressed: _saveNote,
+              onPressed: () {
+                _saveNote(); // Call the function to save the note
+
+                // Navigate to the NotesPage after saving the note
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(builder: (context) => NotesPage()), // Replace with your NotesPage widget
+                );
+              },
               child: Text(
                 'Save Note',
                 style: TextStyle(color: Colors.white), // Text color
@@ -89,7 +111,8 @@ class _NotePageState extends State<NotePage> {
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.blue[900], // Background color of the button
               ),
-            )
+            ),
+
           ],
         ),
       ),

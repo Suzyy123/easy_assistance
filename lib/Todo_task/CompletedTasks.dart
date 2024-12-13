@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'firestore_service.dart'; // Import the Firestore service for fetching tasks
+import 'package:easy_assistance_app/TodoTask_Service/firestore_service.dart';
 
 class CompletedTasksPage extends StatelessWidget {
   final FirestoreService _firestoreService = FirestoreService();

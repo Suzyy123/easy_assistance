@@ -1,10 +1,10 @@
-
-import 'package:easy_assistance_app/Todo_task/shoppingService.dart';
 import 'package:flutter/material.dart';
-import 'addpage.dart';
+import '../TodoTask_Service/shoppingService.dart';
 import 'frontPage.dart';
 
 class ShoppingPage extends StatelessWidget {
+  const ShoppingPage({super.key});
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -19,6 +19,8 @@ class ShoppingPage extends StatelessWidget {
 }
 
 class TodoHomeScreen extends StatefulWidget {
+  const TodoHomeScreen({super.key});
+
   @override
   _TodoHomeScreenState createState() => _TodoHomeScreenState();
 }
@@ -42,8 +44,8 @@ class _TodoHomeScreenState extends State<TodoHomeScreen> {
 
           onPressed: () {
             Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(builder: (context) => TodoApp()), // Navigate to TodoApp
+              context,
+              MaterialPageRoute(builder: (context) => TodoApp()), // Navigate to TodoApp
             );
           },
         ),
@@ -216,9 +218,9 @@ class _TodoHomeScreenState extends State<TodoHomeScreen> {
 
                   SizedBox(height: 10),
 // Below section has been removed to clean up the code and remove lists and dropdown
-    Expanded(
-    child: ShoppingListPage(), // Directly call the ShoppingListPage here
-    ),
+                  Expanded(
+                    child: ShoppingListPage(), // Directly call the ShoppingListPage here
+                  ),
                 ],
               ),
             ),
@@ -237,12 +239,12 @@ class NavItem extends StatelessWidget {
   final Function() onTap;
 
   const NavItem({
-    Key? key,
+    super.key,
     required this.icon,
     required this.label,
     required this.isSelected,
     required this.onTap,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

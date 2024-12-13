@@ -1,11 +1,13 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'firestore_service.dart';
-import 'task_completion_service.dart';  // Import the new service
+import 'package:easy_assistance_app/TodoTask_Service/firestore_service.dart';
+
 
 class TaskListPage extends StatelessWidget {
   final FirestoreService _firestoreService = FirestoreService();
   final FirestoreService _taskCompletionService = FirestoreService();
+
+  TaskListPage({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -108,15 +110,15 @@ class TaskListPage extends StatelessWidget {
                           }
                         },
                       ),
-                  IconButton(
-                    icon: Icon(
-                      isFavorite ? Icons.star : Icons.star_border,
-                      color: isFavorite ? Colors.yellow : Colors.black,
-                    ),
-                    onPressed: () {
-                      _firestoreService.toggleFavorite(task['id'], !isFavorite);  // Toggle favorite status
-                    },
-                  ),
+                      IconButton(
+                        icon: Icon(
+                          isFavorite ? Icons.star : Icons.star_border,
+                          color: isFavorite ? Colors.yellow : Colors.black,
+                        ),
+                        onPressed: () {
+                          _firestoreService.toggleFavorite(task['id'], !isFavorite);  // Toggle favorite status
+                        },
+                      ),
 
                     ],
                   ),

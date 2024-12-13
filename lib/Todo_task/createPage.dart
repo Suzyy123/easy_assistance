@@ -1,9 +1,8 @@
-
 import 'package:flutter/material.dart';
 import 'NotificationList.dart';
-import 'firestore_service.dart';
-//import 'notification.dart';
-//import 'package:easy_assistance_app/Todo_task/notification.dart'; // Adjust path if necessary
+import 'package:easy_assistance_app/TodoTask_Service/firestore_service.dart';
+
+import 'TaskListPage.dart';
 
 
 
@@ -305,6 +304,11 @@ class _CreateState extends State<Create> {
 
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(content: Text('Task added successfully !'), backgroundColor: Colors.green,),
+                          );
+                          // Navigate to TaskListPage
+                          Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(builder: (context) => TaskListPage()),
                           );
                         } catch (e) {
                           print('Error adding task: $e');

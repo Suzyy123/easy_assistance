@@ -1,5 +1,16 @@
+
+import 'package:easy_assistance_app/ChatPage/chatfucntions.dart';
+import 'package:easy_assistance_app/Pages/chatscreen.dart';
+import 'package:easy_assistance_app/Todo_task/frontPage.dart';
+import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
 import 'package:flutter/material.dart';
-import 'firestore_service.dart';
+import 'package:flutter/services.dart';
+import '../ChatPage/ChatPageUI.dart';
+import 'package:easy_assistance_app/TodoTask_Service/firestore_service.dart';
+import 'package:url_launcher/url_launcher.dart';
+import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
+
+import 'AcceptDenyPage.dart';
 
 class MeetingsPage extends StatefulWidget {
   @override
@@ -8,6 +19,16 @@ class MeetingsPage extends StatefulWidget {
 
 class _MeetingsPageState extends State<MeetingsPage> {
   final FirestoreService _firestoreService = FirestoreService();
+
+  // Method to navigate to the Accept/Deny page when meetingId is clicked
+  void _navigateToAcceptDenyPage(String meetingId) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => AcceptDenyPage(meetingId: meetingId),
+      ),
+    );
+  }
 
   // Method to handle delete action with confirmation
   void _deleteMeeting(String meetingId) async {
@@ -43,11 +64,10 @@ class _MeetingsPageState extends State<MeetingsPage> {
       // Show success message
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Meeting deleted successfully !'),
+          content: Text('Meeting deleted successfully!'),
           backgroundColor: Colors.green, // Set the background color to green
         ),
       );
-
     }
   }
 
@@ -75,12 +95,7 @@ class _MeetingsPageState extends State<MeetingsPage> {
                 children: [
                   TextFormField(
                     initialValue: _editedTitle,
-                    decoration: InputDecoration(labelText: 'Title', labelStyle: TextStyle(color: Colors.grey
-                    ),
-                      focusedBorder: UnderlineInputBorder(
-                        borderSide: BorderSide(color: Colors.blue), // Change the border color to blue
-                      ),
-                    ),
+                    decoration: InputDecoration(labelText: 'Title', labelStyle: TextStyle(color: Colors.grey)),
                     onSaved: (value) => _editedTitle = value!,
                     validator: (value) {
                       if (value == null || value.isEmpty) {
@@ -91,12 +106,7 @@ class _MeetingsPageState extends State<MeetingsPage> {
                   ),
                   TextFormField(
                     initialValue: _editedDescription,
-                    decoration: InputDecoration(labelText: 'Description',
-                      labelStyle: TextStyle(color: Colors.grey), // Change label color to blue
-                      focusedBorder: UnderlineInputBorder(
-                        borderSide: BorderSide(color: Colors.blue), // Change the border color to blue
-                      ),
-                    ),
+                    decoration: InputDecoration(labelText: 'Description', labelStyle: TextStyle(color: Colors.grey)),
                     onSaved: (value) => _editedDescription = value!,
                     validator: (value) {
                       if (value == null || value.isEmpty) {
@@ -108,12 +118,7 @@ class _MeetingsPageState extends State<MeetingsPage> {
                   // Date Picker
                   TextFormField(
                     readOnly: true,
-                    decoration: InputDecoration(labelText: 'Date',
-                      labelStyle: TextStyle(color: Colors.grey), // Change label color to blue
-                      focusedBorder: UnderlineInputBorder(
-                        borderSide: BorderSide(color: Colors.blue), // Change the border color to blue
-                      ),
-                    ),
+                    decoration: InputDecoration(labelText: 'Date', labelStyle: TextStyle(color: Colors.grey)),
                     controller: TextEditingController(text: _editedDate),
                     onTap: () async {
                       DateTime? selectedDate = await showDatePicker(
@@ -132,29 +137,18 @@ class _MeetingsPageState extends State<MeetingsPage> {
                   // Time Picker
                   TextFormField(
                     readOnly: true,
-                    decoration: InputDecoration(labelText: 'Time',
-                      labelStyle: TextStyle(color: Colors.grey), // Change label color to blue
-                      focusedBorder: UnderlineInputBorder(
-                        borderSide: BorderSide(color: Colors.blue), // Change the border color to blue
-                      ),
-                    ),
+                    decoration: InputDecoration(labelText: 'Time', labelStyle: TextStyle(color: Colors.grey)),
                     controller: TextEditingController(text: _editedTime),
                     onTap: () async {
-                      // Check if _editedTime is not in the correct format
                       String time = _editedTime.isNotEmpty ? _editedTime : '12:00'; // Default time
-          
-                      // Parse the time string safely
                       TimeOfDay initialTime = TimeOfDay(
                         hour: int.parse(time.split(':')[0]),
                         minute: int.parse(time.split(':')[1]),
                       );
-          
-                      // Show the time picker
                       TimeOfDay? selectedTime = await showTimePicker(
                         context: context,
                         initialTime: initialTime,
                       );
-          
                       if (selectedTime != null) {
                         setState(() {
                           _editedTime = '${selectedTime.hour.toString().padLeft(2, '0')}:${selectedTime.minute.toString().padLeft(2, '0')}';
@@ -162,7 +156,6 @@ class _MeetingsPageState extends State<MeetingsPage> {
                       }
                     },
                   ),
-          
                   // Location (Dropdown)
                   DropdownButtonFormField<String>(
                     value: _editedLocation,
@@ -174,15 +167,12 @@ class _MeetingsPageState extends State<MeetingsPage> {
                     items: ['Virtual', 'In-Person'].map((location) {
                       return DropdownMenuItem<String>(
                         value: location,
-                        child: Text(location, style: TextStyle(color: Colors.black)), // Set text color to blue
+                        child: Text(location, style: TextStyle(color: Colors.black)),
                       );
                     }).toList(),
                     decoration: InputDecoration(
                       labelText: 'Location',
-                      labelStyle: TextStyle(color: Colors.grey), // Change label color to blue
-                      focusedBorder: UnderlineInputBorder(
-                        borderSide: BorderSide(color: Colors.blue), // Change the border color to blue
-                      ),
+                      labelStyle: TextStyle(color: Colors.grey),
                     ),
                   ),
                 ],
@@ -195,14 +185,13 @@ class _MeetingsPageState extends State<MeetingsPage> {
                 },
                 child: Text(
                   'Cancel',
-                  style: TextStyle(color: Colors.black), // Change text color to blue
+                  style: TextStyle(color: Colors.black),
                 ),
               ),
               ElevatedButton(
                 onPressed: () async {
                   if (_formKey.currentState!.validate()) {
                     _formKey.currentState!.save();
-          
                     // Update the meeting
                     await _firestoreService.editMeeting(
                       meetingId,
@@ -212,14 +201,21 @@ class _MeetingsPageState extends State<MeetingsPage> {
                       _editedTime,
                       _editedLocation,
                     );
-          
                     // Close the dialog and refresh the list
                     Navigator.pop(context);
                     setState(() {});
+
+                    // Show success message after the meeting is updated
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text('Meeting updated successfully!'),
+                        backgroundColor: Colors.green, // Set the background color to green
+                      ),
+                    );
                   }
                 },
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.blue[900], // Set the background color of the button to blue
+                  backgroundColor: Colors.blue[900],
                 ),
                 child: Text('Update', style: TextStyle(color: Colors.white)),
               ),
@@ -229,6 +225,103 @@ class _MeetingsPageState extends State<MeetingsPage> {
       },
     );
   }
+
+  void _shareMeeting(String meetingId) async {
+    // Your dynamic link URI prefix and link to handle the meeting ID
+    final DynamicLinkParameters parameters = DynamicLinkParameters(
+      uriPrefix: 'https://easyassistance.page.link',  // Dynamic link URI prefix
+      link: Uri.parse('https://easyassistance.page.link/meeting_invitation_link?meetingId=$meetingId'),  // Full dynamic link with meetingId parameter
+
+      androidParameters: AndroidParameters(
+        packageName: 'com.example.easy_assistance_app',  // Replace with your Android package name
+        minimumVersion: 1,
+      ),
+    );
+
+    // Create the dynamic link
+    final Uri dynamicUrl = await FirebaseDynamicLinks.instance.buildLink(parameters);
+
+    // Show the dialog with the dynamic link
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Share Meeting'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text('Meeting Link:'),
+              GestureDetector(
+                onTap: () {
+                  //Instead of opening an external link, navigate to the AcceptDenyPage within the app
+                  // Navigator.push(
+                  //   context,
+                  //   MaterialPageRoute(
+                  //     builder: (context) => AcceptDenyPage(meetingId: meetingId),
+                  //   ),
+                  // );
+
+                    // Launch the dynamic URL
+                    launch(dynamicUrl.toString());
+                },
+                child: Text(
+                  dynamicUrl.toString(),
+                  style: TextStyle(
+                    color: Colors.blue,
+                    decoration: TextDecoration.underline,
+                  ),
+                ),
+              ),
+              SizedBox(height: 10),
+              Text('Meeting ID: $meetingId'),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context); // Close the current dialog
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => ChatPage()), // Navigate to ChatPage
+                );
+              },
+              child: Text('OK'),
+            ),
+
+            TextButton(
+              onPressed: () {
+                Clipboard.setData(ClipboardData(text: dynamicUrl.toString()));
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text('Meeting link copied to clipboard!'),
+                    backgroundColor: Colors.green,
+                  ),
+                );
+              },
+              child: Text('Copy Link', style: TextStyle(color: Colors.blue[900])),
+            ),
+            TextButton(
+              onPressed: () {
+                Clipboard.setData(ClipboardData(text: meetingId));
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text('Meeting ID copied to clipboard!'),
+                    backgroundColor: Colors.green,
+                  ),
+                );
+              },
+              child: Text('Copy ID', style: TextStyle(color: Colors.blue[900])),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+
+
+
 
   @override
   Widget build(BuildContext context) {
@@ -287,6 +380,8 @@ class _MeetingsPageState extends State<MeetingsPage> {
                             );
                           } else if (value == 'delete') {
                             _deleteMeeting(meeting['id']);
+                          } else if (value == 'share') {
+                            _shareMeeting(meeting['id']);
                           }
                         },
                         itemBuilder: (BuildContext context) {
@@ -308,6 +403,16 @@ class _MeetingsPageState extends State<MeetingsPage> {
                                   Icon(Icons.delete, color: Colors.black),
                                   SizedBox(width: 8),
                                   Text('Delete'),
+                                ],
+                              ),
+                            ),
+                            PopupMenuItem<String>(
+                              value: 'share',
+                              child: Row(
+                                children: [
+                                  Icon(Icons.share, color: Colors.black),
+                                  SizedBox(width: 8),
+                                  Text('Share'),
                                 ],
                               ),
                             ),

@@ -2,20 +2,29 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:easy_assistance_app/Todo_task/All_Notes.dart';
 import 'package:easy_assistance_app/Todo_task/FavoriteTasks.dart';
 import 'package:easy_assistance_app/Todo_task/ListsPgae.dart';
+import 'package:easy_assistance_app/Todo_task/Meeting.dart';
 import 'package:easy_assistance_app/Todo_task/My%20Work.dart';
 import 'package:easy_assistance_app/Todo_task/TaskListPage.dart';
 import 'package:easy_assistance_app/Todo_task/shopping.dart';
 import 'package:flutter/material.dart';
+import '../ChatPage/ChatPageUI.dart';
+import '../Components/icons.dart';
+import '../ProfilePage/ProfileMain.dart';
 import 'Assignment.dart';
+import 'Bottom.dart';
+import 'DocsPage.dart';
 import 'MeetingPage.dart';
+import 'createPage.dart';
 import 'default.dart';
-import 'firestore_service.dart';
+import 'package:easy_assistance_app/TodoTask_Service/firestore_service.dart';
 import 'package:easy_assistance_app/Todo_task/personal.dart'; // Personal page import
 import 'package:easy_assistance_app/Todo_task/notification_icon.dart'; // Import NotificationIcon
 import 'package:intl/intl.dart'; // Ensure this is imported for DateFormat
 import 'CompletedTasks.dart';
-import 'addpage.dart';
 import 'calendarScreen.dart';
+import 'package:easy_assistance_app/TodoTask_Service/firestore_service.dart' as taskFirestore;
+import 'package:easy_assistance_app/Todo_task/Meeting.dart' as meetingFirestore;
+
 
 class TodoApp extends StatelessWidget {
   @override
@@ -176,7 +185,7 @@ class _TodoHomeScreenState extends State<TodoHomeScreen> {
         flexibleSpace: SafeArea(
           child: Center(
             child: Text(
-              'Todo App',
+              '',
               style: TextStyle(
                 color: Colors.white,
                 fontSize: 24,
@@ -186,6 +195,33 @@ class _TodoHomeScreenState extends State<TodoHomeScreen> {
           ),
         ),
         actions: [
+
+          // Second Create Icon
+          IconButton(
+            icon: Icon(Icons.mark_unread_chat_alt_rounded), // Choose appropriate icon
+            color: Colors.white,
+            onPressed: () {
+              // Navigate to the second creation page
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const ChatPage()),
+              );
+            },
+            tooltip: 'Create Note',
+          ),
+          // Third Create Icon
+          IconButton(
+            icon: Icon(Icons.person), // Choose appropriate icon
+            color: Colors.white,
+            onPressed: () {
+              //Navigate to the third creation page
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const ProfilePage()),
+              );
+            },
+            tooltip: 'Create Event',
+          ),
           Padding(
             padding: const EdgeInsets.only(right: 16.0),
             child: StreamBuilder<List<Map<String, dynamic>>>(
@@ -545,6 +581,7 @@ class _TodoHomeScreenState extends State<TodoHomeScreen> {
                                 ],
                               ),
                             ),
+
                           if (showCalendar)
                             Expanded(
                               child: Container(
@@ -596,6 +633,7 @@ class _TodoHomeScreenState extends State<TodoHomeScreen> {
           ),
         ),
       ),
+      bottomNavigationBar: const NavBar(),
     );
   }
 }
@@ -617,28 +655,32 @@ class NavItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-        onTap: onTap,
-        child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Icon(icon, color: isSelected ? Colors.white : Colors.grey),
-              SizedBox(height: 4),
-              Text(
-                label,
-                style: TextStyle(
-                  fontSize: 12,
-                  color: isSelected ? Colors.white : Colors.grey,
-                ),
-              ),
-              if (isSelected)
-                Container(
-                  margin: EdgeInsets.only(top: 2),
-                  height: 1.5,
-                  width: 40,
-                  color: Colors.white,
-                ),
-            ],
-        ),
-     );
-    }
+      onTap: onTap,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, color: isSelected ? Colors.white : Colors.grey),
+          SizedBox(height: 4),
+          Text(
+            label,
+            style: TextStyle(
+              fontSize: 12,
+              color: isSelected ? Colors.white : Colors.grey,
+            ),
+          ),
+          if (isSelected)
+            Container(
+              margin: EdgeInsets.only(top: 2),
+              height: 1.5,
+              width: 40,
+              color: Colors.white,
+            ),
+        ],
+
+      ),
+      // Bottom Navigation Bar
+
+    );
+
+  }
 }

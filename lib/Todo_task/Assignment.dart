@@ -1,9 +1,5 @@
-
-import 'package:easy_assistance_app/Todo_task/personalService.dart';
-import 'package:easy_assistance_app/Todo_task/shoppingService.dart';
 import 'package:flutter/material.dart';
-import 'addpage.dart';
-import 'assignmentService.dart';
+import '../TodoTask_Service/assignmentService.dart';
 import 'frontPage.dart';
 
 class AssignmentDetails extends StatelessWidget {

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-import 'SearchResults.dart';
-import 'firestore_service.dart';  // Import your Firestore service file
+import 'package:easy_assistance_app/TodoTask_Service/firestore_service.dart';
 
 class ListPage extends StatefulWidget {
   @override
@@ -33,7 +32,7 @@ class _ListPageState extends State<ListPage> {
         isLoading = false;  // Stop showing the loading indicator in case of an error
       });
     }
-   }
+  }
 
   // Method to add a task list
   void addTaskList() async {
@@ -63,23 +62,6 @@ class _ListPageState extends State<ListPage> {
     }
   }
 
-  // // Method to delete a task list and update the UI
-  // Future<void> deleteTaskList(String listName) async {
-  //   try {
-  //     await _firestoreService.deleteTaskList(listName);  // Call the FirestoreService delete method
-  //     setState(() {
-  //       taskLists.remove(listName);  // Remove the list from the UI after deletion
-  //     });
-  //     ScaffoldMessenger.of(context).showSnackBar(
-  //       SnackBar(content: Text('$listName deleted successfully')),
-  //     );
-  //   } catch (e) {
-  //     print('Error deleting task list: $e');
-  //     ScaffoldMessenger.of(context).showSnackBar(
-  //       SnackBar(content: Text('Error deleting $listName')),
-  //     );
-  //   }
-  // }
   // Method to delete a task list and update the UI after deletion
   Future<void> deleteTaskList(String listName) async {
     try {
@@ -111,7 +93,7 @@ class _ListPageState extends State<ListPage> {
         iconTheme: IconThemeData(color: Colors.white),
         backgroundColor: Colors.blue[900],  // Set the appbar color to blue
         title: Text('Task Lists',
-        style: TextStyle(color: Colors.white),),
+          style: TextStyle(color: Colors.white),),
         centerTitle: true,
       ),
       body: isLoading
@@ -192,17 +174,17 @@ class _ListPageState extends State<ListPage> {
                             ),
                           ],
                         ),
-                        onTap: () {
-                          // You can add actions here when a task list is tapped
-                          // print('Tapped on ${taskLists[index]}');
-                          // Navigate to TaskListDetailsPage when a task list is tapped
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => TaskListDetailsPage(listName: taskLists[index]),
-                            ),
-                          );
-                        },
+                        // onTap: () {
+                        // You can add actions here when a task list is tapped
+                        // print('Tapped on ${taskLists[index]}');
+                        // Navigate to TaskListDetailsPage when a task list is tapped
+                        //   Navigator.push(
+                        //     context,
+                        //     MaterialPageRoute(
+                        //       //builder: (context) => TaskListDetailsPage(listName: taskLists[index]),
+                        //     ),
+                        //   );
+                        // },
 
                       ),
                     );

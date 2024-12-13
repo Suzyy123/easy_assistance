@@ -1,92 +1,138 @@
-
-import 'package:easy_assistance_app/Todo_task/MeetingPage.dart';
+import 'package:easy_assistance_app/Todo_task/All_Notes.dart';
+import 'package:easy_assistance_app/authServices/AuthGate.dart';
 import 'package:easy_assistance_app/firebase_options.dart';
+import 'package:easy_assistance_app/themes/lightMode.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'package:firebase_messaging/firebase_messaging.dart';
-import 'package:easy_assistance_app/firebase_options.dart'; // Your Firebase options
-import 'package:easy_assistance_app/services/notification_mobile_service.dart'; // Import the new file
-//import 'mobilenotification.dart';
-
-
-// import 'Todo_task/My Work.dart';
-import 'Todo_task/All_Notes.dart';
-import 'Todo_task/CompletedTasks.dart';
+import 'package:provider/provider.dart';
+import 'ChatPage/ChatBubble.dart';
+import 'ChatPage/ChatPageUI.dart';
+import 'ChatPage/Message.dart';
+import 'ChatPage/Messenger.dart';
+import 'ChatPage/chatListPage.dart';
+import 'Pages/homePage.dart'; // Your home page
+import 'ProfilePage/ProfileMain.dart';
 import 'Todo_task/DocsPage.dart';
-import 'Todo_task/FavoriteTasks.dart';
-import 'Todo_task/ListsPgae.dart';
 import 'Todo_task/Meeting.dart';
-import 'Todo_task/My Work.dart';
-import 'Todo_task/NotificationHome.dart';
-import 'Todo_task/NotificationList.dart';
-import 'Todo_task/Recents.dart';
-import 'Todo_task/TaskListDropdown.dart';
-import 'Todo_task/TaskListPage.dart';
-import 'Todo_task/TodoTask.dart';
-import 'Todo_task/addpage.dart';
-import 'Todo_task/createPage.dart';
-import 'Todo_task/default.dart';
+import 'Todo_task/MeetingPage.dart';
 import 'Todo_task/frontPage.dart';
-import 'Todo_task/personal.dart';
-import 'Todo_task/premium.dart';
-import 'Todo_task/shopping.dart';
-import 'Todo_task/shoppingService.dart';
-import 'package:flutter/material.dart';
-import 'Todo_task/notification_icon.dart';
+import 'package:firebase_dynamic_links/firebase_dynamic_links.dart'; // Import Firebase Dynamic Links
+import 'package:easy_assistance_app/Todo_task/AcceptDenyPage.dart';
 
-
-void main() async{
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
-  //FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
   runApp(const MyApp());
 }
 
-// // This function handles background messages
-// Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
-//   await Firebase.initializeApp();
-//   print("Handling a background message: ${message.messageId}");
-// }
-//
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   const MyApp({super.key});
-  //final NotificationService _notificationService = NotificationService();
 
+  @override
+  _MyAppState createState() => _MyAppState();
+}
 
+class _MyAppState extends State<MyApp> {
+  @override
+  void initState() {
+    super.initState();
+    _initDynamicLinks();
+  }
 
-  // This widget is the root of your application.
+  void _initDynamicLinks() async {
+    // Handle dynamic links when the app is resumed
+    FirebaseDynamicLinks.instance.onLink.listen((PendingDynamicLinkData? dynamicLink) {
+      final Uri? deepLink = dynamicLink?.link;
+
+      if (deepLink != null) {
+        print('Received dynamic link: $deepLink');
+        if (deepLink.queryParameters.containsKey('meetingId')) {
+          String meetingId = deepLink.queryParameters['meetingId']!;
+          print('Extracted meetingId: $meetingId');
+
+          // Navigate to the AcceptDenyPage with the meetingId from the dynamic link
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => AcceptDenyPage(meetingId: meetingId),
+            ),
+          );
+        } else {
+          print('Dynamic link does not contain a meetingId parameter. Navigating to HomePage.');
+          // Navigate to HomePage if no meetingId is present
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => HomePage(), // Update HomePage with your actual home page widget
+            ),
+          );
+        }
+      } else {
+        print('No deep link found. Navigating to HomePage.');
+        // Navigate to HomePage if no deep link is found
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => HomePage(), // Update HomePage with your actual home page widget
+          ),
+        );
+      }
+    }).onError((error) {
+      print('Error in dynamic link: $error. Navigating to HomePage.');
+      // Navigate to HomePage if an error occurs
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => HomePage(), // Update HomePage with your actual home page widget
+        ),
+      );
+    });
+
+    // Handle dynamic links when the app is initially opened
+    final PendingDynamicLinkData? initialLink = await FirebaseDynamicLinks.instance.getInitialLink();
+    final Uri? deepLink = initialLink?.link;
+
+    if (deepLink != null) {
+      print('Initial deep link: $deepLink');
+      if (deepLink.queryParameters.containsKey('meetingId')) {
+        String meetingId = deepLink.queryParameters['meetingId']!;
+        print('Extracted meetingId from initial link: $meetingId');
+
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => AcceptDenyPage(meetingId: meetingId),
+          ),
+        );
+      } else {
+        print('Initial link does not contain a meetingId parameter. Navigating to HomePage.');
+        // Navigate to HomePage if no meetingId is present in the initial link
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => HomePage(), // Update HomePage with your actual home page widget
+          ),
+        );
+      }
+    } else {
+      print('No initial deep link found. Navigating to HomePage.');
+      // Navigate to HomePage if no deep link is found at launch
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => HomePage(), // Update HomePage with your actual home page widget
+        ),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    //_notificationService.requestNotificationPermissions();  // Call the method here
     return MaterialApp(
-      debugShowCheckedModeBanner: false,
       title: 'Flutter Demo',
-      theme: ThemeData(
-        // This is the theme of your application.
-        //
-        // TRY THIS: Try running your application with "flutter run". You'll see
-        // the application has a purple toolbar. Then, without quitting the app,
-        // try changing the seedColor in the colorScheme below to Colors.green
-        // and then invoke "hot reload" (save your changes or press the "hot
-        // reload" button in a Flutter-supported IDE, or press "r" if you used
-        // the command line to start the app).
-        //
-        // Notice that the counter didn't reset back to zero; the application
-        // state is not lost during the reload. To reset the state, use hot
-        // restart instead.
-        //
-        // This works for code too, not just values: Most code changes can be
-        // tested with just a hot reload.
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-        useMaterial3: true,
-      ),
-      // debugShowCheckedModeBanner: false,
-      // home: TodoApp(),
-          home: TodoApp(),
-      //home: CalendarPage(upcomingTasks: [], overdueTasks: []),
-
+      debugShowCheckedModeBanner: false,
+      home: Authgate(), // Or your desired starting page
+      theme: lightMode,
     );
   }
 }
-
-
