@@ -1,12 +1,8 @@
-import 'package:easy_assistance_app/Todo_task/DocsPage.dart';
-import 'package:easy_assistance_app/Todo_task/Meeting.dart';
-import 'package:easy_assistance_app/Todo_task/createPage.dart';
 import 'package:flutter/material.dart';
-import '../ChatPage/ChatPageUI.dart';
 import '../Pages/homePage.dart';
-import '../ProfilePage/ProfileMain.dart';
-import '../RegisterPages/userlist.dart';
-import '../Todo_task/frontPage.dart';
+import 'Meeting_All/Meeting.dart';
+import 'Notes_All/DocsPage.dart';
+import 'Tasks_All/createPage.dart';
 
 class bottomNavBar extends StatelessWidget {
   final IconData icon;

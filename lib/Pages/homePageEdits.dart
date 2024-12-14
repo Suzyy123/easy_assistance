@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-
-import '../TodoTask_Service/meeting notification/notificationpage.dart';
 import 'friendRequestPage.dart';
 
 void main() {
@@ -29,26 +27,7 @@ class HomePageEdits extends StatefulWidget {
 class _HomePageState extends State<HomePageEdits> {
   final TextEditingController _searchController = TextEditingController();
   final List<String> mockData = ['Figma Design', 'Prototype', 'UI Tasks', 'Development'];
-  final List<Map<String, dynamic>> reminders = [
-    {
-      "title": "Team Meeting",
-      "date": "Nov 28, 10:00 AM",
-      "priority": "Urgent",
-      "color": Colors.red,
-    },
-    {
-      "title": "Client Presentation",
-      "date": "Nov 30, 2:00 PM",
-      "priority": "Important",
-      "color": Colors.orange,
-    },
-    {
-      "title": "Submit Report",
-      "date": "Dec 8, 9:00 AM",
-      "priority": "Upcoming",
-      "color": Colors.green,
-    },
-  ];
+
 
   void _handleSearch() {
     String searchQuery = _searchController.text.trim();
@@ -107,15 +86,15 @@ class _HomePageState extends State<HomePageEdits> {
               );
             },
           ),
-          IconButton(
-            icon: const Icon(Icons.meeting_room, color: Colors.black),
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) =>  NotificationPageID()),
-              );
-            },
-          ),
+          // IconButton(
+          //   icon: const Icon(Icons.meeting_room, color: Colors.black),
+          //   onPressed: () {
+          //     Navigator.push(
+          //       context,
+          //       MaterialPageRoute(builder: (context) =>  NotificationPageID()),
+          //     );
+          //   },
+          // ),
           IconButton(
             icon: const Icon(Icons.notifications, color: Colors.black),
             onPressed: () {
@@ -211,23 +190,7 @@ class _HomePageState extends State<HomePageEdits> {
                           style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                         ),
                       ),
-                      const SizedBox(height: 10),
-                      ...reminders.map((reminder) => ListTile(
-                        leading: Icon(Icons.calendar_today, color: reminder['color']),
-                        title: Text(reminder['title'] ?? "No Title"),
-                        subtitle: Text(reminder['date'] ?? "No Date Provided"),
-                        trailing: Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-                          decoration: BoxDecoration(
-                            color: reminder['color'],
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          child: Text(
-                            reminder['priority'] ?? "No Priority",
-                            style: const TextStyle(color: Colors.white),
-                          ),
-                        ),
-                      )),
+
                       const Spacer(),
                     ],
                   ),

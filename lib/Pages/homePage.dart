@@ -1,8 +1,10 @@
 import 'package:easy_assistance_app/Components/icons.dart';
+import 'package:easy_assistance_app/TodoTask_Service/TaskNotification/notification_icon.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../ProfilePage/Settings/Drawer.dart';
+import '../TodoTask_Service/meeting notification/IconPAge.dart';
 import 'friendRequestPage.dart';
 
 void main() {
@@ -85,7 +87,7 @@ class _HomePageState extends State<HomePage> {
     return Scaffold(
       appBar: AppBar(
         elevation: 0,
-        backgroundColor: Colors.white,
+        backgroundColor: Colors.blue[900],
         title: FutureBuilder<DocumentSnapshot>(
           future: FirebaseFirestore.instance
               .collection('users')
@@ -93,34 +95,37 @@ class _HomePageState extends State<HomePage> {
               .get(),
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
-              return const Text("Loading...");
+              return const Text("Loading...", style: TextStyle(color: Colors.white));
             }
             if (!snapshot.hasData || !snapshot.data!.exists) {
-              return const Text("Hi, User");
+              return const Text("Hi, User", style: TextStyle(color: Colors.white));
             }
             final userData = snapshot.data!;
             return Text("Hi, ${userData['username'] ?? ' Username'}",
-                style: const TextStyle(color: Colors.black));
+                style: const TextStyle(color: Colors.white));
           },
         ),
         actions: [
-          IconButton(
-            icon: const Icon(Icons.group_add, color: Colors.black),
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => const FriendRequestPage()),
-              );
-            },
+          SizedBox(height: 5),
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: IconButton(
+              icon: const Icon(Icons.group_add, color: Colors.white),
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const FriendRequestPage()),
+                );
+              },
+            ),
           ),
-          IconButton(
-            icon: const Icon(Icons.notifications, color: Colors.black),
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => const NotificationPage()),
-              );
-            },
+          Padding(
+            padding: const EdgeInsets.only(right: 20.0),
+            child: MeetingNotificationIcon(),  // Call your meeting notification icon here
+          ),
+          Padding(
+            padding: const EdgeInsets.only(right: 20.0),
+            child: NotificationIcon_Task(),  // No need to pass taskCount, it's calculated internally
           ),
         ],
       ),
@@ -315,40 +320,7 @@ class _HomePageState extends State<HomePage> {
   }
 }
 
-// Notification Page
-class NotificationPage extends StatelessWidget {
-  const NotificationPage({super.key});
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.black),
-          onPressed: () => Navigator.pop(context),
-        ),
-        title: const Text(
-          "Notifications",
-          style: TextStyle(color: Colors.black),
-        ),
-      ),
-      body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: ListView(
-            children: [
-              notificationCard("New Task Assigned", "You have a new task: 'Complete Figma Prototype' due by Nov 25.", Colors.blue),
-              notificationCard("Meeting Reminder", "Don't forget the project meeting tomorrow at 10 AM.", Colors.orange),
-              notificationCard("Task Completed", "Great work! You completed the 'UI Redesign' task.", Colors.green),
-              notificationCard("Deadline Update", "The deadline for 'Wireframe Design' has been extended to Nov 30.", Colors.red),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
 
   // Function for notification cards
   Widget notificationCard(String title, String description, Color color) {
@@ -395,4 +367,4 @@ class NotificationPage extends StatelessWidget {
       ),
     );
   }
-}
+

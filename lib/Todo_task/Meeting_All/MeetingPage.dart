@@ -5,12 +5,14 @@ import 'package:easy_assistance_app/Todo_task/frontPage.dart';
 import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import '../ChatPage/ChatPageUI.dart';
+import '../../ChatPage/ChatPageUI.dart';
 import 'package:easy_assistance_app/TodoTask_Service/firestore_service.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
 
-import 'AcceptDenyPage.dart';
+import 'package:easy_assistance_app/Todo_task/AcceptDenyPage.dart';
+
+import '../links/DynamicLinkService.dart';
 
 class MeetingsPage extends StatefulWidget {
   @override
@@ -19,6 +21,8 @@ class MeetingsPage extends StatefulWidget {
 
 class _MeetingsPageState extends State<MeetingsPage> {
   final FirestoreService _firestoreService = FirestoreService();
+  final DynamicLinkService _dynamicLinkService = DynamicLinkService(); // Initialize the service
+
 
   // Method to navigate to the Accept/Deny page when meetingId is clicked
   void _navigateToAcceptDenyPage(String meetingId) {
@@ -226,20 +230,24 @@ class _MeetingsPageState extends State<MeetingsPage> {
     );
   }
 
+  // void _shareMeeting(String meetingId) async {
+  //   // Your dynamic link URI prefix and link to handle the meeting ID
+  //   final DynamicLinkParameters parameters = DynamicLinkParameters(
+  //     uriPrefix: 'https://easyassistance.page.link',  // Dynamic link URI prefix
+  //     link: Uri.parse('https://easyassistance.page.link/meeting_invitation_link?meetingId=$meetingId'),  // Full dynamic link with meetingId parameter
+  //
+  //     androidParameters: AndroidParameters(
+  //       packageName: 'com.example.easy_assistance_app',  // Replace with your Android package name
+  //       minimumVersion: 1,
+  //     ),
+  //   );
+  //
+  //   // Create the dynamic link
+  //   final Uri dynamicUrl = await FirebaseDynamicLinks.instance.buildLink(parameters);
+
+  // Method to share the meeting link
   void _shareMeeting(String meetingId) async {
-    // Your dynamic link URI prefix and link to handle the meeting ID
-    final DynamicLinkParameters parameters = DynamicLinkParameters(
-      uriPrefix: 'https://easyassistance.page.link',  // Dynamic link URI prefix
-      link: Uri.parse('https://easyassistance.page.link/meeting_invitation_link?meetingId=$meetingId'),  // Full dynamic link with meetingId parameter
-
-      androidParameters: AndroidParameters(
-        packageName: 'com.example.easy_assistance_app',  // Replace with your Android package name
-        minimumVersion: 1,
-      ),
-    );
-
-    // Create the dynamic link
-    final Uri dynamicUrl = await FirebaseDynamicLinks.instance.buildLink(parameters);
+    final Uri dynamicUrl = await _dynamicLinkService.createMeetingLink(meetingId);  // Use the service to create the link
 
     // Show the dialog with the dynamic link
     showDialog(
