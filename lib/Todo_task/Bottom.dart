@@ -3,6 +3,7 @@ import '../Pages/homePage.dart';
 import 'Meeting_All/Meeting.dart';
 import 'Notes_All/DocsPage.dart';
 import 'Tasks_All/createPage.dart';
+import 'frontPage.dart';
 
 class bottomNavBar extends StatelessWidget {
   final IconData icon;
@@ -107,13 +108,23 @@ class NavBar extends StatelessWidget {
                 icon: Icons.library_add_check,
                 color: Colors.white,
                 onTap: () {
-                  // Navigator.push(
-                  //   context,
-                  //   MaterialPageRoute(builder: (context) =>  TodoApp()),
-                  // );
-
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) =>  TodoApp()),
+                  );
                 },
               ),
+            bottomNavBar(
+              icon: Icons.person,
+              color: Colors.white,
+              onTap: () {
+                // Add your navigation action here
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => CreateMeetingPage()),
+                );
+              },
+            ),
           ],
         ),
       ),

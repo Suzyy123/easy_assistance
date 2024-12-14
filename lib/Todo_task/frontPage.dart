@@ -208,18 +208,18 @@ class _TodoHomeScreenState extends State<TodoHomeScreen> {
             tooltip: 'Create Note',
           ),
           // Third Create Icon
-          IconButton(
-            icon: Icon(Icons.person), // Choose appropriate icon
-            color: Colors.white,
-            onPressed: () {
-              //Navigate to the third creation page
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => const ProfilePage()),
-              );
-            },
-            tooltip: 'Create Event',
-          ),
+          // IconButton(
+          //   icon: Icon(Icons.person), // Choose appropriate icon
+          //   color: Colors.white,
+          //   onPressed: () {
+          //     //Navigate to the third creation page
+          //     Navigator.push(
+          //       context,
+          //       MaterialPageRoute(builder: (context) => const ProfilePage()),
+          //     );
+          //   },
+          //   tooltip: 'Create Event',
+          // ),
           Row(
             children: [
               Padding(

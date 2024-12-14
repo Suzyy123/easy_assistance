@@ -2,6 +2,8 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:easy_assistance_app/TodoTask_Service/firestore_service.dart';
 
+import 'Taskdetailpage.dart';
+
 
 class TaskListPage extends StatelessWidget {
   final FirestoreService _firestoreService = FirestoreService();
@@ -25,16 +27,32 @@ class TaskListPage extends StatelessWidget {
 
         ),
         iconTheme: IconThemeData(color: Colors.white), // Set the back arrow color to white
-        // actions: [
-        //   IconButton(
-        //     icon: Icon(Icons.notifications, color: Colors.white, size: 30),
-        //     onPressed: () {
-        //       //showNotifications(context);
-        //     },
-        //   ),
-        // ],
       ),
-      body: StreamBuilder<List<Map<String, dynamic>>>(
+      body: Column(
+          children: [
+      // Dynamic Progress Bar
+      StreamBuilder<double>(  // Real-time progress bar based on task completion percentage
+      stream: _firestoreService.getTaskCompletionPercentage(),
+      builder: (context, snapshot) {
+        double progress = snapshot.data ?? 0.0;
+        return Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            children: [
+              LinearProgressIndicator(
+                value: progress,
+                backgroundColor: Colors.grey[300],
+                valueColor: AlwaysStoppedAnimation<Color>(Colors.green),
+              ),
+              SizedBox(height: 8),
+              Text('${(progress * 100).toStringAsFixed(1)}% tasks completed'),
+            ],
+          ),
+        );
+      },
+    ),
+      Expanded(
+      child: StreamBuilder<List<Map<String, dynamic>>>(
         stream: _firestoreService.getTasks(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
@@ -60,6 +78,19 @@ class TaskListPage extends StatelessWidget {
               return Card(
                 margin: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
                 child: ListTile(
+                  // Handle onTap for navigation to TaskDetailPage
+                  onTap: () {
+                    // Navigate to TaskDetailPage when other parts of the task are clicked
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => TaskDetailPage(
+                          taskId: task['id'],
+                          taskName: task['task'] ?? 'No Task',
+                        ),
+                      ),
+                    );
+                  },
                   title: Text(task['task'] ?? 'No Task'),
                   subtitle: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -113,7 +144,6 @@ class TaskListPage extends StatelessWidget {
                           _firestoreService.toggleFavorite(task['id'], !isFavorite);  // Toggle favorite status
                         },
                       ),
-
                     ],
                   ),
                 ),
@@ -122,8 +152,10 @@ class TaskListPage extends StatelessWidget {
           );
         },
       ),
+      ),
+          ],
+      ),
     );
   }
 }
-
 
