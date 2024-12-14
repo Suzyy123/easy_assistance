@@ -3,6 +3,17 @@ import 'package:easy_assistance_app/firebase_options.dart';
 import 'package:easy_assistance_app/themes/lightMode.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+<<<<<<< HEAD
+=======
+
+
+import 'ChatPage/ChatBubble.dart';
+import 'ChatPage/ChatPageUI.dart';
+import 'ChatPage/Message.dart';
+import 'ChatPage/Messenger.dart';
+import 'ChatPage/chatListPage.dart';
+
+>>>>>>> a8c317de50e405dad173f4787debb8b2818ebed1
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();

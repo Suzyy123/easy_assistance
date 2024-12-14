@@ -2,11 +2,12 @@ import 'package:easy_assistance_app/authServices/AuthServices.dart';
 import 'package:flutter/material.dart';
 import '../Components/buttons.dart';
 import '../Components/textFields.dart';
+import 'forgotPassword.dart';
 
 class Loginpage extends StatefulWidget {
   final void Function()? onTap;
 
-  Loginpage({super.key, required this.onTap});
+  const Loginpage({super.key, required this.onTap});
 
   @override
   _LoginpageState createState() => _LoginpageState();
@@ -75,7 +76,7 @@ class _LoginpageState extends State<Loginpage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Theme.of(context).colorScheme.background,
+      backgroundColor: Theme.of(context).colorScheme.surface,
       appBar: AppBar(
         backgroundColor: Colors.white,
         title: const Text(
@@ -90,6 +91,7 @@ class _LoginpageState extends State<Loginpage> {
         ),
         leading: Icon(Icons.arrow_back),
       ),
+<<<<<<< HEAD
       body: Center(
         child: SingleChildScrollView(
           child: Padding(
@@ -105,6 +107,45 @@ class _LoginpageState extends State<Loginpage> {
                   hintText: "Email",
                   obscureText: false,
                   controller: emailController,
+=======
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            children: [
+              Center(
+                child: Image.asset(
+                  "assets/images/google.jpeg",
+                  height: 100,
+                  width: 100,
+                ),
+              ),
+              const SizedBox(height: 20),
+              // Email Input
+              MyTextfield(
+                hintText: "Email",
+                obscureText: false,
+                controller: emailController,
+              ),
+              const SizedBox(height: 10),
+              // Password Input
+              MyTextfield(
+                hintText: "Password",
+                obscureText: true,
+                controller: passwordController,
+              ),
+              const SizedBox(height: 10),
+              // Forgot Password
+              GestureDetector(
+                onTap: () {
+                 Navigator.push(context, MaterialPageRoute(builder:(context){
+                   return ForgotPasswordPage();
+                 }));
+                },
+                child: const Text(
+                  "Forgot password?",
+                  style: TextStyle(decoration: TextDecoration.underline),
+>>>>>>> a8c317de50e405dad173f4787debb8b2818ebed1
                 ),
                 const SizedBox(height: 10),
                 // Password Input

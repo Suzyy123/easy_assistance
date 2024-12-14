@@ -4,6 +4,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'Accept/Reject.dart';
 
 class FriendRequestsPage extends StatelessWidget {
+  const FriendRequestsPage({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(

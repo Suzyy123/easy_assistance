@@ -112,7 +112,7 @@ class _RegisterPageState extends State<RegisterPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Theme.of(context).colorScheme.background,
+      backgroundColor: Theme.of(context).colorScheme.surface,
       appBar: AppBar(
         title: const Text(
           "Register Here",
@@ -134,7 +134,7 @@ class _RegisterPageState extends State<RegisterPage> {
               // Registration Page Image
               Center(
                 child: Image.asset(
-                  "lib/images/registerPage.png",
+                  "assets/images/registerPage.png",
                   height: 200,
                   width: 200,
                 ),

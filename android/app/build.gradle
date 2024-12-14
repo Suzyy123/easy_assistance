@@ -1,12 +1,13 @@
 plugins {
     id "com.android.application"
+    id 'com.google.gms.google-services' // Firebase plugin
     id "kotlin-android"
-    id "com.google.gms.google-services" // Firebase plugin
     id "dev.flutter.flutter-gradle-plugin" // Flutter plugin
 }
 
 android {
     namespace = "com.example.easy_assistance_app"
+<<<<<<< HEAD
     compileSdk = 34 // Match the required SDK version
 
     defaultConfig {
@@ -15,6 +16,27 @@ android {
         targetSdk = 34 // Match the compile SDK version
         versionCode = 1
         versionName = "1.0"
+=======
+    compileSdk = flutter.compileSdkVersion
+    ndkVersion = flutter.ndkVersion
+
+    defaultConfig {
+        applicationId = "com.example.easy_assistance_app"
+        minSdk = 23 // Set explicitly to 23
+        targetSdk = flutter.targetSdkVersion
+        versionCode = flutter.versionCode
+        versionName = flutter.versionName
+    }
+
+
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_1_8
+        targetCompatibility = JavaVersion.VERSION_1_8
+    }
+
+    kotlinOptions {
+        jvmTarget = "1.8"
+>>>>>>> a8c317de50e405dad173f4787debb8b2818ebed1
     }
 
     buildTypes {
@@ -26,8 +48,13 @@ android {
             // Specify ProGuard rules to avoid breaking Firebase or other libraries
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
 
+<<<<<<< HEAD
             // Ensure proper signing configuration for release builds
             signingConfig signingConfigs.debug // Update this with your production key if needed
+=======
+            // Use your signing configuration for release builds
+            signingConfig signingConfigs.debug // Update this for production builds
+>>>>>>> a8c317de50e405dad173f4787debb8b2818ebed1
         }
 
         debug {
@@ -37,6 +64,7 @@ android {
         }
     }
 
+<<<<<<< HEAD
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
@@ -44,6 +72,11 @@ android {
 
     kotlinOptions {
         jvmTarget = "1.8"
+=======
+    lintOptions {
+        // Optional: Suppress deprecation warnings
+        warningsAsErrors false
+>>>>>>> a8c317de50e405dad173f4787debb8b2818ebed1
     }
 }
 

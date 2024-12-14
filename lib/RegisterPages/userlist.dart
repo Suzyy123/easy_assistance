@@ -3,8 +3,6 @@ import 'package:easy_assistance_app/ChatPage/Messenger.dart';
 import 'package:easy_assistance_app/authServices/AuthServices.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import '../Components/icons.dart';
 
 class Homepage extends StatefulWidget {
   const Homepage({super.key});
@@ -28,6 +26,7 @@ class _HomepageState extends State<Homepage> {
     return Scaffold(
       appBar: AppBar(
         title: const Text("Home Page"),
+        leading: Icon(Icons.arrow_back),
       ),
       body: _showUserList(),
       // bottomNavigationBar: const NavigatorBar(),

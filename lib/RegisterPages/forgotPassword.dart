@@ -30,6 +30,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
       print(e);
       showDialog(context: context, builder: (context){
         return AlertDialog(
+<<<<<<< HEAD
         content: Text(e.message.toString()),
         );
       });
@@ -66,6 +67,44 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
 
         ],
       )
+=======
+          content: Text(e.message.toString()),
+        );
+      });
+    }
+  }
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+        appBar: AppBar(
+          backgroundColor: Color(0xFF013763),
+          elevation: 0,
+        ),
+        body:Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 25),
+              child: Text("Enter your email and we will send you a password reset link",
+                textAlign: TextAlign.center,
+              ),
+            ),
+            SizedBox(height:10 ),
+            MyTextfield(
+              hintText: "Email",
+              obscureText: false,
+              controller: emailController,
+            ),
+            SizedBox(height:10 ),
+            MaterialButton(
+              onPressed: passwordReset ,
+              color: Color(0xFF013763),
+              child: Text("Reset Password"),// Move `child` property outside the `onPressed` function
+            ),
+
+          ],
+        )
+>>>>>>> a8c317de50e405dad173f4787debb8b2818ebed1
     );
   }
 }

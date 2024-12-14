@@ -1,10 +1,12 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import '../Components/icons.dart';
 import '../authServices/AuthServices.dart';
-import 'Searchfucntion.dart';
+import '../Components/icons.dart';
+import 'friendRequestPage.dart'; // Import the FriendRequestPage
+import 'Searchfucntion.dart'; // Import your user search function
 import 'chatListPage.dart';
-import 'chatfucntions.dart';
 
 class ChatPage extends StatefulWidget {
   const ChatPage({super.key});
@@ -17,8 +19,7 @@ class _ChatPageState extends State<ChatPage> {
   String? profileAvatar;
   String searchQuery = "";
   List<Map<String, dynamic>> searchResults = [];
-
-  final UserSearchService _userSearchService = UserSearchService(); // Instance of UserSearchService
+  final UserSearchService _userSearchService = UserSearchService();
 
   @override
   void initState() {
@@ -26,14 +27,12 @@ class _ChatPageState extends State<ChatPage> {
     _loadProfileAvatar();
   }
 
-  // Log out the user
   void logoutfrompage() async {
     final auth = AuthServices();
-    await auth.signOut();
-    Navigator.of(context).pushReplacementNamed('/login'); // Replace with your actual route
+    await auth.signOut(); // Sign out the user
+    Navigator.of(context).pushReplacementNamed('/login'); // Redirect to Login Page
   }
 
-  // Load avatar from SharedPreferences
   Future<void> _loadProfileAvatar() async {
     final prefs = await SharedPreferences.getInstance();
     setState(() {
@@ -41,7 +40,6 @@ class _ChatPageState extends State<ChatPage> {
     });
   }
 
-  // Function to handle searching users by username or email
   Future<void> searchUsers(String query) async {
     if (query.isEmpty) {
       setState(() {
@@ -63,6 +61,21 @@ class _ChatPageState extends State<ChatPage> {
     }
   }
 
+  // Send friend request method
+  Future<void> sendFriendRequest(String fromUserId, String toUserId) async {
+    try {
+      await FirebaseFirestore.instance.collection('friend_requests').add({
+        'from': fromUserId,   // ID of the user sending the request
+        'to': toUserId,       // ID of the user receiving the request
+        'status': 'pending',  // Default status of the request
+        'timestamp': FieldValue.serverTimestamp(), // Timestamp of the request
+      });
+      print('Friend request sent successfully!');
+    } catch (e) {
+      print('Error sending friend request: $e');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -80,7 +93,7 @@ class _ChatPageState extends State<ChatPage> {
         title: const Text("Chat Page"),
         actions: [
           IconButton(
-            onPressed: logoutfrompage,
+            onPressed: logoutfrompage, // Logout functionality
             icon: const Icon(Icons.logout),
             tooltip: 'Logout',
           ),
@@ -123,23 +136,31 @@ class _ChatPageState extends State<ChatPage> {
                   Padding(
                     padding: const EdgeInsets.only(right: 16.0),
                     child: Row(
-                      children: const [
-                        Text(
+                      children: [
+                        const Text(
                           "Messages",
                           style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                         ),
-                        Spacer(), // This will push "Requests" to the right
-                        Padding(
-                          padding: EdgeInsets.only(left: 10),
-                          child: Text(
-                            "Requests",
-                            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                        Spacer(),
+                        GestureDetector(
+                          onTap: () {
+                            // Navigate to FriendRequestPage
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(builder: (context) => const FriendRequestPage()),
+                            );
+                          },
+                          child: const Padding(
+                            padding: EdgeInsets.only(left: 10),
+                            child: Text(
+                              "Requests",
+                              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                            ),
                           ),
                         ),
                       ],
                     ),
                   ),
-
                 // Display Search Results label
                 if (searchQuery.isNotEmpty)
                   const Align(
@@ -152,7 +173,6 @@ class _ChatPageState extends State<ChatPage> {
               ],
             ),
           ),
-
           // Search Results or Main Content
           Expanded(
             child: searchQuery.isNotEmpty && searchResults.isNotEmpty
@@ -164,8 +184,8 @@ class _ChatPageState extends State<ChatPage> {
                   margin: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
                   padding: const EdgeInsets.all(16.0),
                   decoration: BoxDecoration(
-                    color: Colors.pink, // Purple background color
-                    borderRadius: BorderRadius.circular(12.0), // Rounded corners
+                    color: Colors.pink,
+                    borderRadius: BorderRadius.circular(12.0),
                   ),
                   child: Row(
                     children: [
@@ -196,6 +216,15 @@ class _ChatPageState extends State<ChatPage> {
                           ),
                         ],
                       ),
+                      const Spacer(),
+                      ElevatedButton(
+                        onPressed: () async {
+                          String fromUserId = 'Prapti@123'; // Replace with actual user ID
+                          String toUserId = user['id'];  // ID of the user being searched
+                          await sendFriendRequest(fromUserId, toUserId);
+                        },
+                        child: const Text('Send Request'),
+                      ),
                     ],
                   ),
                 );
@@ -203,9 +232,8 @@ class _ChatPageState extends State<ChatPage> {
             )
                 : searchQuery.isNotEmpty && searchResults.isEmpty
                 ? const Center(child: Text("No users found"))
-                : const ChatList(),
+                : const ChatList(), // Display your chat list if no search query
           ),
-
           // Bottom Navigation Bar
           const NavigatorBar(),
         ],

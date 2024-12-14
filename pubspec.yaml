@@ -12,6 +12,7 @@ dependencies:
   flutter:
     sdk: flutter
   cupertino_icons: ^1.0.8
+<<<<<<< HEAD
   firebase_core: ^2.32.0
   firebase_auth: ^4.16.0 # Updated to a stable and compatible version
   cloud_firestore: ^4.17.5
@@ -22,11 +23,20 @@ dependencies:
   flutterfire_cli: ^1.0.1-dev.4
   google_sign_in: 5.4.2
   email_otp: ^2.0.0
+=======
+  firebase_core: ^3.8.1
+  firebase_auth: ^5.3.4 # Updated to a compatible, working version
+  cloud_firestore: ^5.5.1
+  shared_preferences: ^2.0.18
+  provider: ^6.1.2 # Added a specific compatible version
+  http: ^1.2.2
+  intl: ^0.20.1 # Added the `intl` package for internationalization and date formatting
+>>>>>>> a8c317de50e405dad173f4787debb8b2818ebed1
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  flutter_lints: ^4.0.0
+  flutter_lints: ^5.0.0
 
 flutter:
   uses-material-design: true
