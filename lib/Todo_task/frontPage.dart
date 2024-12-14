@@ -80,36 +80,70 @@ class _TodoHomeScreenState extends State<TodoHomeScreen> {
       });
     }
   }
-
+  //search code
   void searchFirestore(String query) async {
+    // Get the current user's ID
+    final String? userId = FirebaseAuth.instance.currentUser?.uid;
+
+    if (userId == null) {
+      print('User is not logged in.');
+      return;
+    }
+
     List<Map<String, dynamic>> tempResults = [];
 
-    // Search tasks
-    final tasksSnapshot = await FirebaseFirestore.instance
-        .collection('tasks')
-        .where('task', isGreaterThanOrEqualTo: query)
-        .where('task', isLessThanOrEqualTo: query + '\uf8ff')
-        .get();
-    tempResults.addAll(tasksSnapshot.docs.map((doc) => {...doc.data(), 'type': 'task'}));
+    try {
+      // Fetch tasks for the current user
+      final tasksSnapshot = await FirebaseFirestore.instance
+          .collection('tasks')
+          .where('UserId', isEqualTo: userId) // Filter by userId
+          .get();
 
-    // Search meetings
-    final meetingsSnapshot = await FirebaseFirestore.instance
-        .collection('meetings')
-        .where('title', isGreaterThanOrEqualTo: query)
-        .where('title', isLessThanOrEqualTo: query + '\uf8ff')
-        .get();
-    tempResults.addAll(meetingsSnapshot.docs.map((doc) => {...doc.data(), 'type': 'meeting'}));
+      // Filter locally for tasks that match the query
+      final filteredTasks = tasksSnapshot.docs
+          .where((doc) => (doc['task'] ?? '').toString().toLowerCase().contains(query.toLowerCase()))
+          .map((doc) => {...doc.data(), 'type': 'task'});
 
-    // Search notes
-    final notesSnapshot = await FirebaseFirestore.instance
-        .collection('notes')
-        .where('title', isGreaterThanOrEqualTo: query)
-        .where('title', isLessThanOrEqualTo: query + '\uf8ff')
-        .get();
-    tempResults.addAll(notesSnapshot.docs.map((doc) => {...doc.data(), 'type': 'note'}));
+      tempResults.addAll(filteredTasks);
 
-    setState(() => searchResults = tempResults);
+      // Fetch meetings for the current user
+      final meetingsSnapshot = await FirebaseFirestore.instance
+          .collection('meetings')
+          .where('UserId', isEqualTo: userId) // Filter by userId
+          .get();
+
+      // Filter locally for meetings that match the query
+      final filteredMeetings = meetingsSnapshot.docs
+          .where((doc) => (doc['title'] ?? '').toString().toLowerCase().contains(query.toLowerCase()))
+          .map((doc) => {...doc.data(), 'type': 'meeting'});
+
+      tempResults.addAll(filteredMeetings);
+
+      // Fetch notes for the current user
+      final notesSnapshot = await FirebaseFirestore.instance
+          .collection('notes')
+          .where('UserId', isEqualTo: userId) // Filter by userId
+          .get();
+
+      // Filter locally for notes that match the query
+      final filteredNotes = notesSnapshot.docs
+          .where((doc) => (doc['title'] ?? '').toString().toLowerCase().contains(query.toLowerCase()))
+          .map((doc) => {...doc.data(), 'type': 'note'});
+
+      tempResults.addAll(filteredNotes);
+
+      // Update state with results
+      setState(() {
+        searchResults = tempResults;
+      });
+
+      print('Search results: $tempResults');
+    } catch (e) {
+      print('Error searching Firestore: $e');
+    }
   }
+
+
 
   Future<void> _loadTaskCount() async {
     final tasks = await _firestoreService.getTasks(userId).first;
