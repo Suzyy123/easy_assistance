@@ -4,24 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../ProfilePage/Settings/Drawer.dart';
-import '../TodoTask_Service/meeting notification/IconPAge.dart';
+import '../Pages/IconPAge.dart';
 import 'friendRequestPage.dart';
-
-void main() {
-  runApp(const MyApp());
-}
-
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return const MaterialApp(
-      debugShowCheckedModeBanner: false,
-      home: HomePage(),
-    );
-  }
-}
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -33,27 +17,31 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   final TextEditingController _searchController = TextEditingController();
   final List<String> mockData = ['Figma Design', 'Prototype', 'UI Tasks', 'Development'];
-  final List<Map<String, dynamic>> reminders = [
-    {
-      "title": "Team Meeting",
-      "date": "Nov 28, 10:00 AM",
-      "priority": "Urgent",
-      "color": Colors.red,
-    },
-    {
-      "title": "Client Presentation",
-      "date": "Nov 30, 2:00 PM",
-      "priority": "Important",
-      "color": Colors.orange,
-    },
-    {
-      "title": "Submit Report",
-      "date": "Dec 8, 9:00 AM",
-      "priority": "Upcoming",
-      "color": Colors.green,
-    },
-  ];
 
+  // Handling Firestore data fetching for meetings
+  late Stream<List<Map<String, dynamic>>> meetingsStream;
+
+  @override
+  void initState() {
+    super.initState();
+
+    meetingsStream = FirebaseFirestore.instance
+        .collection('meetings')
+        .orderBy('created_at', descending: true)
+        .snapshots()
+        .map((snapshot) => snapshot.docs.map((doc) {
+      return {
+        'title': doc['title'] ?? '',
+        'date': doc['date'] ?? '',
+        'description': doc['description'] ?? '',
+        'location': doc['location'] ?? '',
+        'time': doc['time'] ?? '',
+        'color': Colors.blue,  // Use a fixed color or dynamically set
+      };
+    }).toList());
+  }
+
+  // Handling search functionality
   void _handleSearch() {
     String searchQuery = _searchController.text.trim();
 
@@ -101,8 +89,7 @@ class _HomePageState extends State<HomePage> {
               return const Text("Hi, User", style: TextStyle(color: Colors.white));
             }
             final userData = snapshot.data!;
-            return Text("Hi, ${userData['username'] ?? ' Username'}",
-                style: const TextStyle(color: Colors.white));
+            return Text("Hi, ${userData['username'] ?? ' Username'}", style: const TextStyle(color: Colors.white));
           },
         ),
         actions: [
@@ -121,11 +108,11 @@ class _HomePageState extends State<HomePage> {
           ),
           Padding(
             padding: const EdgeInsets.only(right: 20.0),
-            child: MeetingNotificationIcon(),  // Call your meeting notification icon here
+            child: MeetingNotificationIcon(), // Meeting notification icon
           ),
           Padding(
             padding: const EdgeInsets.only(right: 20.0),
-            child: NotificationIcon_Task(),  // No need to pass taskCount, it's calculated internally
+            child: NotificationIcon_Task(), // Task notification icon
           ),
         ],
       ),
@@ -163,29 +150,45 @@ class _HomePageState extends State<HomePage> {
                         ),
                       ),
 
-                      // Important Projects
+                      // Meetings Section (Stream from Firestore)
                       const Padding(
                         padding: EdgeInsets.symmetric(horizontal: 16.0),
                         child: Text(
-                          "Important Projects",
+                          "Meetings",
                           style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                         ),
                       ),
-                      const SizedBox(height: 20),
-                      SizedBox(
-                        height: 140,
-                        child: ListView(
-                          scrollDirection: Axis.horizontal,
-                          children: [
-                            projectCard("Figma Design for prototype", "Very IMP", "Nov 11", "Dec 8"),
-                            projectCard("Prototype Development", "High", "Nov 15", "Dec 12"),
-                            projectCard("UI Redesign Tasks", "Critical", "Nov 20", "Dec 18"),
-                          ],
-                        ),
-                      ),
-                      const SizedBox(height: 20),
+                      const SizedBox(height: 10),
+                      StreamBuilder<List<Map<String, dynamic>>>(
+                        stream: meetingsStream,
+                        builder: (context, snapshot) {
+                          if (snapshot.connectionState == ConnectionState.waiting) {
+                            return const CircularProgressIndicator();
+                          }
 
-                      // My Tasks
+                          if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                            return const Center(child: Text("No meetings available"));
+                          }
+
+                          return SizedBox(
+                            height: 140,
+                            child: ListView(
+                              scrollDirection: Axis.horizontal,
+                              children: snapshot.data!.map((meeting) {
+                                return projectCard(
+                                  meeting['title'] ?? '',
+                                  meeting['description'] ?? 'No Description',
+                                  meeting['date'] ?? 'No Date',
+                                  meeting['time'] ?? 'No Time',
+                                );
+                              }).toList(),
+                            ),
+                          );
+                        },
+                      ),
+
+                      // My Tasks Section
+                      const SizedBox(height: 20),  // Added extra space before "My Tasks"
                       const Padding(
                         padding: EdgeInsets.symmetric(horizontal: 16.0),
                         child: Text(
@@ -193,7 +196,7 @@ class _HomePageState extends State<HomePage> {
                           style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                         ),
                       ),
-                      const SizedBox(height: 10),
+                      const SizedBox(height: 30),  // Adjusted space below the text for better alignment
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 16.0),
                         child: Column(
@@ -206,7 +209,8 @@ class _HomePageState extends State<HomePage> {
                       ),
                       const SizedBox(height: 20),
 
-                      // Reminders
+
+                      // Reminders Section
                       const Padding(
                         padding: EdgeInsets.symmetric(horizontal: 16.0),
                         child: Text(
@@ -215,6 +219,7 @@ class _HomePageState extends State<HomePage> {
                         ),
                       ),
                       const SizedBox(height: 10),
+                      // Displaying reminders
                       ...reminders.map((reminder) => ListTile(
                         leading: Icon(Icons.calendar_today, color: reminder['color']),
                         title: Text(reminder['title'] ?? "No Title"),
@@ -231,6 +236,7 @@ class _HomePageState extends State<HomePage> {
                           ),
                         ),
                       )),
+
                       const Spacer(),
                     ],
                   ),
@@ -244,7 +250,7 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  // Function for project cards
+  // Project Card Widget
   Widget projectCard(String title, String priority, String startDate, String endDate) {
     return Container(
       width: 200,
@@ -280,7 +286,7 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  // Function for task cards
+  // Task Card Widget
   Widget taskCard(String title, String description, Color color) {
     return Container(
       margin: const EdgeInsets.only(bottom: 10),
@@ -309,7 +315,7 @@ class _HomePageState extends State<HomePage> {
             children: [
               Text(
                 title,
-                style: const TextStyle(fontWeight: FontWeight.bold),
+                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
               ),
               Text(description),
             ],
@@ -318,53 +324,10 @@ class _HomePageState extends State<HomePage> {
       ),
     );
   }
+
+  // Reminders mock data
+  List<Map<String, dynamic>> reminders = [
+    {"title": "Finish coding", "date": "2024-12-15", "priority": "High", "color": Colors.red},
+    {"title": "Complete design", "date": "2024-12-16", "priority": "Low", "color": Colors.green},
+  ];
 }
-
-
-
-  // Function for notification cards
-  Widget notificationCard(String title, String description, Color color) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 16),
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey[300]!,
-            blurRadius: 5,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          CircleAvatar(
-            radius: 20,
-            backgroundColor: color.withOpacity(0.2),
-            child: Icon(Icons.notifications, color: color),
-          ),
-          const SizedBox(width: 10),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  title,
-                  style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  description,
-                  style: TextStyle(color: Colors.grey[600], fontSize: 14),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
