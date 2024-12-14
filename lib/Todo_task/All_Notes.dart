@@ -1,20 +1,23 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'firestore_service.dart';
+import 'package:easy_assistance_app/TodoTask_Service/firestore_service.dart';
 
 class NotesPage extends StatelessWidget {
   final FirestoreService _firestoreService = FirestoreService();
-
+  final String userId = FirebaseAuth.instance.currentUser!.uid;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         iconTheme: IconThemeData(color: Colors.white),
         backgroundColor: Colors.blue[900],
-        title: Text("Notes",
-        style: TextStyle(color: Colors.white),),
+        title: Text(
+          "Notes",
+          style: TextStyle(color: Colors.white),
+        ),
       ),
       body: StreamBuilder<List<Map<String, dynamic>>>(
-        stream: _firestoreService.getNotes(),
+        stream: _firestoreService.getNotes(userId),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return Center(child: CircularProgressIndicator());
@@ -53,7 +56,8 @@ class NotesPage extends StatelessWidget {
                       if (value == 'edit') {
                         _editNote(context, note); // Open Edit functionality
                       } else if (value == 'delete') {
-                        _showDeleteConfirmationDialog(context, note['id']); // Delete functionality
+                        _showDeleteConfirmationDialog(
+                            context, note['id']); // Delete functionality
                       }
                     },
                     itemBuilder: (context) => [
@@ -105,7 +109,7 @@ class NotesPage extends StatelessWidget {
             ),
             TextButton(
               onPressed: () {
-                _firestoreService.deleteNote(noteId); // Delete the note
+                _firestoreService.deleteNote(noteId, userId); // Delete the note
                 Navigator.of(context).pop(); // Close dialog
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
@@ -127,7 +131,8 @@ class NotesPage extends StatelessWidget {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => EditNotePage(note: note, firestoreService: _firestoreService),
+        builder: (context) =>
+            EditNotePage(note: note, firestoreService: _firestoreService, userId: userId),
       ),
     );
   }
@@ -135,9 +140,9 @@ class NotesPage extends StatelessWidget {
 
 class EditNotePage extends StatefulWidget {
   final Map<String, dynamic> note;
-  final FirestoreService firestoreService;  // Pass the FirestoreService here
-
-  EditNotePage({required this.note, required this.firestoreService}); // Constructor
+  final FirestoreService firestoreService; // Pass the FirestoreService here
+  final String userId; // **(RED)** Accept userId
+  EditNotePage({required this.note, required this.firestoreService, required this.userId}); // **(RED)** Add userId to constructor
 
   @override
   _EditNotePageState createState() => _EditNotePageState();
@@ -162,10 +167,11 @@ class _EditNotePageState extends State<EditNotePage> {
   }
 
   void _updateNote() {
-    widget.firestoreService.updateNote(  // Use the FirestoreService instance passed to this page
+    widget.firestoreService.updateNote(
       widget.note['id'],
-      _contentController.text,
-      _titleController.text,
+      _contentController.text, // Content controller used here
+      _titleController.text, // Title controller used here
+      widget.userId, // **(RED)** Pass userId to update the note
     );
     Navigator.pop(context); // Close the edit page
 
@@ -183,18 +189,22 @@ class _EditNotePageState extends State<EditNotePage> {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.blue[800],
-        title: Text("Edit Note",
-        style: TextStyle(color: Colors.white),),
-        iconTheme: IconThemeData(color: Colors.white), // Change back arrow color to white
+        title: Text(
+          "Edit Note",
+          style: TextStyle(color: Colors.white),
+        ),
+        iconTheme:
+        IconThemeData(color: Colors.white), // Change back arrow color to white
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
+            // Title TextField
             TextField(
-              controller: _titleController,
+              controller: _titleController, // Correct controller
               decoration: InputDecoration(
-                  labelText: "Title",
+                labelText: "Title",
                 labelStyle: TextStyle(color: Colors.blue[400]), // Set label color
                 focusedBorder: OutlineInputBorder(
                   borderSide: BorderSide(color: Colors.blue[800]!), // Set focused border color
@@ -202,8 +212,9 @@ class _EditNotePageState extends State<EditNotePage> {
               ),
             ),
             SizedBox(height: 30),
+            // Content TextField
             TextField(
-              controller: _titleController,
+              controller: _contentController, // Correct controller
               decoration: InputDecoration(
                 labelText: "Content",
                 labelStyle: TextStyle(color: Colors.blue[400]), // Set label color
@@ -213,14 +224,16 @@ class _EditNotePageState extends State<EditNotePage> {
               ),
               maxLines: 6,
             ),
-            SizedBox(height: 30),
+            SizedBox(height: 20),
             ElevatedButton(
               onPressed: _updateNote,
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.blue[800], // Set the background color of the button
               ),
-              child: Text("Save",
-              style: TextStyle(color: Colors.white),),
+              child: Text(
+                "Update",
+                style: TextStyle(color: Colors.white),
+              ),
             ),
           ],
         ),

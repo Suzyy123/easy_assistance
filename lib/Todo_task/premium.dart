@@ -32,7 +32,7 @@ class _PremiumPageState extends State<PremiumPage> {
           Align(
             alignment: Alignment.topCenter,
             child: Padding(
-              padding: const EdgeInsets.only(top: 120),
+              padding: const EdgeInsets.only(top: 90),
               child: Icon(
                 Icons.diamond,
                 color: Color(0xFFDAA520),
@@ -46,7 +46,7 @@ class _PremiumPageState extends State<PremiumPage> {
             child: Padding(
               padding: const EdgeInsets.only(top: 10), // Adjusts the container's position
               child: Container(
-                width: 400,
+                width: 350,
                 height: 410, // Increased height to make space for the button
                 decoration: BoxDecoration(
                   color: Colors.white,
@@ -84,15 +84,15 @@ class _PremiumPageState extends State<PremiumPage> {
                             children: [
                               Text(
                                 '"unlock exclusive features for a',
-                                style: TextStyle(fontSize: 19, color: Colors.black),
+                                style: TextStyle(fontSize: 10, color: Colors.black),
                               ),
                               Text(
                                 'seamless and ad-free chat experience ' ,
-                                style: TextStyle(fontSize: 19, color: Colors.black),
+                                style: TextStyle(fontSize: 10, color: Colors.black),
                               ),
                               Text(
                                 'with Premium!"',
-                                style: TextStyle(fontSize: 19, color: Colors.black),
+                                style: TextStyle(fontSize: 10, color: Colors.black),
                               ),
                             ],
                           ),
@@ -100,6 +100,19 @@ class _PremiumPageState extends State<PremiumPage> {
                       ),
                       SizedBox(height: 26),
                       // Point 1
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(Icons.check, color: Colors.green, size: 20),
+                          SizedBox(width: 10),
+                          Text(
+                            'Virtual Meeting',
+                            style: TextStyle(fontSize: 18, color: Colors.black),
+                          ),
+                        ],
+                      ),
+                      SizedBox(height: 10),
+                      // Point 2
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
@@ -137,21 +150,22 @@ class _PremiumPageState extends State<PremiumPage> {
                           ),
                         ],
                       ),
-                      SizedBox(height: 50),
-                      // "Get Premium" Button
+                      SizedBox(height: 20), // Reduced height for positioning the button higher
+// "Get Premium" Button
                       ElevatedButton(
                         onPressed: () {
                           // Logic to proceed to Premium subscription or features
                         },
-                        child: Text('Get Premium', style: TextStyle(fontSize: 18)),
+                        child: Text('Get Premium', style: TextStyle(fontSize: 16)), // Smaller text size
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Color(0xFFDAA520), // Gold color
-                          padding: EdgeInsets.symmetric(horizontal: 60, vertical: 12),
+                          padding: EdgeInsets.symmetric(horizontal: 20, vertical: 5), // Reduced padding for a smaller button
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(20),
                           ),
                         ),
                       ),
+
                     ],
                   ),
                 ),
@@ -170,7 +184,7 @@ class _PremiumPageState extends State<PremiumPage> {
                     // Weekly Plan
                     Container(
                       width: 200,
-                      height: 240,
+                      height: 200,
                       decoration: BoxDecoration(
                         color: Colors.white,
                         borderRadius: BorderRadius.circular(10),
@@ -201,7 +215,7 @@ class _PremiumPageState extends State<PremiumPage> {
                     // Monthly Plan
                     Container(
                       width: 200,
-                      height: 240,
+                      height: 200,
                       decoration: BoxDecoration(
                         color: Colors.white,
                         borderRadius: BorderRadius.circular(10),
@@ -232,7 +246,7 @@ class _PremiumPageState extends State<PremiumPage> {
                     // Annual Plan
                     Container(
                       width: 200,
-                      height: 240,
+                      height: 200,
                       decoration: BoxDecoration(
                         color: Colors.white,
                         borderRadius: BorderRadius.circular(10),

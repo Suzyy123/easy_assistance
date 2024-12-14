@@ -1,12 +1,13 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:easy_assistance_app/Todo_task/firestore_service.dart';
+import 'package:easy_assistance_app/TodoTask_Service/firestore_service.dart';
 import 'My Work.dart';  // Import the CalendarPage
 
 
 class NotificationPage extends StatelessWidget {
   final FirestoreService firestoreService = FirestoreService();
-
+  String userId= FirebaseAuth.instance.currentUser!.uid;
   NotificationPage({Key? key}) : super(key: key);
 
   @override
@@ -21,7 +22,7 @@ class NotificationPage extends StatelessWidget {
         iconTheme: const IconThemeData(color: Colors.white),
       ),
       body: StreamBuilder<List<Map<String, dynamic>>>(
-        stream: firestoreService.getTasks(),
+        stream: firestoreService.getTasks(userId),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());

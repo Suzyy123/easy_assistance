@@ -1,9 +1,10 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'firestore_service.dart'; // Import the Firestore service for fetching tasks
+import 'package:easy_assistance_app/TodoTask_Service/firestore_service.dart';
 
 class CompletedTasksPage extends StatelessWidget {
   final FirestoreService _firestoreService = FirestoreService();
-
+  String userId= FirebaseAuth.instance.currentUser!.uid;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -21,7 +22,7 @@ class CompletedTasksPage extends StatelessWidget {
         backgroundColor: Colors.blue[900],
       ),
       body: StreamBuilder<List<Map<String, dynamic>>>(
-        stream: _firestoreService.getCompletedTasks(), // Fetch completed tasks
+        stream: _firestoreService.getCompletedTasks(userId), // Fetch completed tasks
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return Center(child: CircularProgressIndicator());

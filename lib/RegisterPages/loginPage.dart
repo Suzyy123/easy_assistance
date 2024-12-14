@@ -2,6 +2,7 @@ import 'package:easy_assistance_app/authServices/AuthServices.dart';
 import 'package:flutter/material.dart';
 import '../Components/buttons.dart';
 import '../Components/textFields.dart';
+import 'forgotPassword.dart';
 
 class Loginpage extends StatefulWidget {
   final void Function()? onTap;
@@ -76,30 +77,20 @@ class _LoginpageState extends State<Loginpage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.background,
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        title: const Text(
-          "Login",
-          style: TextStyle(
-            fontSize: 26,
-            fontWeight: FontWeight.bold,
-            fontStyle: FontStyle.normal,
-            color: Colors.white
-          ),
-          
-        ),
-        leading: Icon(Icons.arrow_back),
-      ),
       body: Center(
         child: SingleChildScrollView(
           child: Padding(
             padding: const EdgeInsets.all(16.0),
             child: Column(
               children: [
+                const SizedBox(height: 10,),
+                Text("Login Here", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 28),),
+                // Registration Page Image
                 Center(
-                  child: Icon(Icons.person, size: 200,)
+                    child: Image.asset("lib/images/registerPage.png",
+                    height: 280,
+                    )
                 ),
-                const SizedBox(height: 20),
                 // Email Input
                 MyTextfield(
                   hintText: "Email",
@@ -117,7 +108,7 @@ class _LoginpageState extends State<Loginpage> {
                 // Forgot Password
                 GestureDetector(
                   onTap: () {
-                    // Implement forgot password functionality here
+                    Navigator.push(context, MaterialPageRoute(builder: (context)=> ForgotPasswordPage()));
                   },
                   child: const Text(
                     "Forgot password?",
@@ -131,35 +122,11 @@ class _LoginpageState extends State<Loginpage> {
                   onTap: () async => await login(context), // Ensure async call
                 ),
                 const SizedBox(height: 20),
-                // Don't have an account? Register Now
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      "Don't have an account? ",
-                      style: TextStyle(
-                        fontFamily: 'cursive',
-                        color: Theme.of(context).colorScheme.inversePrimary,
-                      ),
-                    ),
-                    GestureDetector(
-                      onTap: widget.onTap,
-                      child: Text(
-                        "Register Now",
-                        style: TextStyle(
-                          fontSize: 12,
-                          color: Theme.of(context).colorScheme.inversePrimary,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 20),
                 GestureDetector(
                   onTap: () async {
                     try {
                       // Use the AuthServices to sign in with Google
-                      await AuthServices().loginWithGoogle();
+                      await AuthServices().registerWithGoogle();
 
                       // Show success dialog
                       showDialog(
@@ -201,6 +168,31 @@ class _LoginpageState extends State<Loginpage> {
                     height: 80,
                   ),
                 ),
+                // Don't have an account? Register Now
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      "Don't have an account? ",
+                      style: TextStyle(
+                        fontFamily: 'cursive',
+                        color: Theme.of(context).colorScheme.inversePrimary,
+                      ),
+                    ),
+                    GestureDetector(
+                      onTap: widget.onTap,
+                      child: Text(
+                        "Register Now",
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: Theme.of(context).colorScheme.inversePrimary,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 20),
+
               ],
             ),
           ),

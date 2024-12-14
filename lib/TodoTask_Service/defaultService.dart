@@ -1,18 +1,19 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'firestore_service.dart';
-import 'task_completion_service.dart';  // Import the new service
+ // Import the new service
 
-class PersonalListPage extends StatelessWidget {
+class DefaultListPage extends StatelessWidget {
   final FirestoreService _firestoreService = FirestoreService();
   final FirestoreService _taskCompletionService = FirestoreService();
-
+  String userId= FirebaseAuth.instance.currentUser!.uid;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         toolbarHeight: 95, // Adjust the height if necessary
         title: const Text(
-          'Personal List',
+          'Default List',
           style: TextStyle(
             color: Colors.black,       // White color for the title text
             fontSize: 27,              // Font size set to 27
@@ -32,7 +33,7 @@ class PersonalListPage extends StatelessWidget {
       backgroundColor: Colors.white, // Background color of scaffold
 
       body: StreamBuilder<List<Map<String, dynamic>>>(
-        stream: _firestoreService.getTasks(), // Fetch all tasks
+        stream: _firestoreService.getTasks(userId), // Fetch all tasks
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return Center(child: CircularProgressIndicator());
@@ -43,23 +44,23 @@ class PersonalListPage extends StatelessWidget {
           }
 
           if (!snapshot.hasData || snapshot.data!.isEmpty) {
-            return Center(child: Text('No tasks found in Personal list.'));
+            return Center(child: Text('No tasks found in Default list.'));
           }
 
           // Filter tasks to only those with "Shopping" list
-          final personalTasks = snapshot.data!
-              .where((task) => task['list'] == 'Personal') // Filter by 'Shopping' list
+          final defaultTasks = snapshot.data!
+              .where((task) => task['list'] == 'Default') // Filter by 'Shopping' list
               .toList();
 
-          if (personalTasks.isEmpty) {
-            return Center(child: Text('No tasks found in Personal list.'));
+          if (defaultTasks.isEmpty) {
+            return Center(child: Text('No tasks found in Default list.'));
           }
 
           // Display only shopping tasks
           return ListView.builder(
-            itemCount: personalTasks.length,
+            itemCount: defaultTasks.length,
             itemBuilder: (context, index) {
-              final task = personalTasks[index];
+              final task = defaultTasks[index];
               return Card(
                 margin: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
                 child: ListTile(
@@ -91,7 +92,7 @@ class PersonalListPage extends StatelessWidget {
                       IconButton(
                         icon: Icon(Icons.delete, color: Colors.black),
                         onPressed: () {
-                         // _taskCompletionService.deleteTask(task['id']);
+                          //_taskCompletionService.deleteTask(task['id']);
 
                           // Show the snackbar after deletion
                           ScaffoldMessenger.of(context).showSnackBar(

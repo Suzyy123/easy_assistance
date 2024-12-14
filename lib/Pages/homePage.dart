@@ -2,8 +2,8 @@ import 'package:easy_assistance_app/Components/icons.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import '../ChatPage/FriendRequestPage.dart';
 import '../ProfilePage/Settings/Drawer.dart';
-import 'friendRequestPage.dart';
 
 void main() {
   runApp(const MyApp());
@@ -29,6 +29,9 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  int totalTasks = 0;
+  int completedTasks = 0;
+  int get ongoingTasks => totalTasks - completedTasks;
   final TextEditingController _searchController = TextEditingController();
   final List<String> mockData = ['Figma Design', 'Prototype', 'UI Tasks', 'Development'];
   final List<Map<String, dynamic>> reminders = [
@@ -51,6 +54,48 @@ class _HomePageState extends State<HomePage> {
       "color": Colors.green,
     },
   ];
+
+  @override
+  void initState(){
+    super.initState();
+    fetchTasks();
+  }
+  Future<void> fetchTasks() async {
+    try {
+      final String? userId = FirebaseAuth.instance.currentUser?.uid;
+
+      if (userId == null) {
+        print('User is not logged in.');
+        return;
+      }
+
+      // Query tasks for the current user
+      QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+          .collection('tasks')
+          .where('UserId', isEqualTo: userId) // Filter tasks by UserId
+          .get();
+
+      int total = querySnapshot.docs.length;
+      int completed = querySnapshot.docs.where((doc) {
+        final data = doc.data() as Map<String, dynamic>;
+        // Default isCompleted to false if the field doesn't exist
+        return data['isCompleted'] ?? false;
+      }).length;
+
+      setState(() {
+        totalTasks = total;
+        completedTasks = completed;
+      });
+
+      print("Documents retrieved: $total");
+      for (var doc in querySnapshot.docs) {
+        print("Task data: ${doc.data()}");
+      }
+    } catch (e) {
+      print('Error fetching tasks: $e');
+    }
+  }
+
 
   void _handleSearch() {
     String searchQuery = _searchController.text.trim();
@@ -189,18 +234,95 @@ class _HomePageState extends State<HomePage> {
                         ),
                       ),
                       const SizedBox(height: 10),
+                      //Task Lists
                       Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                        padding: const EdgeInsets.only(left: 8.0),
                         child: Column(
-                          children: [
-                            taskCard("To-Do", "Total: 5 tasks", Colors.blue),
-                            taskCard("On-going", "Total: 2 tasks", Colors.orange),
-                            taskCard("Done", "Total: 2 tasks", Colors.green),
-                          ],
+                         crossAxisAlignment: CrossAxisAlignment.start,
+                         children: [
+                        Container(
+                          width: 340,
+                        decoration: BoxDecoration(
+                          color: Colors.white70, // Background color
+                          borderRadius: BorderRadius.circular(8), // Rounded corners
+                            border: Border.all( color: Colors.black)
                         ),
-                      ),
-                      const SizedBox(height: 20),
+                        padding: EdgeInsets.all(16), // Inner padding
 
+                        child: Text(
+                          'Total Tasks: $totalTasks',
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.black, // Text color
+                          ),
+                        ),
+                                            ),
+                          SizedBox(height: 8),
+                           Container(
+                             width: 340,
+                             decoration: BoxDecoration(
+                               color: Colors.white70, // Background color
+                               borderRadius: BorderRadius.circular(8), // Rounded corners
+                               border: Border.all(color: Colors.black), // Border color and style
+                             ),
+                             padding: EdgeInsets.all(16), // Inner padding
+                             child: Column(
+                               crossAxisAlignment: CrossAxisAlignment.start, // Align children to the start
+                               children: [
+                                 Text(
+                                   "On going Task",
+                                   style: TextStyle(
+                                     fontSize: 18,
+                                     fontWeight: FontWeight.bold,
+                                     color: Colors.black,
+                                   ),
+                                 ),
+                                 SizedBox(height: 5), // Spacing between the two texts
+                                 Text(
+                                   'On going Tasks: $ongoingTasks',
+                                   style: TextStyle(
+                                     fontSize: 16,
+                                     color: Colors.black, // Text color
+                                   ),
+                                 ),
+                               ],
+                             ),
+                           ),
+                           SizedBox(height: 8),
+                           Container(
+                             width: 340,
+                             decoration: BoxDecoration(
+                               color: Colors.white70, // Background color
+                               borderRadius: BorderRadius.circular(8), // Rounded corners
+                               border: Border.all(color: Colors.black), // Border color and style
+                             ),
+                             padding: EdgeInsets.all(16), // Inner padding
+                             child: Column(
+                               crossAxisAlignment: CrossAxisAlignment.start, // Align children to the start
+                               children: [
+                                 Text(
+                                   "Done Task",
+                                   style: TextStyle(
+                                     fontSize: 18,
+                                     fontWeight: FontWeight.bold,
+                                     color: Colors.black,
+                                   ),
+                                 ),
+                                 SizedBox(height: 5), // Spacing between the two texts
+                                 Text(
+                                   'Completed Tasks: $completedTasks',
+                                   style: TextStyle(
+                                     fontSize: 16,
+                                     color: Colors.black, // Text color
+                                   ),
+                                 ),
+                               ],
+                             ),
+                           ),
+                        ]
+                          ),
+                      ),
                       // Reminders
                       const Padding(
                         padding: EdgeInsets.symmetric(horizontal: 16.0),
@@ -209,7 +331,7 @@ class _HomePageState extends State<HomePage> {
                           style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                         ),
                       ),
-                      const SizedBox(height: 10),
+                    const SizedBox(height: 10),
                       ...reminders.map((reminder) => ListTile(
                         leading: Icon(Icons.calendar_today, color: reminder['color']),
                         title: Text(reminder['title'] ?? "No Title"),

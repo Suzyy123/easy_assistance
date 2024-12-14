@@ -65,7 +65,7 @@ class _ProfilePageState extends State<ProfilePage> {
       // Retrieve avatar from local storage
       final prefs = await SharedPreferences.getInstance();
       setState(() {
-        selectedAvatar = prefs.getString('selectedAvatar') ?? 'lib/images/default_avatar.png';
+        selectedAvatar = prefs.getString('selectedAvatar') ?? 'lib/images/avatar1.png';
       });
     } catch (e) {
       print('Error loading user data: $e');
@@ -140,13 +140,14 @@ class _ProfilePageState extends State<ProfilePage> {
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.background,
       appBar: AppBar(
+        backgroundColor: Colors.blue[900],
         title: const Text(
           "Profile",
-          style: TextStyle(fontWeight: FontWeight.bold),
+          style: TextStyle(fontWeight: FontWeight.bold,color: Colors.white,),
         ),
+        iconTheme: const IconThemeData(color: Colors.white),
       ),
       body: Container(
-        color: Theme.of(context).colorScheme.primary,
         child: Stack(
           children: [
             SingleChildScrollView(

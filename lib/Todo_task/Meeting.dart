@@ -1,28 +1,9 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_core/firebase_core.dart';
 
-class FirestoreService {
-  // Method to add meeting to Firebase
-  Future<void> addMeeting(
-      String title,
-      String description,
-      String date,
-      String time,
-      String location,
-      ) async {
-    final meetingRef = FirebaseFirestore.instance.collection('meetings');
-    await meetingRef.add({
-      'title': title,
-      'description': description,
-      'date': date,
-      'time': time,
-      'location': location,
-      'created_at': FieldValue.serverTimestamp(),
-    });
-  }
-}
+import 'MeetingPage.dart';
 
 class CreateMeetingPage extends StatefulWidget {
   @override
@@ -35,7 +16,7 @@ class _CreateMeetingPageState extends State<CreateMeetingPage> {
   DateTime? _selectedDate;
   TimeOfDay? _selectedTime;
   String _selectedLocation = 'Virtual'; // Default location
-  final FirestoreService _firestoreService = FirestoreService(); // Firestore service instance
+  String user = FirebaseAuth.instance.currentUser!.uid;
 
   // Format Date and Time for display
   String get formattedDate =>
@@ -48,8 +29,11 @@ class _CreateMeetingPageState extends State<CreateMeetingPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Schedule Meeting', style: TextStyle(color: Colors.white),),
+        title: Text('Schedule Meeting', style: TextStyle(color: Colors.white)),
         backgroundColor: Colors.blue[800],
+        iconTheme: IconThemeData(
+          color: Colors.white, // Ensure all icons in the AppBar are white
+        ),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -201,7 +185,8 @@ class _CreateMeetingPageState extends State<CreateMeetingPage> {
       _descriptionController.clear();
       _selectedDate = null;
       _selectedTime = null;
-      _selectedLocation = 'Virtual'; // Reset to default location
+      _selectedLocation = 'Virtual';
+     // Reset to default location
     });
     print('Meeting Creation Canceled');
   }
@@ -220,14 +205,16 @@ class _CreateMeetingPageState extends State<CreateMeetingPage> {
       return;
     }
 
-    // Save meeting to Firebase
-    _firestoreService.addMeeting(
-      _titleController.text,
-      _descriptionController.text,
-      formattedDate,
-      formattedTime,
-      _selectedLocation,
-    ).then((_) {
+    // Save meeting to Firebase directly
+    FirebaseFirestore.instance.collection('meetings').add({
+      'UserId': user,
+      'title': _titleController.text,
+      'description': _descriptionController.text,
+      'date': formattedDate,
+      'time': formattedTime,
+      'location': _selectedLocation,
+      'created_at': FieldValue.serverTimestamp(),
+    }).then((_) {
       // On success, show success dialog
       _showSuccessDialog();
     }).catchError((error) {
@@ -270,6 +257,12 @@ class _CreateMeetingPageState extends State<CreateMeetingPage> {
               onPressed: () {
                 Navigator.of(context).pop();
                 _cancelMeeting(); // Clear fields after success
+
+                // Navigate to the MeetingsPage
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => MeetingsPage()), // Replace with your MeetingsPage widget
+                );
               },
               child: Text('OK'),
             ),
@@ -279,12 +272,3 @@ class _CreateMeetingPageState extends State<CreateMeetingPage> {
     );
   }
 }
-
-// void main() async {
-//   WidgetsFlutterBinding.ensureInitialized();
-//   await Firebase.initializeApp(); // Initialize Firebase
-//   runApp(MaterialApp(
-//     home: CreateMeetingPage(),
-//     debugShowCheckedModeBanner: false,
-//   ));
-// }

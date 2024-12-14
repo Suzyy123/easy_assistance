@@ -1,9 +1,7 @@
-
 import 'package:flutter/material.dart';
-import 'NotificationList.dart';
-import 'firestore_service.dart';
-//import 'notification.dart';
-//import 'package:easy_assistance_app/Todo_task/notification.dart'; // Adjust path if necessary
+import 'package:easy_assistance_app/TodoTask_Service/firestore_service.dart';
+import 'package:firebase_auth/firebase_auth.dart'; // Import Firebase Auth
+import 'TaskListPage.dart';
 
 
 
@@ -20,11 +18,10 @@ class _CreateState extends State<Create> {
   final TextEditingController _timeController = TextEditingController();
   final FirestoreService _firestoreService = FirestoreService();
   final TextEditingController _newListController = TextEditingController();
-
-
-
+  String userId= FirebaseAuth.instance.currentUser!.uid;
   String _selectedList = 'Default';
   List<String> _lists = ['Default', 'Work', 'Personal', 'Urgent', 'Shopping'];
+
 
 
 
@@ -35,7 +32,7 @@ class _CreateState extends State<Create> {
   }
 
   Future<void> _loadTaskLists() async {
-    List<String> taskLists = await _firestoreService.getTaskLists();
+    List<String> taskLists = await _firestoreService.getTaskLists(userId);
     setState(() {
       _lists = ['Default'] + taskLists;
       _lists = _lists.toSet().toList(); // Remove duplicates
@@ -70,7 +67,7 @@ class _CreateState extends State<Create> {
             TextButton(
               onPressed: () async {
                 if (_newListController.text.isNotEmpty) {
-                  await _firestoreService.addNewTaskList(_newListController.text);
+                  await _firestoreService.addNewTaskList(_newListController.text, userId);
                   await _loadTaskLists(); // Reload lists to include the new one
                   setState(() {
                     _selectedList = _newListController.text;
@@ -89,15 +86,23 @@ class _CreateState extends State<Create> {
 
   void _deleteList(String listName) async {
     // Delete the list from Firestore
-    await _firestoreService.deleteTaskList(listName); // Delete from Firestore
+    // await _firestoreService.deleteTaskList(listName); // Delete from Firestore
+    //
+    // // Remove the list from the local list immediately
+    // setState(() {
+    //   _lists.remove(listName); // Remove from the local list
+    //   if (_selectedList == listName) {
+    //     _selectedList = 'Default'; // Reset selected list if deleted
+    //   }
+    // });
+    await _firestoreService.addTask(
+      _taskController.text,
+      _dateController.text,
+      _timeController.text,
+      _selectedList,
+      userId
+    );
 
-    // Remove the list from the local list immediately
-    setState(() {
-      _lists.remove(listName); // Remove from the local list
-      if (_selectedList == listName) {
-        _selectedList = 'Default'; // Reset selected list if deleted
-      }
-    });
 
     // Close the dropdown menu programmatically
     Navigator.of(context).pop(); // Close the dropdown menu
@@ -292,19 +297,29 @@ class _CreateState extends State<Create> {
                 children: [
                   ElevatedButton(
                     onPressed: () async {
-                      if (_taskController.text.isNotEmpty && _dateController.text.isNotEmpty && _timeController.text.isNotEmpty) {
+                      if (_taskController.text.isNotEmpty
+                          && _dateController.text.isNotEmpty &&
+                          _timeController.text.isNotEmpty) {
                         try {
+                          String user= FirebaseAuth.instance.currentUser!.uid;
                           await _firestoreService.addTask(
                             _taskController.text,
                             _dateController.text,
                             _timeController.text,
                             _selectedList,
+
+                            user, //passing user id
                           );
 
                           _clearFields();
 
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(content: Text('Task added successfully !'), backgroundColor: Colors.green,),
+                          );
+                          // Navigate to TaskListPage
+                          Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(builder: (context) => TaskListPage()),
                           );
                         } catch (e) {
                           print('Error adding task: $e');

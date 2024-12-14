@@ -2,20 +2,30 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:easy_assistance_app/Todo_task/All_Notes.dart';
 import 'package:easy_assistance_app/Todo_task/FavoriteTasks.dart';
 import 'package:easy_assistance_app/Todo_task/ListsPgae.dart';
+import 'package:easy_assistance_app/Todo_task/Meeting.dart';
 import 'package:easy_assistance_app/Todo_task/My%20Work.dart';
 import 'package:easy_assistance_app/Todo_task/TaskListPage.dart';
 import 'package:easy_assistance_app/Todo_task/shopping.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import '../ChatPage/ChatPageUI.dart';
 import '../Components/icons.dart';
+import '../ProfilePage/ProfileMain.dart';
 import 'Assignment.dart';
+import 'Bottom.dart';
+import 'DocsPage.dart';
 import 'MeetingPage.dart';
+import 'createPage.dart';
 import 'default.dart';
-import 'firestore_service.dart';
+import 'package:easy_assistance_app/TodoTask_Service/firestore_service.dart';
 import 'package:easy_assistance_app/Todo_task/personal.dart'; // Personal page import
 import 'package:easy_assistance_app/Todo_task/notification_icon.dart'; // Import NotificationIcon
 import 'package:intl/intl.dart'; // Ensure this is imported for DateFormat
 import 'CompletedTasks.dart';
 import 'calendarScreen.dart';
+import 'package:easy_assistance_app/TodoTask_Service/firestore_service.dart' as taskFirestore;
+import 'package:easy_assistance_app/Todo_task/Meeting.dart' as meetingFirestore;
+
 
 class TodoApp extends StatelessWidget {
   @override
@@ -49,6 +59,7 @@ class _TodoHomeScreenState extends State<TodoHomeScreen> {
   List<Map<String, dynamic>> searchResults = [];
   TextEditingController searchController = TextEditingController();
   bool isSearching = false;
+  String userId= FirebaseAuth.instance.currentUser!.uid;
 
   @override
   void initState() {
@@ -101,7 +112,7 @@ class _TodoHomeScreenState extends State<TodoHomeScreen> {
   }
 
   Future<void> _loadTaskCount() async {
-    final tasks = await _firestoreService.getTasks().first;
+    final tasks = await _firestoreService.getTasks(userId).first;
     final now = DateTime.now();
     final upcomingTasks = tasks.where((task) {
       final dueDate = _parseDueDate(task['dueDate'], task['dueTime']);
@@ -160,7 +171,7 @@ class _TodoHomeScreenState extends State<TodoHomeScreen> {
   }
 
   Future<void> _loadTaskLists() async {
-    taskLists = await _firestoreService.getTaskLists();
+    taskLists = await _firestoreService.getTaskLists(userId);
     setState(() {
       isLoading = false;
     });
@@ -176,7 +187,7 @@ class _TodoHomeScreenState extends State<TodoHomeScreen> {
         flexibleSpace: SafeArea(
           child: Center(
             child: Text(
-              'Todo App',
+              '',
               style: TextStyle(
                 color: Colors.white,
                 fontSize: 24,
@@ -189,7 +200,7 @@ class _TodoHomeScreenState extends State<TodoHomeScreen> {
           Padding(
             padding: const EdgeInsets.only(right: 16.0),
             child: StreamBuilder<List<Map<String, dynamic>>>(
-              stream: _firestoreService.getTasks(),
+              stream: _firestoreService.getTasks(userId),
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
                   return CircularProgressIndicator();
@@ -491,6 +502,44 @@ class _TodoHomeScreenState extends State<TodoHomeScreen> {
                               ),
                             ),
                           ),
+                          if(!_isDropdownOpened  && !isSearching && !showCalendar)
+                            Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Padding(
+                                    padding: const EdgeInsets.only(right: 300),
+                                    child: IconButton(
+                                      icon: Icon(Icons.create, size: 30,
+                                          color: Colors.blue[900]),
+                                      onPressed: () {
+                                        Navigator.push(context,
+                                            MaterialPageRoute(
+                                                builder: (context) =>
+                                                    Create()));
+                                      },
+                                    ),
+                                  ),
+                                  IconButton(
+                                    icon: Icon(Icons.note_alt_sharp, size: 30,
+                                        color: Colors.blue[900]),
+                                    onPressed: () {
+                                      Navigator.push(context, MaterialPageRoute(
+                                          builder: (context) => NotePage()));
+                                    },
+                                  ),
+                                  IconButton(
+                                    icon: Icon(
+                                        Icons.meeting_room_outlined, size: 30,
+                                        color: Colors.blue[900]),
+                                    onPressed: () {
+                                      Navigator.push(context, MaterialPageRoute(
+                                          builder: (context) =>
+                                              CreateMeetingPage()));
+                                    },
+                                  ),
+                                ]
+                            ),
+
                           SizedBox(height: 15),
                           if (_isDropdownOpened)
                             Container(
@@ -505,6 +554,7 @@ class _TodoHomeScreenState extends State<TodoHomeScreen> {
                                   ),
                                 ],
                               ),
+
                               child: Column(
                                 children: [
                                   Padding(
@@ -545,6 +595,7 @@ class _TodoHomeScreenState extends State<TodoHomeScreen> {
                                 ],
                               ),
                             ),
+
                           if (showCalendar)
                             Expanded(
                               child: Container(
@@ -618,32 +669,32 @@ class NavItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-        onTap: onTap,
-        child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Icon(icon, color: isSelected ? Colors.white : Colors.grey),
-              SizedBox(height: 4),
-              Text(
-                label,
-                style: TextStyle(
-                  fontSize: 12,
-                  color: isSelected ? Colors.white : Colors.grey,
-                ),
-              ),
-              if (isSelected)
-                Container(
-                  margin: EdgeInsets.only(top: 2),
-                  height: 1.5,
-                  width: 40,
-                  color: Colors.white,
-                ),
-            ],
+      onTap: onTap,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, color: isSelected ? Colors.white : Colors.grey),
+          SizedBox(height: 4),
+          Text(
+            label,
+            style: TextStyle(
+              fontSize: 12,
+              color: isSelected ? Colors.white : Colors.grey,
+            ),
+          ),
+          if (isSelected)
+            Container(
+              margin: EdgeInsets.only(top: 2),
+              height: 1.5,
+              width: 40,
+              color: Colors.white,
+            ),
+        ],
 
-        ),
+      ),
       // Bottom Navigation Bar
 
-     );
+    );
 
-    }
+  }
 }

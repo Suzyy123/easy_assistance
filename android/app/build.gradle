@@ -11,7 +11,7 @@ android {
 
     defaultConfig {
         applicationId = "com.example.easy_assistance_app"
-        minSdk = 21 // Minimum SDK supported by Firebase
+        minSdk = 23 // Minimum SDK supported by Firebase
         targetSdk = 34 // Match the compile SDK version
         versionCode = 1
         versionName = "1.0"

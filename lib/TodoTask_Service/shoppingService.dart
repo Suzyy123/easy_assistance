@@ -1,18 +1,19 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'firestore_service.dart';
-import 'task_completion_service.dart';  // Import the new service
 
-class DefaultListPage extends StatelessWidget {
+
+class ShoppingListPage extends StatelessWidget {
   final FirestoreService _firestoreService = FirestoreService();
   final FirestoreService _taskCompletionService = FirestoreService();
-
+  String userId= FirebaseAuth.instance.currentUser!.uid;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         toolbarHeight: 95, // Adjust the height if necessary
         title: const Text(
-          'Default List',
+          'Shopping List',
           style: TextStyle(
             color: Colors.black,       // White color for the title text
             fontSize: 27,              // Font size set to 27
@@ -32,7 +33,7 @@ class DefaultListPage extends StatelessWidget {
       backgroundColor: Colors.white, // Background color of scaffold
 
       body: StreamBuilder<List<Map<String, dynamic>>>(
-        stream: _firestoreService.getTasks(), // Fetch all tasks
+        stream: _firestoreService.getTasks(userId), // Fetch all tasks
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return Center(child: CircularProgressIndicator());
@@ -43,23 +44,23 @@ class DefaultListPage extends StatelessWidget {
           }
 
           if (!snapshot.hasData || snapshot.data!.isEmpty) {
-            return Center(child: Text('No tasks found in Default list.'));
+            return Center(child: Text('No tasks found in Shopping list.'));
           }
 
           // Filter tasks to only those with "Shopping" list
-          final defaultTasks = snapshot.data!
-              .where((task) => task['list'] == 'Default') // Filter by 'Shopping' list
+          final shoppingTasks = snapshot.data!
+              .where((task) => task['list'] == 'Shopping') // Filter by 'Shopping' list
               .toList();
 
-          if (defaultTasks.isEmpty) {
-            return Center(child: Text('No tasks found in Default list.'));
+          if (shoppingTasks.isEmpty) {
+            return Center(child: Text('No tasks found in Shopping list.'));
           }
 
           // Display only shopping tasks
           return ListView.builder(
-            itemCount: defaultTasks.length,
+            itemCount: shoppingTasks.length,
             itemBuilder: (context, index) {
-              final task = defaultTasks[index];
+              final task = shoppingTasks[index];
               return Card(
                 margin: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
                 child: ListTile(

@@ -1,41 +1,45 @@
-import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'firestore_service.dart';
-import 'task_completion_service.dart';  // Import the new service
+import 'package:easy_assistance_app/TodoTask_Service/firestore_service.dart';
 
 class TaskListPage extends StatelessWidget {
   final FirestoreService _firestoreService = FirestoreService();
   final FirestoreService _taskCompletionService = FirestoreService();
+  final String userId = FirebaseAuth.instance.currentUser?.uid ?? ''; // Ensure userId is retrieved
 
   TaskListPage({super.key});
 
   @override
   Widget build(BuildContext context) {
+    if (userId.isEmpty) {
+      // Handle case when userId is not available
+      return Scaffold(
+        appBar: AppBar(
+          title: Text('All Tasks'),
+          backgroundColor: Colors.blue[900],
+        ),
+        body: Center(
+          child: Text('User not logged in. Please log in to view tasks.'),
+        ),
+      );
+    }
+
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.blue[900],
         toolbarHeight: 95,
-        // title: Text('Task List'),
         title: const Text(
           'All Tasks',
-          style: TextStyle(color: Colors.white,
+          style: TextStyle(
+            color: Colors.white,
             fontSize: 27,
             fontWeight: FontWeight.bold,
-          ), // Make the title text white
-
+          ),
         ),
-        iconTheme: IconThemeData(color: Colors.white), // Set the back arrow color to white
-        // actions: [
-        //   IconButton(
-        //     icon: Icon(Icons.notifications, color: Colors.white, size: 30),
-        //     onPressed: () {
-        //       //showNotifications(context);
-        //     },
-        //   ),
-        // ],
+        iconTheme: IconThemeData(color: Colors.white),
       ),
       body: StreamBuilder<List<Map<String, dynamic>>>(
-        stream: _firestoreService.getTasks(),
+        stream: _firestoreService.getTasks(userId), // Pass userId to filter tasks
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return Center(child: CircularProgressIndicator());
@@ -77,49 +81,44 @@ class TaskListPage extends StatelessWidget {
                         onChanged: (bool? value) {
                           _taskCompletionService.toggleTaskCompletion(task['id'], value ?? false);
                         },
-                        activeColor: Colors.green,  // Set the checkbox color to green when checked
+                        activeColor: Colors.green,
                       ),
-                      // IconButton(
-                      //   icon: Icon(Icons.delete, color: Colors.black),
-                      //   onPressed: () {
-                      //     //_taskCompletionService.deleteTask(task['id']);
-                      //     _firestoreService.deleteTask(task['id']);
-                      //   },
-                      // ),
                       IconButton(
                         icon: Icon(Icons.delete, color: Colors.black),
                         onPressed: () async {
                           try {
                             await _firestoreService.deleteTask(task['id']);
-                            // Show a SnackBar to indicate success
                             ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(content: Text('Task deleted successfully !',
-                                style: TextStyle(color: Colors.white), // Text color (optional)
-                              ),
-                                backgroundColor: Colors.green, // Set background color to green
+                              SnackBar(
+                                content: Text(
+                                  'Task deleted successfully!',
+                                  style: TextStyle(color: Colors.white),
+                                ),
+                                backgroundColor: Colors.green,
                               ),
                             );
                           } catch (e) {
-                            // Handle errors if any
-                            SnackBar(content: Text('Failed to deleted task !',
-                              style: TextStyle(color: Colors.white), // Text color (optional)
-                            ),
-                              backgroundColor: Colors.yellow, // Set background color to green
-
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text(
+                                  'Failed to delete task!',
+                                  style: TextStyle(color: Colors.white),
+                                ),
+                                backgroundColor: Colors.red,
+                              ),
                             );
                           }
                         },
                       ),
-                  IconButton(
-                    icon: Icon(
-                      isFavorite ? Icons.star : Icons.star_border,
-                      color: isFavorite ? Colors.yellow : Colors.black,
-                    ),
-                    onPressed: () {
-                      _firestoreService.toggleFavorite(task['id'], !isFavorite);  // Toggle favorite status
-                    },
-                  ),
-
+                      IconButton(
+                        icon: Icon(
+                          isFavorite ? Icons.star : Icons.star_border,
+                          color: isFavorite ? Colors.yellow : Colors.black,
+                        ),
+                        onPressed: () {
+                          _firestoreService.toggleFavorite(task['id'], !isFavorite); // Toggle favorite status
+                        },
+                      ),
                     ],
                   ),
                 ),
@@ -131,5 +130,3 @@ class TaskListPage extends StatelessWidget {
     );
   }
 }
-
-
