@@ -17,6 +17,7 @@ class _LoginpageState extends State<Loginpage> {
   // Email and password controllers
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
+  bool _isObscure = true; // State variable to manage text visibility
 
   @override
   void dispose() {
@@ -36,7 +37,6 @@ class _LoginpageState extends State<Loginpage> {
         emailController.text.trim(),
         passwordController.text.trim(),
       );
-
       // If successful, display success message
       showDialog(
         context: context,
@@ -98,12 +98,33 @@ class _LoginpageState extends State<Loginpage> {
                   controller: emailController,
                 ),
                 const SizedBox(height: 10),
-                // Password Input
+                //Password Input
                 MyTextfield(
                   hintText: "Password",
                   obscureText: true,
                   controller: passwordController,
+
                 ),
+                //different textfield
+                // TextField(
+                //   obscureText: _isObscure,
+                //   controller: passwordController,
+                //   decoration: InputDecoration(
+                //     hintText: "Password",
+                //     border: OutlineInputBorder(),
+                //     suffixIcon: IconButton(
+                //       onPressed: () {
+                //         // Toggle the visibility state
+                //         setState(() {
+                //           _isObscure = !_isObscure;
+                //         });
+                //       },
+                //       icon: Icon(
+                //         _isObscure ? Icons.visibility_off : Icons.visibility,
+                //       ),
+                //     ),
+                //   ),
+                // ),
                 const SizedBox(height: 10),
                 // Forgot Password
                 GestureDetector(

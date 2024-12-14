@@ -7,6 +7,49 @@ import 'package:path_provider/path_provider.dart';
 class FirestoreService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
+// Method to get the task stream from Firestore
+  Stream<DocumentSnapshot> getTaskStream(String taskId) {
+    return _firestore.collection('tasks').doc(taskId).snapshots();
+  }
+
+  // Method to update task status
+  Future<void> updateTaskStatus(String taskId, String status) async {
+    try {
+      await _firestore.collection('tasks').doc(taskId).update({'status': status});
+    } catch (e) {
+      throw Exception('Error updating task status: $e');
+    }
+  }
+
+  // Method to update status for all existing tasks programmatically
+  Future<void> addStatusToAllTasks() async {
+    try {
+      // Fetch all tasks from Firestore
+      QuerySnapshot taskSnapshot = await _firestore.collection('tasks').get();
+
+      // Loop through all tasks and add the 'status' field
+      for (var taskDoc in taskSnapshot.docs) {
+        String taskId = taskDoc.id;
+        await updateTaskStatus(taskId, 'incomplete'); // Default status 'incomplete'
+      }
+      print('Status field added to all tasks');
+    } catch (e) {
+      print('Error adding status to tasks: $e');
+    }
+  }
+
+  // Stream to get task completion percentage
+  Stream<double> getTaskCompletionPercentage() {
+    return _firestore.collection('tasks').snapshots().map((snapshot) {
+      final tasks = snapshot.docs.map((doc) => doc.data() as Map<String, dynamic>).toList();
+      final totalTasks = tasks.length;
+      if (totalTasks == 0) return 0.0;
+
+      final completedTasks = tasks.where((task) => task['isCompleted'] == true).length;
+      return completedTasks / totalTasks;
+    });
+  }
+
 
   // Method to add a new task to both 'tasks' and 'taskLists' collections
   Future<void> addTask(String task, String dueDate, String dueTime, String list, String user) async {

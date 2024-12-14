@@ -11,6 +11,8 @@ import 'package:flutter/material.dart';
 import '../ChatPage/ChatPageUI.dart';
 import '../Components/icons.dart';
 import '../ProfilePage/ProfileMain.dart';
+import '../TodoTask_Service/TaskNotification/notification_icon.dart';
+import '../TodoTask_Service/meeting notification/IconPAge.dart';
 import 'Assignment.dart';
 import 'Bottom.dart';
 import 'DocsPage.dart';
@@ -232,31 +234,42 @@ class _TodoHomeScreenState extends State<TodoHomeScreen> {
         ),
         actions: [
           Padding(
-            padding: const EdgeInsets.only(right: 16.0),
-            child: StreamBuilder<List<Map<String, dynamic>>>(
-              stream: _firestoreService.getTasks(userId),
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return CircularProgressIndicator();
-                }
-                if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                  return NotificationIcon(taskCount: 0);  // No tasks to display
-                }
-                final tasks = snapshot.data!;
-                final now = DateTime.now();
-
-                // Filter tasks due within the next 3 days
-                final upcomingTasks = tasks.where((task) {
-                  final dueDate = _parseDueDate(task['dueDate'], task['dueTime']);
-                  return dueDate.isAfter(now) && dueDate.difference(now).inDays <= 3;
-                }).toList();
-
-                // Update the task count in NotificationIcon
-                return NotificationIcon(taskCount: upcomingTasks.length);
-              },
-            ),
+            padding: const EdgeInsets.only(right: 20.0),
+            child: MeetingNotificationIcon(), // Add your custom meeting notification icon widget
+          ),
+          Padding(
+            padding: const EdgeInsets.only(right: 20.0),
+            child: NotificationIcon_Task(), // Add your custom task notification icon widget
           ),
         ],
+        // actions: [
+        //   Padding(
+        //     padding: const EdgeInsets.only(right: 16.0),
+        //     child: StreamBuilder<List<Map<String, dynamic>>>(
+        //       stream: _firestoreService.getTasks(userId),
+        //       builder: (context, snapshot) {
+        //         if (snapshot.connectionState == ConnectionState.waiting) {
+        //           return CircularProgressIndicator();
+        //         }
+        //         if (!snapshot.hasData || snapshot.data!.isEmpty) {
+        //           return NotificationIcon(taskCount: 0);  // No tasks to display
+        //         }
+        //         final tasks = snapshot.data!;
+        //         final now = DateTime.now();
+        //
+        //         // Filter tasks due within the next 3 days
+        //         final upcomingTasks = tasks.where((task) {
+        //           final dueDate = _parseDueDate(task['dueDate'], task['dueTime']);
+        //           return dueDate.isAfter(now) && dueDate.difference(now).inDays <= 3;
+        //         }).toList();
+        //
+        //         // Update the task count in NotificationIcon
+        //         return NotificationIcon(taskCount: upcomingTasks.length);
+        //       },
+        //     ),
+        //   ),
+        // ],
+
       ),
 
       body: SafeArea(

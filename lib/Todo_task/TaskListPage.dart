@@ -2,6 +2,9 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:easy_assistance_app/TodoTask_Service/firestore_service.dart';
 
+import 'Tasks_All/Taskdetailpage.dart';
+
+
 class TaskListPage extends StatelessWidget {
   final FirestoreService _firestoreService = FirestoreService();
   final FirestoreService _taskCompletionService = FirestoreService();
@@ -15,7 +18,15 @@ class TaskListPage extends StatelessWidget {
       // Handle case when userId is not available
       return Scaffold(
         appBar: AppBar(
-          title: Text('All Tasks'),
+          title: const Text(
+            'All Tasks',
+            style: TextStyle(color: Colors.white,
+              fontSize: 27,
+              fontWeight: FontWeight.bold,
+            ), // Make the title text white
+
+          ),
+          iconTheme: IconThemeData(color: Colors.white), // Set the back arrow color to white
           backgroundColor: Colors.blue[900],
         ),
         body: Center(
@@ -38,7 +49,31 @@ class TaskListPage extends StatelessWidget {
         ),
         iconTheme: IconThemeData(color: Colors.white),
       ),
-      body: StreamBuilder<List<Map<String, dynamic>>>(
+      body: Column(
+        children: [
+          // Dynamic Progress Bar
+          StreamBuilder<double>(  // Real-time progress bar based on task completion percentage
+            stream: _firestoreService.getTaskCompletionPercentage(),
+            builder: (context, snapshot) {
+              double progress = snapshot.data ?? 0.0;
+              return Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
+                  children: [
+                    LinearProgressIndicator(
+                      value: progress,
+                      backgroundColor: Colors.grey[300],
+                      valueColor: AlwaysStoppedAnimation<Color>(Colors.green),
+                    ),
+                    SizedBox(height: 8),
+                    Text('${(progress * 100).toStringAsFixed(1)}% tasks completed'),
+                  ],
+                ),
+              );
+            },
+    ),
+      Expanded(
+      child: StreamBuilder<List<Map<String, dynamic>>>(
         stream: _firestoreService.getTasks(userId), // Pass userId to filter tasks
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
@@ -64,6 +99,21 @@ class TaskListPage extends StatelessWidget {
               return Card(
                 margin: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
                 child: ListTile(
+
+                  // Handle onTap for navigation to TaskDetailPage
+                  onTap: () {
+                    // Navigate to TaskDetailPage when other parts of the task are clicked
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => TaskDetailPage(
+                          taskId: task['id'],
+                          taskName: task['task'] ?? 'No Task',
+                        ),
+                      ),
+                    );
+                  },
+
                   title: Text(task['task'] ?? 'No Task'),
                   subtitle: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -126,6 +176,9 @@ class TaskListPage extends StatelessWidget {
             },
           );
         },
+      ),
+      ),
+          ],
       ),
     );
   }
