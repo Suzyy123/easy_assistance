@@ -1,12 +1,14 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart'; // Import the intl package for date formatting
+import '../TodoTask_Service/firestore_service.dart';
 import 'TaskDetailPage.dart';
 import 'TaskDetailPage.dart';
-import 'firestore_service.dart';
 
 class TaskListPage extends StatelessWidget {
   final FirestoreService _firestoreService = FirestoreService();
+  String userId = FirebaseAuth.instance.currentUser!.uid;
 
   // Helper function to parse the date string
   DateTime? parseDate(String dateStr) {
@@ -59,7 +61,7 @@ class TaskListPage extends StatelessWidget {
           ),
           Expanded(
             child: StreamBuilder<List<Map<String, dynamic>>>(  // Fetch task data from Firestore in real-time
-              stream: _firestoreService.getTasks(),
+              stream: _firestoreService.getTasks(userId),
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
                   return Center(child: CircularProgressIndicator());
