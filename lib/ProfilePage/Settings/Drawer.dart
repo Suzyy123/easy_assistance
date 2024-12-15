@@ -3,11 +3,10 @@ import 'package:easy_assistance_app/Pages/homePage.dart';
 import 'package:easy_assistance_app/ProfilePage/Settings/settingPage.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-
 import '../../ChatPage/ChatPageUI.dart';
 import '../../RegisterPages/loginPage.dart';
-import '../../Todo_task/MeetingPage.dart';
-import '../../Todo_task/TaskListPage.dart';
+import '../../Todo_task/Meeting_All/MeetingPage.dart';
+import '../../Todo_task/Tasks_All/TaskListPage.dart';
 import '../../Todo_task/premium.dart';
 import '../../authServices/AuthGate.dart';
 import '../../authServices/AuthServices.dart';

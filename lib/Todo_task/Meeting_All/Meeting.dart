@@ -186,7 +186,7 @@ class _CreateMeetingPageState extends State<CreateMeetingPage> {
       _selectedDate = null;
       _selectedTime = null;
       _selectedLocation = 'Virtual';
-     // Reset to default location
+      // Reset to default location
     });
     print('Meeting Creation Canceled');
   }

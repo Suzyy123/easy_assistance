@@ -1,10 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:easy_assistance_app/Todo_task/All_Notes.dart';
-import 'package:easy_assistance_app/Todo_task/FavoriteTasks.dart';
 import 'package:easy_assistance_app/Todo_task/ListsPgae.dart';
-import 'package:easy_assistance_app/Todo_task/Meeting.dart';
 import 'package:easy_assistance_app/Todo_task/My%20Work.dart';
-import 'package:easy_assistance_app/Todo_task/TaskListPage.dart';
 import 'package:easy_assistance_app/Todo_task/shopping.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -14,19 +10,21 @@ import '../ProfilePage/ProfileMain.dart';
 import '../TodoTask_Service/TaskNotification/notification_icon.dart';
 import '../TodoTask_Service/meeting notification/IconPAge.dart';
 import 'Assignment.dart';
-import 'Bottom.dart';
-import 'DocsPage.dart';
-import 'MeetingPage.dart';
-import 'createPage.dart';
+import 'Meeting_All/Meeting.dart';
+import 'Meeting_All/MeetingPage.dart';
+import 'Notes_All/All_Notes.dart';
+import 'Notes_All/DocsPage.dart';
+import 'Tasks_All/CompletedTasks.dart';
+import 'Tasks_All/FavoriteTasks.dart';
+import 'Tasks_All/TaskListPage.dart';
+import 'Tasks_All/createPage.dart';
 import 'default.dart';
 import 'package:easy_assistance_app/TodoTask_Service/firestore_service.dart';
 import 'package:easy_assistance_app/Todo_task/personal.dart'; // Personal page import
-import 'package:easy_assistance_app/Todo_task/notification_icon.dart'; // Import NotificationIcon
 import 'package:intl/intl.dart'; // Ensure this is imported for DateFormat
-import 'CompletedTasks.dart';
 import 'calendarScreen.dart';
 import 'package:easy_assistance_app/TodoTask_Service/firestore_service.dart' as taskFirestore;
-import 'package:easy_assistance_app/Todo_task/Meeting.dart' as meetingFirestore;
+
 
 
 class TodoApp extends StatelessWidget {
@@ -242,34 +240,6 @@ class _TodoHomeScreenState extends State<TodoHomeScreen> {
             child: NotificationIcon_Task(), // Add your custom task notification icon widget
           ),
         ],
-        // actions: [
-        //   Padding(
-        //     padding: const EdgeInsets.only(right: 16.0),
-        //     child: StreamBuilder<List<Map<String, dynamic>>>(
-        //       stream: _firestoreService.getTasks(userId),
-        //       builder: (context, snapshot) {
-        //         if (snapshot.connectionState == ConnectionState.waiting) {
-        //           return CircularProgressIndicator();
-        //         }
-        //         if (!snapshot.hasData || snapshot.data!.isEmpty) {
-        //           return NotificationIcon(taskCount: 0);  // No tasks to display
-        //         }
-        //         final tasks = snapshot.data!;
-        //         final now = DateTime.now();
-        //
-        //         // Filter tasks due within the next 3 days
-        //         final upcomingTasks = tasks.where((task) {
-        //           final dueDate = _parseDueDate(task['dueDate'], task['dueTime']);
-        //           return dueDate.isAfter(now) && dueDate.difference(now).inDays <= 3;
-        //         }).toList();
-        //
-        //         // Update the task count in NotificationIcon
-        //         return NotificationIcon(taskCount: upcomingTasks.length);
-        //       },
-        //     ),
-        //   ),
-        // ],
-
       ),
 
       body: SafeArea(

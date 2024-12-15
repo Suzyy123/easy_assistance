@@ -2,7 +2,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:easy_assistance_app/TodoTask_Service/firestore_service.dart';
 
-import 'Tasks_All/Taskdetailpage.dart';
+import 'Taskdetailpage.dart';
+
 
 
 class TaskListPage extends StatelessWidget {
