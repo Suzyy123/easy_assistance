@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -15,6 +16,7 @@ class _CreateMeetingPageState extends State<CreateMeetingPage> {
   DateTime? _selectedDate;
   TimeOfDay? _selectedTime;
   String _selectedLocation = 'Virtual'; // Default location
+  String user = FirebaseAuth.instance.currentUser!.uid;
 
   // Format Date and Time for display
   String get formattedDate =>
@@ -183,7 +185,8 @@ class _CreateMeetingPageState extends State<CreateMeetingPage> {
       _descriptionController.clear();
       _selectedDate = null;
       _selectedTime = null;
-      _selectedLocation = 'Virtual'; // Reset to default location
+      _selectedLocation = 'Virtual';
+      // Reset to default location
     });
     print('Meeting Creation Canceled');
   }
@@ -204,6 +207,7 @@ class _CreateMeetingPageState extends State<CreateMeetingPage> {
 
     // Save meeting to Firebase directly
     FirebaseFirestore.instance.collection('meetings').add({
+      'UserId': user,
       'title': _titleController.text,
       'description': _descriptionController.text,
       'date': formattedDate,

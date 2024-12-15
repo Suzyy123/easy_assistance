@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import '../TodoTask_Service/assignmentService.dart';
 import 'frontPage.dart';
@@ -27,6 +28,7 @@ class _AssignmentDetailsState extends State<TodoHomeScreen> {
   bool isMenuVisible = false;
   Offset menuPosition = Offset(100, 100); // Starting position of the draggable menu
   String selectedList = ''; // Track selected list category
+  String userId= FirebaseAuth.instance.currentUser!.uid;
 
   @override
   Widget build(BuildContext context) {

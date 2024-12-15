@@ -1,11 +1,14 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'firestore_service.dart';
 import 'package:intl/intl.dart';
 
 class NotificationService {
   //final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-  final FirestoreService _firestoreService = FirestoreService(); // Create instance
+  final FirestoreService _firestoreService = FirestoreService();
+
+  String userId= FirebaseAuth.instance.currentUser!.uid;
 
   // // Initialize listener for due tasks
   // void initializeNotifications(BuildContext context) {
@@ -16,7 +19,7 @@ class NotificationService {
   // Initialize listener for due tasks
   void initializeNotifications(BuildContext context) {
     // Listen for tasks from Firestore
-    _firestoreService.getTasks().listen((tasks) {
+    _firestoreService.getTasks(userId).listen((tasks) {
       _checkForDueTasks(tasks, context);
     });
   }

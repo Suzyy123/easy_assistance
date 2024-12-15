@@ -1,7 +1,6 @@
-
 import 'package:easy_assistance_app/ChatPage/chatfucntions.dart';
-import 'package:easy_assistance_app/Pages/chatscreen.dart';
 import 'package:easy_assistance_app/Todo_task/frontPage.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -9,10 +8,9 @@ import '../../ChatPage/ChatPageUI.dart';
 import 'package:easy_assistance_app/TodoTask_Service/firestore_service.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
-
 import 'package:easy_assistance_app/Todo_task/AcceptDenyPage.dart';
-
 import '../links/DynamicLinkService.dart';
+
 
 class MeetingsPage extends StatefulWidget {
   @override
@@ -22,7 +20,7 @@ class MeetingsPage extends StatefulWidget {
 class _MeetingsPageState extends State<MeetingsPage> {
   final FirestoreService _firestoreService = FirestoreService();
   final DynamicLinkService _dynamicLinkService = DynamicLinkService(); // Initialize the service
-
+  final String userId = FirebaseAuth.instance.currentUser!.uid;
 
   // Method to navigate to the Accept/Deny page when meetingId is clicked
   void _navigateToAcceptDenyPage(String meetingId) {
@@ -204,6 +202,7 @@ class _MeetingsPageState extends State<MeetingsPage> {
                       _editedDate,
                       _editedTime,
                       _editedLocation,
+                      userId,
                     );
                     // Close the dialog and refresh the list
                     Navigator.pop(context);
@@ -270,8 +269,8 @@ class _MeetingsPageState extends State<MeetingsPage> {
                   //   ),
                   // );
 
-                    // Launch the dynamic URL
-                    launch(dynamicUrl.toString());
+                  // Launch the dynamic URL
+                  launch(dynamicUrl.toString());
                 },
                 child: Text(
                   dynamicUrl.toString(),
@@ -342,7 +341,7 @@ class _MeetingsPageState extends State<MeetingsPage> {
       body: Padding(
         padding: const EdgeInsets.all(8.0),
         child: StreamBuilder<List<Map<String, dynamic>>>( // Using stream
-          stream: _firestoreService.getMeetings(),
+          stream: _firestoreService.getMeetings(userId),
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
               return Center(child: CircularProgressIndicator());

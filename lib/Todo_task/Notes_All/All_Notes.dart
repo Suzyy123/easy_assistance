@@ -1,9 +1,10 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:easy_assistance_app/TodoTask_Service/firestore_service.dart';
 
 class NotesPage extends StatelessWidget {
   final FirestoreService _firestoreService = FirestoreService();
-
+  final String userId = FirebaseAuth.instance.currentUser!.uid;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -16,7 +17,7 @@ class NotesPage extends StatelessWidget {
         ),
       ),
       body: StreamBuilder<List<Map<String, dynamic>>>(
-        stream: _firestoreService.getNotes(),
+        stream: _firestoreService.getNotes(userId),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return Center(child: CircularProgressIndicator());
@@ -108,7 +109,7 @@ class NotesPage extends StatelessWidget {
             ),
             TextButton(
               onPressed: () {
-                _firestoreService.deleteNote(noteId); // Delete the note
+                _firestoreService.deleteNote(noteId, userId); // Delete the note
                 Navigator.of(context).pop(); // Close dialog
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
@@ -131,7 +132,7 @@ class NotesPage extends StatelessWidget {
       context,
       MaterialPageRoute(
         builder: (context) =>
-            EditNotePage(note: note, firestoreService: _firestoreService),
+            EditNotePage(note: note, firestoreService: _firestoreService, userId: userId),
       ),
     );
   }
@@ -140,8 +141,8 @@ class NotesPage extends StatelessWidget {
 class EditNotePage extends StatefulWidget {
   final Map<String, dynamic> note;
   final FirestoreService firestoreService; // Pass the FirestoreService here
-
-  EditNotePage({required this.note, required this.firestoreService}); // Constructor
+  final String userId; // **(RED)** Accept userId
+  EditNotePage({required this.note, required this.firestoreService, required this.userId}); // **(RED)** Add userId to constructor
 
   @override
   _EditNotePageState createState() => _EditNotePageState();
@@ -170,6 +171,7 @@ class _EditNotePageState extends State<EditNotePage> {
       widget.note['id'],
       _contentController.text, // Content controller used here
       _titleController.text, // Title controller used here
+      widget.userId, // **(RED)** Pass userId to update the note
     );
     Navigator.pop(context); // Close the edit page
 

@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:easy_assistance_app/TodoTask_Service/firestore_service.dart';
 
@@ -11,6 +12,7 @@ class _ListPageState extends State<ListPage> {
   List<String> taskLists = []; // To hold the task lists from Firebase
   bool isLoading = true; // To show a loading indicator while fetching data
   final TextEditingController _listNameController = TextEditingController();
+  String userId= FirebaseAuth.instance.currentUser!.uid;
 
   @override
   void initState() {
@@ -21,7 +23,7 @@ class _ListPageState extends State<ListPage> {
   // Method to fetch task lists from Firestore and update the UI
   void fetchTaskLists() async {
     try {
-      List<String> lists = await _firestoreService.getTaskLists();
+      List<String> lists = await _firestoreService.getTaskLists(userId);
       setState(() {
         taskLists = lists;
         isLoading = false;  // Stop showing the loading indicator
@@ -39,7 +41,7 @@ class _ListPageState extends State<ListPage> {
     String listName = _listNameController.text.trim();
     if (listName.isNotEmpty) {
       try {
-        await _firestoreService.addNewTaskList(listName);  // Add the list to Firestore
+        await _firestoreService.addNewTaskList(listName, userId);  // Add the list to Firestore
         setState(() {
           taskLists.add(listName);  // Add the list to the local UI list
         });
@@ -65,7 +67,7 @@ class _ListPageState extends State<ListPage> {
   // Method to delete a task list and update the UI after deletion
   Future<void> deleteTaskList(String listName) async {
     try {
-      await _firestoreService.deleteTaskList(listName);  // Call the FirestoreService delete method
+      await _firestoreService.deleteTaskList(listName, userId);  // Call the FirestoreService delete method
       setState(() {
         taskLists.remove(listName);  // Remove the list from the UI after deletion
       });

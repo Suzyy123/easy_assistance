@@ -1,8 +1,7 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:easy_assistance_app/TodoTask_Service/firestore_service.dart';
-// import 'My Work.dart';  // Import the CalendarPage
-
 
 class NotificationPage_Task extends StatelessWidget {
   final FirestoreService firestoreService = FirestoreService();
@@ -11,17 +10,36 @@ class NotificationPage_Task extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final user = FirebaseAuth.instance.currentUser; // Safely get current user
+    final userId = user?.uid;
+
+    if (userId == null) {
+      return Scaffold(
+        appBar: AppBar(
+          backgroundColor: Colors.blue[900],
+          title: const Text('Task Notifications',
+              style: TextStyle(color: Colors.white)),
+        ),
+        body: const Center(
+          child: Text(
+            'User not signed in. Please log in.',
+            style: TextStyle(fontSize: 16, color: Colors.black54),
+          ),
+        ),
+      );
+    }
+
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.blue[900],
-        title: const Text(
-          'Task Notifications',
-          style: TextStyle(color: Colors.white), // Make the title text white
+        title: Text(
+          'Task Notifications', // Show current user's email
+          style: const TextStyle(color: Colors.white),
         ),
         iconTheme: const IconThemeData(color: Colors.white),
       ),
       body: StreamBuilder<List<Map<String, dynamic>>>(
-        stream: firestoreService.getTasks(),
+        stream: firestoreService.getTasks(userId),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
@@ -33,9 +51,10 @@ class NotificationPage_Task extends StatelessWidget {
             );
           }
 
-          // Get tasks and categorize them
+          // Categorize tasks
           final tasks = snapshot.data!;
           final now = DateTime.now();
+
           final overdueTasks = tasks.where((task) {
             final dueDate = _parseDueDate(task['dueDate'], task['dueTime']);
             return dueDate.isBefore(now);
@@ -44,7 +63,7 @@ class NotificationPage_Task extends StatelessWidget {
           final upcomingTasks = tasks.where((task) {
             final dueDate = _parseDueDate(task['dueDate'], task['dueTime']);
             return dueDate.isAfter(now) &&
-                dueDate.difference(now).inDays <= 3; // Adjust range as needed
+                dueDate.difference(now).inDays <= 3;
           }).toList();
 
           return ListView(
@@ -53,20 +72,6 @@ class NotificationPage_Task extends StatelessWidget {
                 _buildTaskSection('Tasks Approaching Due Date', upcomingTasks, now, false),
               if (overdueTasks.isNotEmpty)
                 _buildTaskSection('Overdue Tasks', overdueTasks, now, true),
-
-
-              // Navigate to CalendarPage with filtered tasks
-              // ElevatedButton(
-              //   onPressed: () {
-              //     Navigator.push(
-              //         context,
-              //         MaterialPageRoute(
-              //           builder: (context) => CalendarPage(tasks: tasks),
-              //     ),
-              //     );
-              //   },
-              //   child: Text('Go to Calendar'),
-              // ),
             ],
           );
         },
@@ -74,63 +79,55 @@ class NotificationPage_Task extends StatelessWidget {
     );
   }
 
-
-
   // Helper: Parse due date and time
   DateTime _parseDueDate(String dueDate, String dueTime) {
-    return DateFormat('dd, MMM yyyy hh:mm a').parse('$dueDate $dueTime');
+    try {
+      return DateFormat('dd, MMM yyyy hh:mm a').parse('$dueDate $dueTime');
+    } catch (e) {
+      print('Error parsing date: $e');
+      return DateTime.now();
+    }
   }
 
   // Helper: Build a section for tasks
   Widget _buildTaskSection(String title, List<Map<String, dynamic>> tasks, DateTime now, bool isOverdue) {
-    return SingleChildScrollView(
-      child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              title,
-              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 10),
-            ...tasks.map((task) {
-              final dueDate = _parseDueDate(task['dueDate'], task['dueTime']);
-              final difference = dueDate.difference(now).inDays;
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 16.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            title,
+            style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+          ),
+          const SizedBox(height: 10),
+          ...tasks.map((task) {
+            final dueDate = _parseDueDate(task['dueDate'], task['dueTime']);
+            final difference = dueDate.difference(now).inDays;
 
-              // // If it's overdue, we don't show remaining days
-              // final status = isOverdue
-              //     ? 'Overdue' // Only show "Overdue" for overdue tasks
-              //     : '$difference day(s) remaining'; // Show remaining days for upcoming tasks
-              // If it's overdue, we don't show remaining days
-              String status = '';
-              if (isOverdue) {
-                status = 'Overdue'; // Only show "Overdue" for overdue tasks
-              } else if (difference == 0) {
-                status = 'Today'; // Show "Today" if due date is today
-              } else {
-                status = '$difference day(s) remaining'; // Show remaining days for upcoming tasks
-              }
+            String status = isOverdue
+                ? 'Overdue'
+                : difference == 0
+                ? 'Today'
+                : '$difference day(s) remaining';
 
-              return Card(
-                margin: const EdgeInsets.symmetric(vertical: 5.0),
-                child: ListTile(
-                  title: Text(task['task']),
-                  subtitle: Text('Due: ${task['dueDate']} at ${task['dueTime']}'),
-                  trailing: Text(
-                    status,
-                    style: TextStyle(
-                      color: isOverdue ? Colors.red : Colors.green,
-                      fontWeight: FontWeight.bold,
-                    ),
+            return Card(
+              margin: const EdgeInsets.symmetric(vertical: 5.0),
+              child: ListTile(
+                title: Text(task['task']),
+                subtitle: Text('Due: ${task['dueDate']} at ${task['dueTime']}'),
+                trailing: Text(
+                  status,
+                  style: TextStyle(
+                    color: isOverdue ? Colors.red : Colors.green,
+                    fontWeight: FontWeight.bold,
                   ),
                 ),
-              );
-            }).toList(),
-          ],
-        ),
+              ),
+            );
+          }).toList(),
+        ],
       ),
     );
   }
 }
-

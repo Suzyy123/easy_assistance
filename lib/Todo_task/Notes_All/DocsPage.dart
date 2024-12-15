@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:easy_assistance_app/TodoTask_Service/firestore_service.dart';
-
+import 'package:firebase_auth/firebase_auth.dart';
 import 'All_Notes.dart';
 
 class NotePage extends StatefulWidget {
@@ -14,17 +14,32 @@ class _NotePageState extends State<NotePage> {
   final TextEditingController _contentController = TextEditingController();
 
   // Method to save the note
-  void _saveNote() {
+  Future<void> _saveNote() async {
     final String noteTitle = _titleController.text;
     final String noteContent = _contentController.text;
 
+    //New
+    User? user = FirebaseAuth.instance.currentUser;
+    if(user == null){
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('User not logged in! Please log in to save a note.'),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return;
+    }
+    //new
+    final String userId = user.uid;
     if (noteTitle.isNotEmpty && noteContent.isNotEmpty) {
-      FirestoreService().saveNote(noteContent, noteTitle);
+      await FirestoreService().saveNote(noteContent, noteTitle, userId);
+      // FirestoreService().saveNote(noteContent, noteTitle);
       // Clear the text fields after saving the note
       _titleController.clear();
       _contentController.clear();
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Note saved successfully !'), backgroundColor: Colors.green,),
+        SnackBar(content: Text('Note saved successfully !'),
+          backgroundColor: Colors.green,),
       );
     } else {
       ScaffoldMessenger.of(context).showSnackBar(

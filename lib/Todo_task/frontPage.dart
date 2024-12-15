@@ -2,19 +2,23 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:easy_assistance_app/Todo_task/ListsPgae.dart';
 import 'package:easy_assistance_app/Todo_task/My%20Work.dart';
 import 'package:easy_assistance_app/Todo_task/shopping.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../ChatPage/ChatPageUI.dart';
 import '../Components/icons.dart';
 import '../ProfilePage/ProfileMain.dart';
 import '../TodoTask_Service/TaskNotification/notification_icon.dart';
 import '../TodoTask_Service/meeting notification/IconPAge.dart';
 import 'Assignment.dart';
-import 'Bottom.dart';
+import 'Meeting_All/Meeting.dart';
 import 'Meeting_All/MeetingPage.dart';
 import 'Notes_All/All_Notes.dart';
+import 'Notes_All/DocsPage.dart';
 import 'Tasks_All/CompletedTasks.dart';
 import 'Tasks_All/FavoriteTasks.dart';
 import 'Tasks_All/TaskListPage.dart';
+import 'Tasks_All/createPage.dart';
 import 'default.dart';
 import 'package:easy_assistance_app/TodoTask_Service/firestore_service.dart';
 import 'package:easy_assistance_app/Todo_task/personal.dart'; // Personal page import
@@ -56,7 +60,8 @@ class _TodoHomeScreenState extends State<TodoHomeScreen> {
   List<Map<String, dynamic>> searchResults = [];
   TextEditingController searchController = TextEditingController();
   bool isSearching = false;
-
+  String userId= FirebaseAuth.instance.currentUser!.uid;
+  String? profileAvatar;
   @override
   void initState() {
     super.initState();
@@ -76,39 +81,73 @@ class _TodoHomeScreenState extends State<TodoHomeScreen> {
       });
     }
   }
-
+  //search code
   void searchFirestore(String query) async {
+    // Get the current user's ID
+    final String? userId = FirebaseAuth.instance.currentUser?.uid;
+
+    if (userId == null) {
+      print('User is not logged in.');
+      return;
+    }
+
     List<Map<String, dynamic>> tempResults = [];
 
-    // Search tasks
-    final tasksSnapshot = await FirebaseFirestore.instance
-        .collection('tasks')
-        .where('task', isGreaterThanOrEqualTo: query)
-        .where('task', isLessThanOrEqualTo: query + '\uf8ff')
-        .get();
-    tempResults.addAll(tasksSnapshot.docs.map((doc) => {...doc.data(), 'type': 'task'}));
+    try {
+      // Fetch tasks for the current user
+      final tasksSnapshot = await FirebaseFirestore.instance
+          .collection('tasks')
+          .where('UserId', isEqualTo: userId) // Filter by userId
+          .get();
 
-    // Search meetings
-    final meetingsSnapshot = await FirebaseFirestore.instance
-        .collection('meetings')
-        .where('title', isGreaterThanOrEqualTo: query)
-        .where('title', isLessThanOrEqualTo: query + '\uf8ff')
-        .get();
-    tempResults.addAll(meetingsSnapshot.docs.map((doc) => {...doc.data(), 'type': 'meeting'}));
+      // Filter locally for tasks that match the query
+      final filteredTasks = tasksSnapshot.docs
+          .where((doc) => (doc['task'] ?? '').toString().toLowerCase().contains(query.toLowerCase()))
+          .map((doc) => {...doc.data(), 'type': 'task'});
 
-    // Search notes
-    final notesSnapshot = await FirebaseFirestore.instance
-        .collection('notes')
-        .where('title', isGreaterThanOrEqualTo: query)
-        .where('title', isLessThanOrEqualTo: query + '\uf8ff')
-        .get();
-    tempResults.addAll(notesSnapshot.docs.map((doc) => {...doc.data(), 'type': 'note'}));
+      tempResults.addAll(filteredTasks);
 
-    setState(() => searchResults = tempResults);
+      // Fetch meetings for the current user
+      final meetingsSnapshot = await FirebaseFirestore.instance
+          .collection('meetings')
+          .where('UserId', isEqualTo: userId) // Filter by userId
+          .get();
+
+      // Filter locally for meetings that match the query
+      final filteredMeetings = meetingsSnapshot.docs
+          .where((doc) => (doc['title'] ?? '').toString().toLowerCase().contains(query.toLowerCase()))
+          .map((doc) => {...doc.data(), 'type': 'meeting'});
+
+      tempResults.addAll(filteredMeetings);
+
+      // Fetch notes for the current user
+      final notesSnapshot = await FirebaseFirestore.instance
+          .collection('notes')
+          .where('UserId', isEqualTo: userId) // Filter by userId
+          .get();
+
+      // Filter locally for notes that match the query
+      final filteredNotes = notesSnapshot.docs
+          .where((doc) => (doc['title'] ?? '').toString().toLowerCase().contains(query.toLowerCase()))
+          .map((doc) => {...doc.data(), 'type': 'note'});
+
+      tempResults.addAll(filteredNotes);
+
+      // Update state with results
+      setState(() {
+        searchResults = tempResults;
+      });
+
+      print('Search results: $tempResults');
+    } catch (e) {
+      print('Error searching Firestore: $e');
+    }
   }
 
+
+
   Future<void> _loadTaskCount() async {
-    final tasks = await _firestoreService.getTasks().first;
+    final tasks = await _firestoreService.getTasks(userId).first;
     final now = DateTime.now();
     final upcomingTasks = tasks.where((task) {
       final dueDate = _parseDueDate(task['dueDate'], task['dueTime']);
@@ -167,9 +206,16 @@ class _TodoHomeScreenState extends State<TodoHomeScreen> {
   }
 
   Future<void> _loadTaskLists() async {
-    taskLists = await _firestoreService.getTaskLists();
+    taskLists = await _firestoreService.getTaskLists(userId);
     setState(() {
       isLoading = false;
+    });
+  }
+
+  Future<void> _loadProfileAvatar() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      profileAvatar = prefs.getString('selectedAvatar') ?? 'lib/images/default_avatar.png';
     });
   }
 
@@ -177,9 +223,46 @@ class _TodoHomeScreenState extends State<TodoHomeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        toolbarHeight: 80,
         backgroundColor: Colors.blue[900],
         elevation: 0,
+        leading: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: CircleAvatar(
+            radius: 20,
+            backgroundColor: Colors.grey,
+            backgroundImage: profileAvatar != null
+                ? AssetImage(profileAvatar!)
+                : const AssetImage('lib/images/avatar2.png'),
+          ),
+        ),
+        title: FutureBuilder<DocumentSnapshot>(
+          future: FirebaseFirestore.instance
+              .collection('users')
+              .doc(FirebaseAuth.instance.currentUser?.uid)
+              .get(),
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const Text(
+                "Loading...",
+                style: TextStyle(color: Colors.white), // Loading text in white
+              );
+            }
+            if (!snapshot.hasData || !snapshot.data!.exists) {
+              return const Text(
+                "Unknown User",
+                style: TextStyle(color: Colors.white), // Unknown user text in white
+              );
+            }
+            final userData = snapshot.data!;
+            return Text(
+              userData['username'] ?? 'No Username',
+              style: const TextStyle(
+                color: Colors.white,
+
+              ),
+            );
+          },
+        ),
         flexibleSpace: SafeArea(
           child: Center(
             child: Text(
@@ -193,44 +276,13 @@ class _TodoHomeScreenState extends State<TodoHomeScreen> {
           ),
         ),
         actions: [
-
-          // Second Create Icon
-          IconButton(
-            icon: Icon(Icons.mark_unread_chat_alt_rounded), // Choose appropriate icon
-            color: Colors.white,
-            onPressed: () {
-              // Navigate to the second creation page
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => const ChatPage()),
-              );
-            },
-            tooltip: 'Create Note',
+          Padding(
+            padding: const EdgeInsets.only(right: 20.0),
+            child: MeetingNotificationIcon(), // Add your custom meeting notification icon widget
           ),
-          // Third Create Icon
-          // IconButton(
-          //   icon: Icon(Icons.person), // Choose appropriate icon
-          //   color: Colors.white,
-          //   onPressed: () {
-          //     //Navigate to the third creation page
-          //     Navigator.push(
-          //       context,
-          //       MaterialPageRoute(builder: (context) => const ProfilePage()),
-          //     );
-          //   },
-          //   tooltip: 'Create Event',
-          // ),
-          Row(
-            children: [
-              Padding(
-                padding: const EdgeInsets.only(right: 20.0),
-                child: MeetingNotificationIcon(),  // Call your meeting notification icon here
-              ),
-              Padding(
-                padding: const EdgeInsets.only(right: 20.0),
-                child: NotificationIcon_Task(),  // No need to pass taskCount, it's calculated internally
-              ),
-            ],
+          Padding(
+            padding: const EdgeInsets.only(right: 20.0),
+            child: NotificationIcon_Task(), // Add your custom task notification icon widget
           ),
         ],
       ),
@@ -278,7 +330,6 @@ class _TodoHomeScreenState extends State<TodoHomeScreen> {
                                   decoration: InputDecoration(
                                     hintText: 'Search',
                                     hintStyle: TextStyle(color: Colors.grey),
-                                    border: InputBorder.none,
                                   ),
                                   onChanged: (value) {
                                     if (value.isNotEmpty) {
@@ -512,6 +563,44 @@ class _TodoHomeScreenState extends State<TodoHomeScreen> {
                               ),
                             ),
                           ),
+                          if(!_isDropdownOpened  && !isSearching && !showCalendar)
+                            Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Padding(
+                                    padding: const EdgeInsets.only(right: 300),
+                                    child: IconButton(
+                                      icon: Icon(Icons.create, size: 30,
+                                          color: Colors.blue[900]),
+                                      onPressed: () {
+                                        Navigator.push(context,
+                                            MaterialPageRoute(
+                                                builder: (context) =>
+                                                    Create()));
+                                      },
+                                    ),
+                                  ),
+                                  IconButton(
+                                    icon: Icon(Icons.note_alt_sharp, size: 30,
+                                        color: Colors.blue[900]),
+                                    onPressed: () {
+                                      Navigator.push(context, MaterialPageRoute(
+                                          builder: (context) => NotePage()));
+                                    },
+                                  ),
+                                  IconButton(
+                                    icon: Icon(
+                                        Icons.meeting_room_outlined, size: 30,
+                                        color: Colors.blue[900]),
+                                    onPressed: () {
+                                      Navigator.push(context, MaterialPageRoute(
+                                          builder: (context) =>
+                                              CreateMeetingPage()));
+                                    },
+                                  ),
+                                ]
+                            ),
+
                           SizedBox(height: 15),
                           if (_isDropdownOpened)
                             Container(
@@ -526,6 +615,7 @@ class _TodoHomeScreenState extends State<TodoHomeScreen> {
                                   ),
                                 ],
                               ),
+
                               child: Column(
                                 children: [
                                   Padding(
@@ -618,7 +708,7 @@ class _TodoHomeScreenState extends State<TodoHomeScreen> {
           ),
         ),
       ),
-      bottomNavigationBar: const NavBar(),
+      bottomNavigationBar: const NavigatorBar(),
     );
   }
 }

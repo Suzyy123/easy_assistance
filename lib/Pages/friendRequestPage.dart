@@ -81,10 +81,10 @@ class _FriendRequestPageState extends State<FriendRequestPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.blue[900],
-        title: const Text("Friend Requests", style: TextStyle(color:Colors.white),),
+        backgroundColor: Colors.blue,
+        title: const Text("Friend Requests"),
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.white,),
+          icon: const Icon(Icons.arrow_back),
           onPressed: () {
             Navigator.pop(context); // Go back to the previous screen
           },

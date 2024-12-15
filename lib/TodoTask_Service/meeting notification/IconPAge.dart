@@ -1,4 +1,5 @@
 import 'package:easy_assistance_app/Todo_task/AcceptDenyPage.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:badges/badges.dart' as custom_badge;
 import 'package:intl/intl.dart';
@@ -14,7 +15,10 @@ class MeetingNotificationIcon extends StatefulWidget {
 class _MeetingNotificationIconState extends State<MeetingNotificationIcon> {
   final FirestoreService firestoreService = FirestoreService();
   int meetingCount = 0;
-  String? upcomingMeetingId;  // Variable to store the meetingId of the first upcoming meeting
+  String? upcomingMeetingId;
+  String userId= FirebaseAuth.instance.currentUser!.uid;
+
+// Variable to store the meetingId of the first upcoming meeting
 
 
   @override
@@ -25,7 +29,7 @@ class _MeetingNotificationIconState extends State<MeetingNotificationIcon> {
 
   // Fetch and count upcoming meetings
   void _getMeetingCount() {
-    firestoreService.getMeetings().listen((meetings) {
+    firestoreService.getMeetings(userId).listen((meetings) {
       final now = DateTime.now();
 
       // Filter for upcoming meetings

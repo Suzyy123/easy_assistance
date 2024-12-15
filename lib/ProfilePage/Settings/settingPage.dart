@@ -1,3 +1,4 @@
+import 'package:easy_assistance_app/Todo_task/premium.dart';
 import 'package:flutter/material.dart';
 
 import '../../ChatPage/ChatPageUI.dart';
@@ -74,12 +75,12 @@ class profileSettings extends StatelessWidget {
               leading: const Icon(Icons.star),
               title: const Text('Review and Ratings'),
               onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const ChatPage(), // Replace ChatPage with the actual destination page.
-                  ),
-                );
+                // Navigator.push(
+                //   context,
+                //   MaterialPageRoute(
+                //     builder: (context) => const ChatPage(), // Replace ChatPage with the actual destination page.
+                //   ),
+                //);
               },
             ),
             const SizedBox(height: 15),
@@ -90,7 +91,7 @@ class profileSettings extends StatelessWidget {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => const ChatPage(), // Replace ChatPage with the actual destination page.
+                    builder: (context) => const PremiumPage(), // Replace ChatPage with the actual destination page.
                   ),
                 );
               },
