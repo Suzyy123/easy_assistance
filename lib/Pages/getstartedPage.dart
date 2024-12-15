@@ -17,22 +17,22 @@ class _GetStartedPageState extends State<GetStartedPage> {
     {
       "title": "Welcome to Easy Assistance",
       "description": "Your perfect productivity partner.",
-      "image": "lib/images/avatar1.png",
+      "image": "lib/images/getstart1.jpg",
     },
     {
       "title": "Organize Your Tasks",
       "description": "Manage tasks efficiently and prioritize what matters.",
-      "image": "lib/images/avatar1.png",
+      "image": "lib/images/getstart2.jpg",
     },
     {
       "title": "Collaborate Seamlessly",
       "description": "Chat, share, and work together with ease.",
-      "image": "lib/images/avatar1.png",
+      "image": "lib/images/getstart3.jpg",
     },
     {
       "title": "Track Your Progress",
       "description": "Monitor your goals and achievements.",
-      "image": "lib/images/avatar1.png",
+      "image": "lib/images/getstart4.jpg",
     },
   ];
 

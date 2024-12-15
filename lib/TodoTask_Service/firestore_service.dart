@@ -54,48 +54,26 @@ class FirestoreService {
   // Method to add a new task to both 'tasks' and 'taskLists' collections
   Future<void> addTask(String task, String dueDate, String dueTime, String list, String user) async {
     try {
-      // Step 1: Add task to 'tasks' collection
-      DocumentReference taskRef = await _firestore.collection('tasks').add({
+      // Format dueDate
+      String formattedDueDate = DateFormat('dd, MMM yyyy').format(DateFormat('dd, MMM yyyy').parse(dueDate.trim()));
+
+      // Format dueTime
+      String formattedDueTime = DateFormat('HH:mm').format(DateFormat('HH:mm').parse(dueTime.trim()));
+
+      // Add task to Firestore
+      await _firestore.collection('tasks').add({
         'UserId': user,
         'task': task,
-        'dueDate': dueDate,
-        'dueTime': dueTime,
+        'dueDate': formattedDueDate,
+        'dueTime': formattedDueTime,
         'list': list,
         'created_at': FieldValue.serverTimestamp(),
       });
-
-      // print('Task added successfully');
-
-
-      // Step 2: Check if task list exists in 'taskLists' collection
-      QuerySnapshot taskListSnapshot = await _firestore.collection('taskLists')
-          .where('name', isEqualTo: list)
-          .get();
-
-      if (taskListSnapshot.docs.isEmpty) {
-        // If the task list doesn't exist, create a new one
-        await _firestore.collection('taskLists').add({
-          'name': list,
-          'createdAt': FieldValue.serverTimestamp(),
-        });
-        print('New task list created successfully');
-      } else {
-        // If the task list exists, you may want to update the task list with additional info
-        // For example, you could add a task count or some other field. Here's an example:
-        DocumentSnapshot taskListDoc = taskListSnapshot.docs.first;
-        String taskListId = taskListDoc.id;
-
-        // Optionally, update task list with task count or other metadata
-        await _firestore.collection('taskLists').doc(taskListId).update({
-          'taskCount': FieldValue.increment(1),  // Increment task count
-        });
-        print('Task list updated with new task count');
-      }
-
     } catch (e) {
-      print('Error adding task: $e');
+      throw Exception('Failed to add task: $e');
     }
   }
+
 
   // Method to retrieve tasks from Firestore/ TasksListPAge
   Stream<List<Map<String, dynamic>>> getTasks(String UserId) {

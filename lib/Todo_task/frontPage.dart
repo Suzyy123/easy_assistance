@@ -1,32 +1,31 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:easy_assistance_app/Todo_task/All_Notes.dart';
-import 'package:easy_assistance_app/Todo_task/FavoriteTasks.dart';
 import 'package:easy_assistance_app/Todo_task/ListsPgae.dart';
-import 'package:easy_assistance_app/Todo_task/Meeting.dart';
 import 'package:easy_assistance_app/Todo_task/My%20Work.dart';
-import 'package:easy_assistance_app/Todo_task/TaskListPage.dart';
 import 'package:easy_assistance_app/Todo_task/shopping.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../ChatPage/ChatPageUI.dart';
 import '../Components/icons.dart';
 import '../ProfilePage/ProfileMain.dart';
 import '../TodoTask_Service/TaskNotification/notification_icon.dart';
 import '../TodoTask_Service/meeting notification/IconPAge.dart';
 import 'Assignment.dart';
-import 'Bottom.dart';
-import 'DocsPage.dart';
-import 'MeetingPage.dart';
-import 'createPage.dart';
+import 'Meeting_All/Meeting.dart';
+import 'Meeting_All/MeetingPage.dart';
+import 'Notes_All/All_Notes.dart';
+import 'Notes_All/DocsPage.dart';
+import 'Tasks_All/CompletedTasks.dart';
+import 'Tasks_All/FavoriteTasks.dart';
+import 'Tasks_All/TaskListPage.dart';
+import 'Tasks_All/createPage.dart';
 import 'default.dart';
 import 'package:easy_assistance_app/TodoTask_Service/firestore_service.dart';
 import 'package:easy_assistance_app/Todo_task/personal.dart'; // Personal page import
-import 'package:easy_assistance_app/Todo_task/notification_icon.dart'; // Import NotificationIcon
 import 'package:intl/intl.dart'; // Ensure this is imported for DateFormat
-import 'CompletedTasks.dart';
 import 'calendarScreen.dart';
 import 'package:easy_assistance_app/TodoTask_Service/firestore_service.dart' as taskFirestore;
-import 'package:easy_assistance_app/Todo_task/Meeting.dart' as meetingFirestore;
+
 
 
 class TodoApp extends StatelessWidget {
@@ -62,7 +61,7 @@ class _TodoHomeScreenState extends State<TodoHomeScreen> {
   TextEditingController searchController = TextEditingController();
   bool isSearching = false;
   String userId= FirebaseAuth.instance.currentUser!.uid;
-
+  String? profileAvatar;
   @override
   void initState() {
     super.initState();
@@ -213,13 +212,57 @@ class _TodoHomeScreenState extends State<TodoHomeScreen> {
     });
   }
 
+  Future<void> _loadProfileAvatar() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      profileAvatar = prefs.getString('selectedAvatar') ?? 'lib/images/default_avatar.png';
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        toolbarHeight: 80,
         backgroundColor: Colors.blue[900],
         elevation: 0,
+        leading: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: CircleAvatar(
+            radius: 20,
+            backgroundColor: Colors.grey,
+            backgroundImage: profileAvatar != null
+                ? AssetImage(profileAvatar!)
+                : const AssetImage('lib/images/avatar2.png'),
+          ),
+        ),
+        title: FutureBuilder<DocumentSnapshot>(
+          future: FirebaseFirestore.instance
+              .collection('users')
+              .doc(FirebaseAuth.instance.currentUser?.uid)
+              .get(),
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const Text(
+                "Loading...",
+                style: TextStyle(color: Colors.white), // Loading text in white
+              );
+            }
+            if (!snapshot.hasData || !snapshot.data!.exists) {
+              return const Text(
+                "Unknown User",
+                style: TextStyle(color: Colors.white), // Unknown user text in white
+              );
+            }
+            final userData = snapshot.data!;
+            return Text(
+              userData['username'] ?? 'No Username',
+              style: const TextStyle(
+                color: Colors.white,
+
+              ),
+            );
+          },
+        ),
         flexibleSpace: SafeArea(
           child: Center(
             child: Text(
@@ -242,34 +285,6 @@ class _TodoHomeScreenState extends State<TodoHomeScreen> {
             child: NotificationIcon_Task(), // Add your custom task notification icon widget
           ),
         ],
-        // actions: [
-        //   Padding(
-        //     padding: const EdgeInsets.only(right: 16.0),
-        //     child: StreamBuilder<List<Map<String, dynamic>>>(
-        //       stream: _firestoreService.getTasks(userId),
-        //       builder: (context, snapshot) {
-        //         if (snapshot.connectionState == ConnectionState.waiting) {
-        //           return CircularProgressIndicator();
-        //         }
-        //         if (!snapshot.hasData || snapshot.data!.isEmpty) {
-        //           return NotificationIcon(taskCount: 0);  // No tasks to display
-        //         }
-        //         final tasks = snapshot.data!;
-        //         final now = DateTime.now();
-        //
-        //         // Filter tasks due within the next 3 days
-        //         final upcomingTasks = tasks.where((task) {
-        //           final dueDate = _parseDueDate(task['dueDate'], task['dueTime']);
-        //           return dueDate.isAfter(now) && dueDate.difference(now).inDays <= 3;
-        //         }).toList();
-        //
-        //         // Update the task count in NotificationIcon
-        //         return NotificationIcon(taskCount: upcomingTasks.length);
-        //       },
-        //     ),
-        //   ),
-        // ],
-
       ),
 
       body: SafeArea(
@@ -315,7 +330,6 @@ class _TodoHomeScreenState extends State<TodoHomeScreen> {
                                   decoration: InputDecoration(
                                     hintText: 'Search',
                                     hintStyle: TextStyle(color: Colors.grey),
-                                    border: InputBorder.none,
                                   ),
                                   onChanged: (value) {
                                     if (value.isNotEmpty) {

@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:easy_assistance_app/TodoTask_Service/firestore_service.dart';
-import 'package:firebase_auth/firebase_auth.dart'; // Import Firebase Auth
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:intl/intl.dart';
 import 'TaskListPage.dart';
-
-
 
 class Create extends StatefulWidget {
   const Create({super.key});
@@ -18,12 +17,9 @@ class _CreateState extends State<Create> {
   final TextEditingController _timeController = TextEditingController();
   final FirestoreService _firestoreService = FirestoreService();
   final TextEditingController _newListController = TextEditingController();
-  String userId= FirebaseAuth.instance.currentUser!.uid;
+  String userId = FirebaseAuth.instance.currentUser!.uid;
   String _selectedList = 'Default';
   List<String> _lists = ['Default', 'Work', 'Personal', 'Urgent', 'Shopping'];
-
-
-
 
   @override
   void initState() {
@@ -32,16 +28,23 @@ class _CreateState extends State<Create> {
   }
 
   Future<void> _loadTaskLists() async {
-    List<String> taskLists = await _firestoreService.getTaskLists(userId);
-    setState(() {
-      _lists = ['Default'] + taskLists;
-      _lists = _lists.toSet().toList(); // Remove duplicates
-      if (!_lists.contains(_selectedList)) {
-        _selectedList = 'Default'; // Ensure default value is valid
-      }
-    });
+    try {
+      List<String> taskLists = await _firestoreService.getTaskLists(userId);
+      setState(() {
+        _lists = ['Default', 'Work', 'Personal', 'Urgent', 'Shopping'];
+        _lists.addAll(taskLists.map((list) => list.trim()));
+        _lists = _lists.toSet().toList();
+        if (!_lists.contains(_selectedList)) {
+          _selectedList = 'Default';
+        }
+      });
+    } catch (e) {
+      debugPrint('Error loading task lists: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Failed to load task lists!"), backgroundColor: Colors.red),
+      );
+    }
   }
-
 
   void _showAddListDialog() {
     showDialog(
@@ -68,7 +71,7 @@ class _CreateState extends State<Create> {
               onPressed: () async {
                 if (_newListController.text.isNotEmpty) {
                   await _firestoreService.addNewTaskList(_newListController.text, userId);
-                  await _loadTaskLists(); // Reload lists to include the new one
+                  await _loadTaskLists();
                   setState(() {
                     _selectedList = _newListController.text;
                   });
@@ -85,32 +88,23 @@ class _CreateState extends State<Create> {
   }
 
   void _deleteList(String listName) async {
-    // Delete the list from Firestore
-    // await _firestoreService.deleteTaskList(listName); // Delete from Firestore
-    //
-    // // Remove the list from the local list immediately
-    // setState(() {
-    //   _lists.remove(listName); // Remove from the local list
-    //   if (_selectedList == listName) {
-    //     _selectedList = 'Default'; // Reset selected list if deleted
-    //   }
-    // });
-    await _firestoreService.addTask(
-      _taskController.text,
-      _dateController.text,
-      _timeController.text,
-      _selectedList,
-      userId
-    );
-
-
-    // Close the dropdown menu programmatically
-    Navigator.of(context).pop(); // Close the dropdown menu
-
-    // Show a SnackBar with a confirmation message
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text("List '$listName' deleted successfully !"), backgroundColor: Colors.green,),
-    );
+    try {
+      await _firestoreService.deleteTaskList(listName, userId);
+      setState(() {
+        _lists.remove(listName);
+        if (_selectedList == listName) {
+          _selectedList = 'Default';
+        }
+      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("List '$listName' deleted successfully!"), backgroundColor: Colors.green),
+      );
+    } catch (e) {
+      debugPrint('Error deleting list: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Failed to delete list!"), backgroundColor: Colors.red),
+      );
+    }
   }
 
   Future<void> _pickDate() async {
@@ -124,7 +118,7 @@ class _CreateState extends State<Create> {
 
     if (pickedDate != null) {
       setState(() {
-        _dateController.text = '${pickedDate.day}, ${_getMonthName(pickedDate.month)} ${pickedDate.year}';
+        _dateController.text = DateFormat('dd, MMM yyyy').format(pickedDate);
       });
     }
   }
@@ -137,18 +131,18 @@ class _CreateState extends State<Create> {
     );
 
     if (pickedTime != null) {
+      final now = DateTime.now();
+      final pickedDateTime = DateTime(
+        now.year,
+        now.month,
+        now.day,
+        pickedTime.hour,
+        pickedTime.minute,
+      );
       setState(() {
-        _timeController.text = '${pickedTime.format(context)}';
+        _timeController.text = DateFormat('HH:mm').format(pickedDateTime);
       });
     }
-  }
-
-  String _getMonthName(int month) {
-    List<String> monthNames = [
-      'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-      'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
-    ];
-    return monthNames[month - 1];
   }
 
   void _clearFields() {
@@ -199,7 +193,7 @@ class _CreateState extends State<Create> {
               TextField(
                 controller: _taskController,
                 decoration: InputDecoration(
-                  suffixIcon: Icon(Icons.calendar_today),
+                  suffixIcon: Icon(Icons.task),
                   border: OutlineInputBorder(),
                   hintText: 'Enter task',
                   hintStyle: TextStyle(color: Colors.grey),
@@ -253,37 +247,36 @@ class _CreateState extends State<Create> {
               ),
               SizedBox(height: 8),
               Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Expanded(
-                      child: DropdownButton<String>(
-                        value: _lists.contains(_selectedList) ? _selectedList : null,
-                        onChanged: (String? newValue) {
-                          setState(() {
-                            _selectedList = newValue!;
-                          });
-                        },
-                        items: _lists.map<DropdownMenuItem<String>>((String value) {
-                          return DropdownMenuItem<String>(
-                            value: value,
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Text(value),
-                                if (value != 'Default')
-                                  IconButton(
-                                    icon: Icon(Icons.delete, size: 20, color: Colors.black),
-                                    onPressed: () {
-                                      _deleteList(value);
-                                    },
-                                  ),
-                              ],
-                            ),
-                          );
-                        }).toList(),
-                        isExpanded: true,
-                        hint: Text('Select a list'),
-                      )
+                    child: DropdownButton<String>(
+                      value: _lists.contains(_selectedList) ? _selectedList : null,
+                      onChanged: (String? newValue) {
+                        setState(() {
+                          _selectedList = newValue!;
+                        });
+                      },
+                      items: _lists.map<DropdownMenuItem<String>>((String value) {
+                        return DropdownMenuItem<String>(
+                          value: value,
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(value),
+                              if (value != 'Default')
+                                IconButton(
+                                  icon: Icon(Icons.delete, size: 20, color: Colors.black),
+                                  onPressed: () {
+                                    _deleteList(value);
+                                  },
+                                ),
+                            ],
+                          ),
+                        );
+                      }).toList(),
+                      isExpanded: true,
+                      hint: Text('Select a list'),
+                    ),
                   ),
                   IconButton(
                     icon: Icon(Icons.add, color: Colors.blue, size: 30),
@@ -297,68 +290,48 @@ class _CreateState extends State<Create> {
                 children: [
                   ElevatedButton(
                     onPressed: () async {
-                      if (_taskController.text.isNotEmpty
-                          && _dateController.text.isNotEmpty &&
+                      if (_taskController.text.isNotEmpty &&
+                          _dateController.text.isNotEmpty &&
                           _timeController.text.isNotEmpty) {
                         try {
-                          String user= FirebaseAuth.instance.currentUser!.uid;
                           await _firestoreService.addTask(
                             _taskController.text,
                             _dateController.text,
                             _timeController.text,
                             _selectedList,
-
-                            user, //passing user id
+                            userId,
                           );
-
                           _clearFields();
-
                           ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(content: Text('Task added successfully !'), backgroundColor: Colors.green,),
+                            SnackBar(content: Text('Task added successfully!'), backgroundColor: Colors.green),
                           );
-                          // Navigate to TaskListPage
                           Navigator.pushReplacement(
                             context,
                             MaterialPageRoute(builder: (context) => TaskListPage()),
                           );
                         } catch (e) {
-                          print('Error adding task: $e');
-
+                          debugPrint('Error adding task: $e');
                           ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(content: Text('Failed to add task !')),
+                            SnackBar(content: Text('Failed to add task!')),
                           );
                         }
                       } else {
                         ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text('Please fill in all fields !', style: TextStyle(color: Colors.black),), backgroundColor: Colors.yellow[600],),
+                          SnackBar(content: Text('Please fill in all fields!'), backgroundColor: Colors.yellow[600]),
                         );
                       }
                     },
-                    child: Text('Add', style: TextStyle(color: Colors.white),),
+                    child: Text('Add', style: TextStyle(color: Colors.white)),
                     style: ElevatedButton.styleFrom(
-                      padding: EdgeInsets.symmetric(vertical: 14, horizontal: 20),
                       backgroundColor: Colors.blue[900],
                       textStyle: TextStyle(fontSize: 20),
                     ),
                   ),
-
-                  // IconButton(
-                  //   icon: Icon(Icons.notifications, color: Colors.blue, size: 30),
-                  //   onPressed: () {
-                  //     // Navigate to the NotificationPage
-                  //     Navigator.push(
-                  //       context,
-                  //       MaterialPageRoute(builder: (context) => NotificationPage()),
-                  //     );
-                  //   },
-                  // ),
-
                   SizedBox(width: 16),
                   ElevatedButton(
                     onPressed: _clearFields,
-                    child: Text('Clear', style: TextStyle(color: Colors.white),),
+                    child: Text('Clear', style: TextStyle(color: Colors.white)),
                     style: ElevatedButton.styleFrom(
-                      padding: EdgeInsets.symmetric(vertical: 14, horizontal: 20),
                       backgroundColor: Colors.blue[900],
                       textStyle: TextStyle(fontSize: 20),
                     ),

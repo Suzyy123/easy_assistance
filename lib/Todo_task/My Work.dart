@@ -15,8 +15,9 @@ class _CalendarPageState extends State<CalendarPage> {
   DateTime _currentDate = DateTime.now();
   List<int> _daysInMonth = [];
   List<Map<String, dynamic>> _tasksForSelectedDate = [];
-  DateTime? _selectedDate; // Track the selected date
+  DateTime? _selectedDate;
   String userId= FirebaseAuth.instance.currentUser!.uid;
+
 
   @override
   void initState() {
@@ -44,13 +45,24 @@ class _CalendarPageState extends State<CalendarPage> {
     setState(() {
       _selectedDate = selectedDate; // Update the selected date
       _tasksForSelectedDate = tasks.where((task) {
-        final dueDate = DateFormat('dd, MMM yyyy').parse(task['dueDate']);
-        return dueDate.year == selectedDate.year &&
-            dueDate.month == selectedDate.month &&
-            dueDate.day == selectedDate.day;
+        final dueDateStr = task['dueDate'];
+        if (dueDateStr == null || dueDateStr.isEmpty) {
+          return false; // Skip tasks with invalid or empty due dates
+        }
+        try {
+          final dueDate = DateFormat('dd, MMM yyyy').parse(dueDateStr);
+          return dueDate.year == selectedDate.year &&
+              dueDate.month == selectedDate.month &&
+              dueDate.day == selectedDate.day;
+        } catch (e) {
+          // Log the error or handle it gracefully
+          debugPrint('Error parsing date: $dueDateStr, Error: $e');
+          return false;
+        }
       }).toList();
     });
   }
+
 
   // Helper method to calculate the task status
   String _getTaskStatus(DateTime dueDate) {
@@ -184,28 +196,28 @@ class _CalendarPageState extends State<CalendarPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Calendar', style: TextStyle(color: Colors.white)),
-        backgroundColor: Colors.blue[800],
-      ),
-      body: StreamBuilder<List<Map<String, dynamic>>>(
-        stream: firestoreService.getTasks(userId),
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
-          }
+        appBar: AppBar(
+          title: Text('Calendar', style: TextStyle(color: Colors.white)),
+          backgroundColor: Colors.blue[800],
+        ),
+        body: StreamBuilder<List<Map<String, dynamic>>>(
+            stream: firestoreService.getTasks(userId),
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return const Center(child: CircularProgressIndicator());
+              }
 
-          if (!snapshot.hasData || snapshot.data!.isEmpty) {
-            return const Center(
-              child: Text('No tasks to display.'),
-            );
-          }
+              if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                return const Center(
+                  child: Text('No tasks to display.'),
+                );
+              }
 
-          final tasks = snapshot.data!;
+              final tasks = snapshot.data!;
 
-          return Center(child: _buildCalendar(tasks));
-        },
-      ),
-    );
+              return Center(child: _buildCalendar(tasks));
+            },
+        ),
+        );
   }
 }
